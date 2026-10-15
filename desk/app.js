@@ -6,9 +6,9 @@
 'use strict';
 
 // ---------------------------------------------------------------------------------------------------------------------------------
-// configuration. The anon key is public by design: it can do nothing the row level security does not allow a signed-in member to do.
+// configuration. The publishable key (sb_publishable_, replaces the legacy anon JWT) is public by design: it can do nothing the row level security does not allow a signed-in member to do.
 var SUPABASE_URL = 'https://tdwnsfkdtveonleolizj.supabase.co';
-var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd25zZmtkdHZlb25sZW9saXpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNzg0NDgsImV4cCI6MjEwNzY1NDQ0OH0.bBpaCy6BDH2RWgnJxK2fIEort0loWDo3ZbwTLl89ByQ';
+var SUPABASE_PUBLISHABLE = 'sb_publishable_jZf7mu9RH6tCUz_tk_KP0Q__F7LZn5b';
 var SDK = {
   integrity: 'sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok',
   urls: ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js',
@@ -1413,7 +1413,7 @@ async function boot() {
   showSplash();
   var problem = urlProblem();
   try { await loadSdk(); } catch (e) { fatal('The sign-in library did not load. Check your connection and try again.'); return; }
-  S.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  S.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE, {
     db: { schema: 'acquiro' },
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit', storageKey: 'acquiro-desk-auth' }
   });
