@@ -180,7 +180,15 @@ select {
 input:hover, select:hover, textarea:hover { border-color: var(--ink); }
 input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; border-color: var(--coral); }
 [aria-invalid="true"] { border-color: var(--error); box-shadow: 0 0 0 1px var(--error); }
-.lot-row { display: grid; grid-template-columns: minmax(0, 1fr) 112px; gap: 8px; }
+.more { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); }
+.more summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: var(--tap); cursor: pointer;
+  font: 500 .75rem/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--coral-text); list-style: none;
+}
+.more summary::-webkit-details-marker { display: none; }
+.more summary::after { content: ""; width: 12px; height: 8px; background: var(--chevron) no-repeat center / 12px 8px; transition: transform .3s var(--ease); }
+.more[open] summary::after { transform: rotate(180deg); }
+.more-note { margin: 4px 0 20px; }
 .size-meter { font-size: .875rem; color: var(--muted); }
 .size-meter.over { color: var(--error); font-weight: 500; }
 
@@ -250,11 +258,12 @@ h1 { animation: settle .8s var(--ease) both; }
 
     <section class="intro" aria-labelledby="page-title">
       <p class="eyebrow">Send a deal</p>
-      <h1 id="page-title">Send a deal. Get <em>real numbers</em>.</h1>
-      <p class="lead">Tell us about a lot or teardown. This page writes the deal out as an email for you to send from your own mail app.</p>
+      <h1 id="page-title">Two things and <em>we do the rest.</em></h1>
+      <p class="lead">Send the address and the asking price. The desk finds the lot size, zoning, flood, trees and comps itself, and you hear back with real numbers. This page writes the deal out as an email for you to send from your own mail app.</p>
+      <p class="lead" style="margin-top:12px">Prefer a text? Text the deal to <a href="sms:+15128661988">(512) 866-1988</a>.</p>
       <span class="chip">City of Austin lots and teardowns</span>
       <ol class="steps">
-        <li><strong>Fill in the form.</strong> Address, ZIP, asking price and your contact details are required.</li>
+        <li><strong>Type two things.</strong> The street address with its ZIP, and the asking price.</li>
         <li><strong>Your email app opens.</strong> The deal is already written out, one line per field.</li>
         <li><strong>You press send.</strong> Nothing goes out until you do.</li>
       </ol>
@@ -264,22 +273,17 @@ h1 { animation: settle .8s var(--ease) both; }
       <section class="card" aria-labelledby="form-title">
         <h2 id="form-title" class="eyebrow" style="font-weight:500">The deal</h2>
         <p class="req-note" style="margin-top:12px"><span aria-hidden="true">*</span> Required</p>
-        <noscript><p class="noscript">This form needs JavaScript to write your email. Without it, email prashant+deals@avivo.homes with the address, ZIP and asking price.</p></noscript>
+        <noscript><p class="noscript">This form needs JavaScript to write your email. Without it, email prashant+deals@avivo.homes or text (512) 866-1988 with the address, ZIP and asking price.</p></noscript>
 
         <form id="form" method="post" novalidate>
           <fieldset>
-            <legend>The property</legend>
+            <legend>The two things</legend>
             <div class="grid two">
               <div class="field">
-                <label for="address">Street address <span class="req" aria-hidden="true">*</span></label>
-                <input id="address" name="address" type="text" required aria-required="true" maxlength="120" autocomplete="off" autocapitalize="words" enterkeyhint="next" placeholder="1204 Example St" aria-describedby="h-address e-address">
-                <p class="hint" id="h-address">Street number and name.</p>
+                <label for="address">Property address and ZIP <span class="req" aria-hidden="true">*</span></label>
+                <input id="address" name="address" type="text" required aria-required="true" maxlength="140" autocomplete="off" autocapitalize="words" enterkeyhint="next" placeholder="1204 Example St, 78704" aria-describedby="h-address e-address">
+                <p class="hint" id="h-address">Street number and name, then the 5-digit ZIP.</p>
                 <p class="err" id="e-address" hidden></p>
-              </div>
-              <div class="field">
-                <label for="zip">ZIP <span class="req" aria-hidden="true">*</span></label>
-                <input id="zip" name="zip" type="text" inputmode="numeric" required aria-required="true" maxlength="10" autocomplete="off" enterkeyhint="next" placeholder="78704" aria-describedby="e-zip">
-                <p class="err" id="e-zip" hidden></p>
               </div>
               <div class="field">
                 <label for="ask">Asking price <span class="req" aria-hidden="true">*</span></label>
@@ -287,85 +291,79 @@ h1 { animation: settle .8s var(--ease) both; }
                 <p class="hint" id="h-ask">Whole dollars. 650000 or 650k both work.</p>
                 <p class="err" id="e-ask" hidden></p>
               </div>
-              <div class="field">
-                <label for="lot_size">Lot size</label>
-                <div class="lot-row">
-                  <input id="lot_size" name="lot_size" type="text" inputmode="decimal" maxlength="12" autocomplete="off" enterkeyhint="next" placeholder="7,500" aria-describedby="h-lot e-lot_size">
-                  <select id="lot_unit" name="lot_unit" aria-label="Lot size unit">
-                    <option value="sf" selected>sq ft</option>
-                    <option value="acres">acres</option>
-                  </select>
-                </div>
-                <p class="hint" id="h-lot">Optional. We look it up too.</p>
-                <p class="err" id="e-lot_size" hidden></p>
-              </div>
-              <div class="field span-all">
-                <label for="arv">Your ARV (after-repair value)</label>
-                <input id="arv" name="arv" type="text" inputmode="decimal" maxlength="16" autocomplete="off" enterkeyhint="next" placeholder="1,250,000" aria-describedby="h-arv e-arv">
-                <p class="hint" id="h-arv">Optional. We keep it as your claim and screen on our own comps.</p>
-                <p class="err" id="e-arv" hidden></p>
-              </div>
             </div>
           </fieldset>
 
           <fieldset>
-            <legend>The existing house</legend>
-            <div class="grid three">
-              <div class="field">
-                <label for="beds">Beds</label>
-                <input id="beds" name="beds" type="text" inputmode="numeric" maxlength="2" autocomplete="off" enterkeyhint="next" placeholder="3" aria-describedby="e-beds">
-                <p class="err" id="e-beds" hidden></p>
-              </div>
-              <div class="field">
-                <label for="baths">Baths</label>
-                <input id="baths" name="baths" type="text" inputmode="decimal" maxlength="4" autocomplete="off" enterkeyhint="next" placeholder="2" aria-describedby="e-baths">
-                <p class="err" id="e-baths" hidden></p>
-              </div>
-              <div class="field">
-                <label for="existing_sf">House sq ft</label>
-                <input id="existing_sf" name="existing_sf" type="text" inputmode="numeric" maxlength="7" autocomplete="off" enterkeyhint="next" placeholder="1,450" aria-describedby="e-existing_sf">
-                <p class="err" id="e-existing_sf" hidden></p>
-              </div>
-            </div>
-            <p class="hint" style="margin-top:12px">Optional. Skip these for a vacant lot.</p>
-          </fieldset>
-
-          <fieldset>
-            <legend>The listing</legend>
+            <legend>How to reach you</legend>
             <div class="field">
-              <label for="listing_url">Link to flyer or listing</label>
-              <input id="listing_url" name="listing_url" type="url" inputmode="url" maxlength="300" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="next" placeholder="https://" aria-describedby="e-listing_url">
-              <p class="err" id="e-listing_url" hidden></p>
+              <label for="contact">Email or phone</label>
+              <input id="contact" name="contact" type="text" maxlength="120" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" aria-describedby="h-contact e-contact">
+              <p class="hint" id="h-contact">Optional. We answer the email you send from. Add a phone or another address here if you want it used.</p>
+              <p class="err" id="e-contact" hidden></p>
             </div>
           </fieldset>
 
-          <fieldset>
-            <legend>You</legend>
+          <details class="more" id="more">
+            <summary>If you have it</summary>
+            <p class="hint more-note">All optional. Skip every one of these and we still run the deal.</p>
             <div class="grid two">
               <div class="field">
-                <label for="agent_name">Your name <span class="req" aria-hidden="true">*</span></label>
-                <input id="agent_name" name="agent_name" type="text" required aria-required="true" maxlength="80" autocomplete="name" enterkeyhint="next" aria-describedby="e-agent_name">
+                <label for="listed">Listed or pocket</label>
+                <select id="listed" name="listed">
+                  <option value="" selected>Not sure</option>
+                  <option value="listed">Listed on the MLS</option>
+                  <option value="pocket">Pocket listing</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="structure">Existing structure</label>
+                <select id="structure" name="structure">
+                  <option value="" selected>Not sure</option>
+                  <option value="vacant">Vacant lot</option>
+                  <option value="demo">House on it, demo needed</option>
+                  <option value="keep">House on it, no demo</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="survey">Survey or plans on hand</label>
+                <select id="survey" name="survey">
+                  <option value="" selected>None or not sure</option>
+                  <option value="survey">Survey</option>
+                  <option value="plans">Plans</option>
+                  <option value="both">Survey and plans</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="timeline">Seller timeline</label>
+                <input id="timeline" name="timeline" type="text" maxlength="80" autocomplete="off" enterkeyhint="next" placeholder="Wants to close in 30 days" aria-describedby="e-timeline">
+                <p class="err" id="e-timeline" hidden></p>
+              </div>
+              <div class="field">
+                <label for="arv">Your ARV (after-repair value)</label>
+                <input id="arv" name="arv" type="text" inputmode="decimal" maxlength="16" autocomplete="off" enterkeyhint="next" placeholder="1,250,000" aria-describedby="h-arv e-arv">
+                <p class="hint" id="h-arv">We keep it as your claim and screen on our own comps.</p>
+                <p class="err" id="e-arv" hidden></p>
+              </div>
+              <div class="field">
+                <label for="agent_name">Your name</label>
+                <input id="agent_name" name="agent_name" type="text" maxlength="80" autocomplete="name" enterkeyhint="next" aria-describedby="e-agent_name">
                 <p class="err" id="e-agent_name" hidden></p>
               </div>
-              <div class="field">
-                <label for="agent_email">Your email <span class="req" aria-hidden="true">*</span></label>
-                <input id="agent_email" name="agent_email" type="email" inputmode="email" required aria-required="true" maxlength="120" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" aria-describedby="e-agent_email">
-                <p class="err" id="e-agent_email" hidden></p>
+              <div class="field span-all">
+                <label for="listing_url">Link to flyer or listing</label>
+                <input id="listing_url" name="listing_url" type="url" inputmode="url" maxlength="300" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="next" placeholder="https://" aria-describedby="e-listing_url">
+                <p class="err" id="e-listing_url" hidden></p>
               </div>
-              <div class="field">
-                <label for="agent_phone">Your phone</label>
-                <input id="agent_phone" name="agent_phone" type="tel" inputmode="tel" maxlength="30" autocomplete="tel" enterkeyhint="next" aria-describedby="e-agent_phone">
-                <p class="err" id="e-agent_phone" hidden></p>
+              <div class="field span-all">
+                <label for="notes">Anything else</label>
+                <textarea id="notes" name="notes" maxlength="600" rows="4" aria-describedby="h-notes size-meter e-notes"></textarea>
+                <p class="hint" id="h-notes">Access, what you have heard, anything the seller said.</p>
+                <p class="size-meter" id="size-meter" hidden></p>
+                <p class="err" id="e-notes" hidden></p>
               </div>
             </div>
-            <div class="field" style="margin-top:20px">
-              <label for="notes">Notes</label>
-              <textarea id="notes" name="notes" maxlength="600" rows="4" aria-describedby="h-notes size-meter e-notes"></textarea>
-              <p class="hint" id="h-notes">Optional. Seller timing, access, anything you have heard.</p>
-              <p class="size-meter" id="size-meter" hidden></p>
-              <p class="err" id="e-notes" hidden></p>
-            </div>
-          </fieldset>
+          </details>
 
           <div class="actions">
             <p class="form-error" id="form-error" role="alert" hidden></p>
@@ -378,7 +376,7 @@ h1 { animation: settle .8s var(--ease) both; }
       <section class="card review" id="review" aria-labelledby="review-title" tabindex="-1" hidden>
         <p class="eyebrow">Your email</p>
         <h2 id="review-title">Ready to <em>send</em></h2>
-        <p class="copy">Your email app should be opening with this message. Check it, then press send there. If nothing opened, copy the text below and email it to the address shown.</p>
+        <p class="copy">Your email app should be opening with this message. Check it, then press send there. If nothing opened, copy the text below and email it to the address shown, or text it to (512) 866-1988.</p>
         <dl class="meta">
           <dt>To</dt><dd id="r-to">prashant+deals@avivo.homes</dd>
           <dt>Subject</dt><dd id="r-subject"></dd>
@@ -410,7 +408,8 @@ h1 { animation: settle .8s var(--ease) both; }
   var WARN_ENCODED = 1400;         // show the size note from here
   var NL = '\r\n';                 // RFC 6068 line break inside mailto bodies
   var MIN_PRICE = 10000, MAX_PRICE = 100000000;
-  var CONTROLS = ['address', 'zip', 'ask', 'lot_size', 'arv', 'beds', 'baths', 'existing_sf', 'listing_url', 'agent_name', 'agent_email', 'agent_phone', 'notes'];
+  var CONTROLS = ['address', 'ask', 'contact', 'arv', 'agent_name', 'listing_url', 'timeline', 'notes'];
+  var IN_MORE = ['arv', 'agent_name', 'listing_url', 'timeline', 'notes'];     // inside the collapsed "If you have it"
 
   var form = document.getElementById('form');
   var attempted = false;
@@ -445,44 +444,18 @@ h1 { animation: settle .8s var(--ease) both; }
       out[label] = '$' + fmtInt(n);
     }
 
-    var address = val('address');
-    if (address.length < 5) { fail('address', 'Enter the street address.'); }
-    out['Address'] = address;
-
-    var zip = val('zip'), zm = /^(\d{5})(?:-\d{4})?$/.exec(zip);
-    if (!zm) { fail('zip', 'Enter a 5-digit ZIP code.'); }
-    out['ZIP'] = zm ? zm[1] : zip;
+    // One field holds the street and the ZIP: the ZIP is the last 5 digits (an optional ", TX" before it is dropped).
+    var addrRaw = val('address'), am = /^(.*?)[\s,]*(?:\b(?:TX|Texas)\b\.?[\s,]*)?(\d{5})(?:-\d{4})?$/i.exec(addrRaw);
+    var street = am ? clean(am[1]).replace(/[\s,]+$/, '') : '';
+    if (!am || street.length < 3 || !/[A-Za-z]/.test(street)) {
+      fail('address', 'Enter the street address, then the 5-digit ZIP, like 1204 Example St, 78704.');
+      out['Address'] = addrRaw; out['ZIP'] = '';
+    } else { out['Address'] = street; out['ZIP'] = am[2]; }
 
     money('ask', 'Ask', true, 'the asking price');
-
-    var lotRaw = val('lot_size'), unit = $('lot_unit').value;
-    if (!lotRaw) { out['Lot size'] = ''; }
-    else {
-      var lot = parseNum(lotRaw);
-      var lo = unit === 'acres' ? 0.01 : 500, hi = unit === 'acres' ? 50 : 2000000;
-      if (isNaN(lot)) { fail('lot_size', 'Enter the lot size as a number, like 7500.'); out['Lot size'] = lotRaw; }
-      else if (lot < lo || lot > hi) { fail('lot_size', 'Check the lot size and unit.'); out['Lot size'] = lotRaw; }
-      else if (unit === 'acres') { var ac = String(parseFloat(lot.toFixed(3))); out['Lot size'] = ac + (ac === '1' ? ' acre' : ' acres'); }
-      else { out['Lot size'] = fmtInt(lot) + ' sf'; }
-    }
-
+    out['Lot size'] = '';            // the desk finds the lot, the zoning and the house itself
     money('arv', 'Claimed ARV', false, 'your ARV');
-
-    var sfRaw = val('existing_sf');
-    if (!sfRaw) { out['Existing sf'] = ''; }
-    else {
-      var sf = parseNum(sfRaw);
-      if (isNaN(sf) || sf < 100 || sf > 50000) { fail('existing_sf', 'Enter square feet as a number, like 1450.'); out['Existing sf'] = sfRaw; }
-      else { out['Existing sf'] = fmtInt(sf); }
-    }
-
-    var bedsRaw = val('beds'), bathsRaw = val('baths'), beds = '', baths = '';
-    if (bedsRaw) {
-      if (/^\d{1,2}$/.test(bedsRaw) && +bedsRaw <= 20) { beds = String(+bedsRaw); } else { fail('beds', 'Enter a whole number.'); }
-    }
-    if (bathsRaw) {
-      if (/^\d{1,2}(?:\.\d)?$/.test(bathsRaw) && parseFloat(bathsRaw) <= 20) { baths = String(parseFloat(bathsRaw)); } else { fail('baths', 'Use a number like 2 or 2.5.'); }
-    }
+    out['Existing sf'] = '';
 
     var link = val('listing_url');
     if (!link) { out['Listing URL'] = ''; }
@@ -495,24 +468,34 @@ h1 { animation: settle .8s var(--ease) both; }
       else { out['Listing URL'] = full; }
     }
 
-    var name = val('agent_name');
-    if (name.length < 2) { fail('agent_name', 'Enter your name.'); }
-    out['Agent name'] = name;
+    out['Agent name'] = val('agent_name');
 
-    var email = val('agent_email');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { fail('agent_email', 'Enter a valid email address.'); }
+    // How to reach you: one box, an email or a phone. An email goes on the email line, anything else on the phone line.
+    var contact = val('contact'), email = '', phone = '';
+    if (contact) {
+      if (contact.indexOf('@') >= 0) {
+        if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(contact)) { email = contact; }
+        else { fail('contact', 'Enter a valid email address or a phone number, or leave it blank.'); }
+      } else {
+        var digits = contact.replace(/\D/g, '');
+        if (digits.length >= 10 && digits.length <= 15) { phone = contact; }
+        else { fail('contact', 'Enter a valid email address or a 10-digit phone number, or leave it blank.'); }
+      }
+    }
     out['Agent email'] = email;
-
-    var phone = val('agent_phone'), digits = phone.replace(/\D/g, '');
-    if (phone && (digits.length < 10 || digits.length > 15)) { fail('agent_phone', 'Enter a 10-digit phone number, or leave it blank.'); }
     out['Agent phone'] = phone;
 
-    // Beds and baths have no label of their own in the contract, so they lead the Notes line.
-    var house = [];
-    if (beds) { house.push(beds + ' bed'); }
-    if (baths) { house.push(baths + ' bath'); }
+    // The "If you have it" answers have no label of their own in the contract, so they lead the Notes line.
     var notes = [];
-    if (house.length) { notes.push('House: ' + house.join(' / ') + '.'); }
+    var listed = val('listed'), structure = val('structure'), survey = val('survey'), timeline = val('timeline');
+    if (listed === 'listed') { notes.push('Listed on the MLS.'); } else if (listed === 'pocket') { notes.push('Pocket listing.'); }
+    if (structure === 'vacant') { notes.push('Vacant lot.'); }
+    else if (structure === 'demo') { notes.push('Existing house, demo needed.'); }
+    else if (structure === 'keep') { notes.push('Existing house, no demo.'); }
+    if (survey === 'survey') { notes.push('Survey on hand.'); }
+    else if (survey === 'plans') { notes.push('Plans on hand.'); }
+    else if (survey === 'both') { notes.push('Survey and plans on hand.'); }
+    if (timeline) { notes.push('Seller timeline: ' + timeline + (/[.!?]$/.test(timeline) ? '' : '.')); }
     var free = val('notes');
     if (free) { notes.push(free); }
     out['Notes'] = notes.join(' ');
@@ -543,6 +526,7 @@ h1 { animation: settle .8s var(--ease) both; }
     var summary = $('form-error'), n = Object.keys(byId).length;
     if (n) { summary.textContent = n === 1 ? 'Please fix the field marked below.' : 'Please fix the ' + n + ' fields marked below.'; summary.hidden = false; }
     else { summary.textContent = ''; summary.hidden = true; }
+    if (errors.some(function (e) { return IN_MORE.indexOf(e.id) >= 0; })) { $('more').open = true; }
     if (moveFocus && errors.length) { $(errors[0].id).focus(); }
   }
 

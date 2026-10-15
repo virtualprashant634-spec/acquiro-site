@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  For Realtors page (owner, 10/15 6:18 PM, in chat). Same tokens and CSS approach as index.html: one file, inline CSS,
+  no framework, no script, no tracking. tests/test_realtors_page.py pins the copy, the links and the :root tokens.
+  OPEN ITEMS BEFORE THIS GOES PUBLIC (the page is in scripts/publish_site.py, so a publish ships it as it stands):
+  (1) "How fast do you close?" still shows the placeholder [owner to set]. Replace the span with the owner's answer.
+  (2) The FAQ link to buyer.html is the right href, but buyer.html is UNPUBLISHED (it is not in SITE_FILES), so the link
+      is a dead link until buyer.html goes up. Publish buyer.html first, or take the link out.
+  (3) The nav link to this page on index.html is the owner's to add.
+  Brand rule: the chrome (nav, footer, title, hero) says Acquiro and nothing else. Avivo is named only in the FAQ, where
+  the question is who buys.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>For Realtors | Acquiro</title>
+<meta name="description" content="Send Acquiro an address and an asking price. Text or email. You can earn two to three sides of a commission, and we do the rest.">
+<meta name="theme-color" content="#FBF9F6">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:title" content="For Realtors | Acquiro">
+<meta property="og:description" content="Send us an address and an asking price. Text or email. We do the rest.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23E4572E'/%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M16 6 25 26h-4.5l-1.6-4h-5.8l-1.6 4H7zm0 7-1.7 5h3.4z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   Acquiro: For Realtors
+   Same tokens and CSS approach as landing/index.html. Mobile first: every rule below is the phone layout, and the
+   min-width queries only widen it. The :root block is a verbatim copy of index.html's; the test fails if the two drift.
+   ========================================================================== */
+
+:root{
+  /* palette */
+  --canvas:#FBF9F6;       /* page */
+  --surface:#F4F1EA;      /* soft section band */
+  --frame:#ECE7DE;        /* placeholder frames */
+  --paper:#FFFFFF;        /* cards */
+  --ink:#1A1714;
+  --muted:#6B6358;        /* body secondary and all small captions (AA) */
+  --faint:#8B8378;        /* decorative strokes only, never text */
+  --line:#ECE7E0;
+  --line-strong:#E2DBD0;
+  --coral:#E4572E;        /* glow, large numerals, focus ring */
+  --coral-fill:#CC4A22;   /* button fill: same hue, deepened so white text clears 4.5:1 */
+  --coral-tint:#FCEFE9;
+  --coral-ink:#B53F1C;    /* small coral text */
+  --night:#16120E;
+  --night-ink:#F5EFE7;
+  --night-muted:#B9AD9D;
+  --ok:#009767;
+  --ok-tint:#E3F5EE;
+  --ok-ink:#00704A;
+  /* type */
+  --sans:'Geist','Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --serif:'Instrument Serif','Newsreader',Georgia,'Times New Roman',serif;
+  --mono:'Geist Mono','JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  /* motion */
+  --ease:cubic-bezier(.22,1,.36,1);   /* ease-out-expo-ish */
+  --ease2:cubic-bezier(.16,1,.3,1);   /* ease-out-quint-ish */
+  /* shape */
+  --shadow:0 2px 6px rgba(26,23,20,.05),0 18px 40px -20px rgba(26,23,20,.22);
+  --gutter:20px;
+  --nav-h:64px;
+}
+@media (min-width:640px){:root{--gutter:32px}}
+@media (min-width:1024px){:root{--gutter:40px}}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--canvas);color:var(--ink);font:400 1rem/1.65 var(--sans);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+a{color:inherit}
+p{margin:0;text-wrap:pretty}
+ul,ol{margin:0;padding:0;list-style:none}
+h1,h2,h3{margin:0}
+:focus-visible{outline:3px solid var(--coral);outline-offset:3px}
+::selection{background:var(--coral-tint);color:var(--ink)}
+
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:16px;top:-120px;z-index:100;background:var(--ink);color:#fff;padding:12px 20px;min-height:44px;border-radius:999px;text-decoration:none;font-weight:500}
+.skip:focus{top:12px}
+
+/* ---------- layout ---------- */
+.wrap{width:100%;max-width:calc(1200px + 2 * var(--gutter));margin-inline:auto;padding-inline:var(--gutter)}
+.sec{position:relative;padding-block:clamp(56px,8vw,104px);overflow-x:clip}
+section[id]{scroll-margin-top:calc(var(--nav-h) - 1px)}
+.band{background:linear-gradient(180deg,var(--canvas) 0%,var(--surface) 22%,var(--surface) 72%,var(--canvas) 100%)}
+.sec-head{max-width:780px;margin-bottom:clamp(28px,4vw,48px)}
+
+/* ---------- type ---------- */
+.eyebrow{margin:0 0 20px;font:500 .75rem/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--coral-ink)}
+.display{font-family:var(--sans);font-weight:500;letter-spacing:-.03em;line-height:1.02;text-wrap:balance}
+h1.display{font-size:clamp(2.5rem,1.2rem + 5.2vw,4.5rem)}
+h2.display{font-size:clamp(2.125rem,1.35rem + 3vw,3.5rem)}
+.display em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.015em;font-size:1.08em}
+h3{font-weight:500;font-size:1.25rem;line-height:1.25;letter-spacing:-.015em}
+.lead{font-size:clamp(1.0625rem,1rem + .3vw,1.1875rem);line-height:1.65;color:var(--muted);max-width:60ch}
+.sec-head .lead{margin-top:24px}
+.note{margin-top:clamp(20px,3vw,28px);color:var(--muted);font-size:.9375rem;max-width:70ch}
+.note + .note{margin-top:12px}
+.pull{margin-top:clamp(20px,3vw,28px);font-weight:500;font-size:clamp(1.125rem,1rem + .5vw,1.375rem);line-height:1.4;letter-spacing:-.015em;max-width:44ch}
+
+/* ---------- buttons and cards ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 26px;border-radius:999px;border:1px solid transparent;font-weight:500;font-size:1rem;line-height:1;text-decoration:none;white-space:nowrap;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s var(--ease),background-color .3s var(--ease),border-color .3s var(--ease)}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--coral-fill);color:#fff;box-shadow:0 4px 12px -2px rgba(228,87,46,.6)}
+.btn-primary:hover{box-shadow:0 8px 18px -4px rgba(228,87,46,.6)}
+.btn-secondary{background:rgba(255,255,255,.72);border-color:var(--line-strong);color:var(--ink)}
+.btn-secondary:hover{background:#fff;border-color:#D6CDBF}
+.btn-sm{min-height:44px;padding:0 18px;font-size:.9375rem}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+
+/* ==========================================================================
+   Nav (no menu: one way home and one action)
+   ========================================================================== */
+.nav{position:sticky;top:0;z-index:50;background:rgba(251,249,246,.94);border-bottom:1px solid var(--line)}
+@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  .nav{background:rgba(251,249,246,.74);-webkit-backdrop-filter:saturate(1.4) blur(16px);backdrop-filter:saturate(1.4) blur(16px)}
+}
+.nav-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:var(--nav-h)}
+.brand{display:inline-flex;align-items:center;min-height:44px;text-decoration:none}
+.brand-name{font-weight:600;font-size:1.1875rem;letter-spacing:-.03em}
+
+/* ==========================================================================
+   1. Hero and the two big tap targets (also used in "Send one now")
+   ========================================================================== */
+.hero{position:relative;isolation:isolate;overflow-x:clip;text-align:center;padding-block:clamp(48px,9vw,112px) clamp(48px,7vw,88px)}
+.hero::before{content:"";position:absolute;z-index:-1;inset:0 0 auto 0;height:min(640px,100%);background:radial-gradient(60% 80% at 50% 0%,rgba(228,87,46,.14),rgba(228,87,46,0) 70%);pointer-events:none}
+.hero h1{max-width:12ch;margin-inline:auto}
+.hero h1 em{display:block;color:var(--coral)}
+.hero .lead{margin:24px auto 0;max-width:40ch}
+
+.sends{display:grid;gap:12px;max-width:760px;margin:clamp(28px,5vw,40px) auto 0}
+.tap{display:flex;flex-direction:column;justify-content:center;min-height:96px;padding:20px 22px;text-align:center;text-decoration:none;transition:transform .3s var(--ease),border-color .3s var(--ease),box-shadow .3s var(--ease)}
+.tap:hover{transform:translateY(-2px);border-color:var(--coral)}
+.tap .k{font:500 .75rem/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--coral-ink)}
+.tap .v{margin-top:8px;font-weight:500;font-size:clamp(1.5rem,1.2rem + 1.2vw,1.875rem);line-height:1.15;letter-spacing:-.025em;overflow-wrap:anywhere}
+.tap .v.long{font-size:clamp(1.0625rem,.8rem + 1.5vw,1.375rem);letter-spacing:-.015em}
+.tap .d{margin-top:8px;color:var(--muted);font-size:.9375rem}
+@media (min-width:720px){.sends{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}}
+
+/* ==========================================================================
+   2. How you earn   4. What you get back   (cards)
+   ========================================================================== */
+.cards{display:grid;gap:16px}
+.tile{padding:clamp(24px,3vw,32px)}
+.tag{display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:var(--coral-tint);color:var(--coral-ink);font:500 .72rem/1.25 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.tile h3{margin-top:18px}
+.tile p{margin-top:12px;color:var(--muted)}
+@media (min-width:768px){.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.cards.three{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.callout{margin-top:clamp(20px,3vw,32px);padding:20px 24px;border-radius:20px;background:var(--coral-tint);border:1px solid #F6D9CC;color:var(--ink);font-size:1.0625rem}
+
+/* ==========================================================================
+   3. What we buy
+   ========================================================================== */
+.stats{display:grid;gap:16px}
+.stat{display:flex;flex-direction:column;justify-content:center;padding:clamp(24px,3vw,32px);text-align:center}
+.stat strong{display:block;font-weight:500;font-size:clamp(1.5rem,1.2rem + 1vw,2rem);line-height:1.15;letter-spacing:-.03em;color:var(--coral);text-wrap:balance}
+.stat span{display:block;margin-top:10px;color:var(--muted)}
+.stat .zips span{display:inline-block;margin:0 .22em;color:inherit}
+@media (min-width:1024px){.stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}}
+
+/* ==========================================================================
+   5. Send one now
+   ========================================================================== */
+.fields{display:grid;gap:12px;counter-reset:field}
+.fields li{counter-increment:field;display:flex;align-items:center;gap:16px;padding:18px 22px}
+.fields li::before{content:counter(field);display:grid;place-items:center;flex:none;width:36px;height:36px;border-radius:50%;background:var(--coral-tint);color:var(--coral-ink);font:500 .9375rem/1 var(--mono)}
+@media (min-width:640px){.fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}}
+.send-more{margin-top:clamp(28px,4vw,40px);display:grid;gap:14px;justify-items:start}
+.send-more .btn{white-space:normal;text-align:center;padding-block:14px;line-height:1.2}
+.extras-h{margin-top:clamp(36px,5vw,56px)}
+.extras{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.extras li{padding:11px 18px;border-radius:999px;background:var(--paper);border:1px solid var(--line-strong);font-weight:500;font-size:.9688rem;line-height:1.3}
+
+/* ==========================================================================
+   6. FAQ (always open: four short answers, no script)
+   ========================================================================== */
+.faq{max-width:820px;border-top:1px solid var(--line-strong)}
+.faq-item{padding:22px 0;border-bottom:1px solid var(--line-strong)}
+.faq-item h3{font-size:clamp(1.0625rem,1rem + .35vw,1.25rem)}
+.faq-item p{margin-top:10px;color:var(--muted);max-width:62ch}
+.faq-item p a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.todo{padding:2px 8px;border-radius:8px;background:var(--coral-tint);color:var(--coral-ink);font:500 .9375rem/1.4 var(--mono)}
+
+.foot{padding:32px 0 48px;border-top:1px solid var(--line);text-align:center}
+.foot p{max-width:none;font:400 .8125rem/1.7 var(--mono);letter-spacing:.02em;color:var(--muted)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-bar">
+    <a class="brand" href="index.html" aria-label="Acquiro, home"><span class="brand-name">Acquiro</span></a>
+    <a class="btn btn-primary btn-sm" href="#send">Send one now</a>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============================ 1. Hero ============================ -->
+<section class="hero" id="top" aria-labelledby="hero-h">
+  <div class="wrap">
+    <p class="eyebrow">For realtors</p>
+    <h1 class="display" id="hero-h">Two things. <em>Two to three sides.</em></h1>
+    <p class="lead">Send us an address and an asking price. Text or email. We do the rest.</p>
+    <div class="sends">
+      <a class="card tap" href="mailto:prashant+deals@avivo.homes"><span class="k">Email</span><span class="v long">prashant+deals@avivo.homes</span><span class="d">Forward the listing, or just type it.</span></a>
+      <a class="card tap" href="sms:+15128661988"><span class="k">Text</span><span class="v">(512) 866-1988</span><span class="d">Two lines is enough.</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 2. How you earn two to three sides ============================ -->
+<section class="sec band" id="earn" aria-labelledby="earn-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">What you earn</p>
+      <h2 class="display" id="earn-h">How you earn <em>two to three sides.</em></h2>
+    </div>
+    <ul class="cards">
+      <li class="card tile"><span class="tag">The purchase</span><h3>You bring the lot</h3><p>You represent the seller, or you represent us, on the purchase. That is one side.</p></li>
+      <li class="card tile"><span class="tag">The finished homes</span><h3>You list what we build</h3><p>When we build, you usually list the finished homes. One listing per home. Two or three homes means two or three more sides.</p></li>
+    </ul>
+    <!-- SOURCE: the owner, in chat. 10/15 4:40 PM: "we usually let realtors who find us the deals represent us on the listing after we develop, so realtors have made $50k to $100k per deal in commission working with us." 10/15 6:18 PM: "You earn two to three sides of a commission by just sending us an address and asking price." Both are the owner's statements, not checked against a closed-deal record.
+         COUNT TO CHECK WITH THE OWNER: one side on the purchase plus one listing per home (two or three homes) adds up to three or four sides. The headline keeps the owner's words, two to three. -->
+    <p class="callout"><strong>Agents have made $50k to $100k per deal with us so far.</strong></p>
+  </div>
+</section>
+
+<!-- ============================ 3. What we buy ============================ -->
+<section class="sec" id="buy" aria-labelledby="buy-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">What we buy</p>
+      <h2 class="display" id="buy-h">Lots and teardowns <em>in four ZIPs.</em></h2>
+      <!-- SOURCE: the lot pack, owner-approved buy box of 10/15: four buy ZIPs, 78731 on watch (screened, never named as a ZIP we buy in), 5,000 sq ft across 2 or 3 units, $650 a foot floor on new-build comps. The owner asked for the 78731 watch note on this page (10/15 6:18 PM). -->
+      <p class="lead">We buy lots and teardowns in Austin. The plan has to carry 5,000 sq ft or more of new construction across 2 or 3 homes.</p>
+    </div>
+    <ul class="stats">
+      <li class="card stat"><strong class="zips"><span>78703</span> <span>78704</span> <span>78746</span> <span>78757</span></strong><span>the ZIPs we buy in</span></li>
+      <li class="card stat"><strong>5,000+ sq ft</strong><span>of new construction, across 2 or 3 homes</span></li>
+      <li class="card stat"><strong>$650+ a foot</strong><span>where new builds sell</span></li>
+    </ul>
+    <p class="pull">We are the buyer. We pay for the lot. You do not need to find us a buyer.</p>
+    <p class="note">78731 is a watch ZIP. This is how we screen. It is not a promise to buy any lot.</p>
+  </div>
+</section>
+
+<!-- ============================ 4. What you get back ============================ -->
+<section class="sec band" id="answer" aria-labelledby="answer-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">What you get back</p>
+      <h2 class="display" id="answer-h">A written answer <em>within a day.</em></h2>
+      <p class="lead">You get a real number. You get it even when the answer is no.</p>
+    </div>
+    <ul class="cards three">
+      <li class="card tile"><span class="tag">Comps</span><h3>Our comps</h3><p>Closed new builds inside half a mile of the lot.</p></li>
+      <li class="card tile"><span class="tag">The lot</span><h3>What the lot supports</h3><p>How much we can build, and whether it is two homes or three.</p></li>
+      <li class="card tile"><span class="tag">The price</span><h3>The most we would pay</h3><p>One number, in writing. We give it when we pass too.</p></li>
+    </ul>
+    <p class="note">Take it back to your seller. It is a number you can use.</p>
+  </div>
+</section>
+
+<!-- ============================ 5. Send one now ============================ -->
+<section class="sec" id="send" aria-labelledby="send-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Send one now</p>
+      <h2 class="display" id="send-h">Two fields. <em>That is it.</em></h2>
+    </div>
+    <ol class="fields">
+      <li class="card"><h3>The address</h3></li>
+      <li class="card"><h3>The asking price</h3></li>
+    </ol>
+    <div class="sends">
+      <a class="card tap" href="mailto:prashant+deals@avivo.homes"><span class="k">Email</span><span class="v long">prashant+deals@avivo.homes</span><span class="d">Forward the listing, or just type it.</span></a>
+      <a class="card tap" href="sms:+15128661988"><span class="k">Text</span><span class="v">(512) 866-1988</span><span class="d">Two lines is enough.</span></a>
+    </div>
+    <!-- SOURCE: the deal form page. It opens the sender's own email app and stores nothing on the page. -->
+    <div class="send-more">
+      <a class="btn btn-secondary" href="submit.html">Use the deal form instead</a>
+      <p class="note" style="margin-top:0">It opens your own email app. Nothing is stored on the page.</p>
+    </div>
+    <h3 class="extras-h">If you have it</h3>
+    <ul class="extras">
+      <li>Listed, or a pocket listing</li>
+      <li>What is on the lot now</li>
+      <li>Survey or plans</li>
+      <li>Your timeline</li>
+      <li>Your ARV</li>
+    </ul>
+    <p class="note">Skip any of it. The address and the price are enough.</p>
+  </div>
+</section>
+
+<!-- ============================ 6. FAQ ============================ -->
+<section class="sec band" id="faq" aria-labelledby="faq-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Questions</p>
+      <h2 class="display" id="faq-h">Short <em>answers.</em></h2>
+    </div>
+    <div class="faq">
+      <div class="faq-item">
+        <h3>Do you pay referral fees?</h3>
+        <p>The listing is the fee. You get paid on the sides above. If you want a referral agreement, ask. Prashant handles those.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Do you buy outside those ZIPs?</h3>
+        <p>We screen everything you send. We buy where new builds clear $650 a foot. An address outside those ZIPs can still work. You get the same written answer.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How fast do you close?</h3>
+        <!-- PLACEHOLDER: the owner has not given a closing time. Nothing is invented here. Replace the whole span. -->
+        <p><span class="todo">[owner to set]</span></p>
+      </div>
+      <div class="faq-item">
+        <h3>Who is behind Acquiro?</h3>
+        <!-- SOURCE: the owner's brief names the link text and the href. buyer.html is UNPUBLISHED (not in SITE_FILES in scripts/publish_site.py), so this href is a dead link until it goes up. The two facts here (Avivo Homes buys the lot and builds the homes; Prashant Vanka owns it) are the ones buyer.html already carries from the Company Brain. -->
+        <p>Avivo Homes. It buys the lot and builds the homes. Prashant Vanka owns it. Read about <a href="buyer.html">the buyer behind the desk</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Acquiro &middot; Austin, Texas</p>
+  </div>
+</footer>
+</body>
+</html>
