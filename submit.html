@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="referrer" content="no-referrer">
+<!-- The CSP makes "no backend" enforceable: the page cannot fetch, post or load scripts from anywhere. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Send a deal | Acquiro</title>
+<meta name="description" content="Send Acquiro a City of Austin lot or teardown. The form writes the deal out as an email you send from your own mail app. Nothing is stored on this page.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23E4572E'/%3E%3Cpath d='M9 23 16 9l7 14M12.2 18.2h7.6' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@500&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+/* ---------- Tokens (palette from the Acquiro landing style guide) ---------- */
+:root {
+  color-scheme: light dark;
+  --canvas: #FBF9F6;
+  --card: #FFFFFF;
+  --ink: #1A1714;
+  --muted: #6B6358;            /* body secondary; also used for captions (the #8B8378 caption grey fails AA for small text) */
+  --line: #ECE7E0;
+  --line-strong: #E2DBD0;
+  --control-border: #8B8378;   /* 3.5:1+ against canvas and card, WCAG 1.4.11 */
+  --control-bg: #FFFFFF;
+  --coral: #E4572E;
+  --coral-tint: #FCEFE9;
+  --coral-text: #B53F1C;       /* small coral text */
+  --on-coral: #FFFFFF;
+  --error: #B5483B;
+  --ok: #007A53;
+  --glow: rgba(228, 87, 46, .14);
+  --nav-bg: rgba(251, 249, 246, .82);
+  --shadow-card: 0 2px 6px rgba(26, 23, 20, .05), 0 18px 40px -20px rgba(26, 23, 20, .22);
+  --shadow-btn: 0 4px 12px -2px rgba(228, 87, 46, .6);
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%231A1714' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --sans: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --serif: "Instrument Serif", "Newsreader", Georgia, "Times New Roman", serif;
+  --mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --tap: 48px;                 /* control height; the floor is 44px */
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --canvas: #16120E;
+    --card: #1F1A15;
+    --ink: #F5EFE7;
+    --muted: #B9AD9D;
+    --line: #2E2822;
+    --line-strong: #3A332B;
+    --control-border: #8A7F70;
+    --control-bg: #16120E;
+    --coral-tint: #2A1A13;
+    --coral-text: #F2724B;
+    --error: #F08A7C;
+    --ok: #4FD1A1;
+    --glow: rgba(228, 87, 46, .18);
+    --nav-bg: rgba(22, 18, 14, .82);
+    --shadow-card: 0 2px 6px rgba(0, 0, 0, .4), 0 18px 40px -20px rgba(0, 0, 0, .65);
+    --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23F5EFE7' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas) radial-gradient(70% 460px at 50% 0, var(--glow), transparent 70%) no-repeat;
+  color: var(--ink);
+  font: 400 1rem/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+main { flex: 1 0 auto; }
+h1, h2, p, ol, dl, dd { margin: 0; }
+a { color: inherit; }
+.wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+.skip {
+  position: absolute; left: 16px; top: -64px; z-index: 30;
+  background: var(--card); color: var(--ink); border: 2px solid var(--coral);
+  border-radius: 999px; padding: 12px 20px; min-height: 44px; text-decoration: none; font-weight: 500;
+}
+.skip:focus { top: 12px; }
+:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
+
+/* ---------- Nav ---------- */
+.nav {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--nav-bg);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
+  backdrop-filter: saturate(1.4) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; min-height: 64px; gap: 12px; }
+.brand { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; text-decoration: none; }
+.brand .word { font-weight: 600; font-size: 1.375rem; letter-spacing: -.03em; }
+.brand .by { font-family: var(--serif); font-style: italic; font-size: 1.25rem; color: var(--muted); }
+.nav-link {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 999px;
+  color: var(--muted); text-decoration: none; font-size: .9375rem; font-weight: 500;
+  transition: color .3s var(--ease), background-color .3s var(--ease);
+}
+.nav-link:hover { color: var(--ink); background: var(--line); }
+
+/* ---------- Layout ---------- */
+.layout { display: grid; gap: 32px; padding-top: 40px; padding-bottom: 56px; }
+.eyebrow { font: 500 .75rem/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--coral-text); }
+h1 {
+  margin-top: 14px;
+  font-weight: 500; letter-spacing: -.03em; line-height: 1.02;
+  font-size: clamp(2.5rem, 1.7rem + 3.6vw, 3.75rem);
+  text-wrap: balance;
+}
+h1 em, h2 em { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 1.08em; color: var(--coral); letter-spacing: -.01em; }
+.lead { margin-top: 18px; max-width: 34rem; color: var(--muted); font-size: 1.0625rem; text-wrap: pretty; }
+.chip {
+  display: inline-flex; align-items: center; min-height: 32px; margin-top: 20px; padding: 0 12px;
+  border-radius: 12px; background: var(--coral-tint); color: var(--coral-text);
+  font: 500 .75rem/1 var(--mono); letter-spacing: .06em; text-transform: uppercase;
+}
+.steps { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 16px; max-width: 34rem; counter-reset: step; }
+.steps li { position: relative; padding-left: 44px; color: var(--muted); counter-increment: step; text-wrap: pretty; }
+.steps li::before {
+  content: "0" counter(step);
+  position: absolute; left: 0; top: .2em;
+  font: 500 .8125rem/1.4 var(--mono); letter-spacing: .08em; color: var(--coral-text);
+}
+.steps strong { color: var(--ink); font-weight: 600; }
+
+@media (min-width: 1024px) {
+  .layout { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; padding-top: 72px; padding-bottom: 88px; align-items: start; }
+  .intro { position: sticky; top: 104px; }
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 24px;
+  box-shadow: var(--shadow-card); padding: 20px;
+}
+@media (min-width: 640px) { .card { padding: 36px; } .wrap { padding: 0 24px; } }
+.stack { display: grid; gap: 24px; min-width: 0; }
+
+/* ---------- Form ---------- */
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+fieldset + fieldset { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--line); }
+legend { padding: 0; margin-bottom: 16px; font: 500 .75rem/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--coral-text); }
+.req-note { margin-bottom: 20px; font-size: .9375rem; color: var(--muted); }
+.req, .req-note span { color: var(--coral-text); font-weight: 600; }
+.grid { display: grid; gap: 20px 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px) {
+  .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 480px) {
+  .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.span-all { grid-column: 1 / -1; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+label { font-weight: 500; font-size: .9375rem; line-height: 1.4; }
+.hint { font-size: .875rem; line-height: 1.45; color: var(--muted); text-wrap: pretty; }
+.err { font-size: .875rem; line-height: 1.45; color: var(--error); font-weight: 500; }
+.err[hidden], .hint[hidden], .form-error[hidden], .card[hidden] { display: none; }
+input, select, textarea {
+  width: 100%; min-height: var(--tap); padding: 0 14px;
+  font: inherit; font-size: 1rem; color: var(--ink);
+  background: var(--control-bg); border: 1px solid var(--control-border); border-radius: 14px;
+  scroll-margin-top: 96px;
+  transition: border-color .3s var(--ease), box-shadow .3s var(--ease);
+}
+textarea { padding: 12px 14px; min-height: 8rem; line-height: 1.5; resize: vertical; }
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
+select {
+  -webkit-appearance: none; appearance: none;
+  padding-right: 40px; cursor: pointer;
+  background-image: var(--chevron); background-repeat: no-repeat; background-position: right 14px center; background-size: 12px 8px;
+}
+input:hover, select:hover, textarea:hover { border-color: var(--ink); }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; border-color: var(--coral); }
+[aria-invalid="true"] { border-color: var(--error); box-shadow: 0 0 0 1px var(--error); }
+.lot-row { display: grid; grid-template-columns: minmax(0, 1fr) 112px; gap: 8px; }
+.size-meter { font-size: .875rem; color: var(--muted); }
+.size-meter.over { color: var(--error); font-weight: 500; }
+
+.actions { margin-top: 32px; display: grid; gap: 14px; }
+.form-error { padding: 12px 16px; border-radius: 14px; background: var(--coral-tint); color: var(--coral-text); font-weight: 500; border: 1px solid var(--coral-text); }
+.note { color: var(--muted); font-size: .9375rem; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 52px; padding: 0 28px; border-radius: 999px; border: 1px solid transparent;
+  font: 600 1.0625rem/1 var(--sans); text-decoration: none; cursor: pointer; text-align: center;
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease), background-color .3s var(--ease);
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary {
+  background: var(--coral); color: var(--on-coral); box-shadow: var(--shadow-btn);
+  font-size: 1.2rem;           /* 19.2px semibold = WCAG "large text"; white on coral is 3.68:1 (needs 3:1) */
+  width: 100%;
+}
+.btn-primary:hover { box-shadow: 0 8px 18px -4px rgba(228, 87, 46, .6); }
+.btn-secondary { background: var(--card); color: var(--ink); border-color: var(--line-strong); }
+.btn-secondary:hover { border-color: var(--control-border); }
+@media (min-width: 640px) { .btn-primary { width: auto; min-width: 260px; } }
+
+/* ---------- Review panel ---------- */
+.review { scroll-margin-top: 80px; }
+.review h2 { margin-top: 10px; font-size: clamp(1.625rem, 1.3rem + 1.4vw, 2.125rem); font-weight: 500; letter-spacing: -.03em; line-height: 1.1; }
+.review p.copy { margin-top: 12px; color: var(--muted); text-wrap: pretty; }
+.meta { margin-top: 20px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 16px; font-size: .9375rem; }
+.meta dt { font: 500 .75rem/1.9 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--coral-text); }
+.meta dd { overflow-wrap: anywhere; font-weight: 500; }
+.review label { display: block; margin-top: 20px; margin-bottom: 6px; }
+.review textarea { font-family: var(--mono); font-size: .875rem; line-height: 1.6; min-height: 15rem; padding: 14px; }
+.row { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 12px; }
+.status { margin-top: 12px; min-height: 1.5em; font-size: .9375rem; color: var(--ok); font-weight: 500; }
+.status.bad { color: var(--error); }
+.noscript { margin: 16px 0 0; padding: 14px 16px; border-radius: 14px; background: var(--coral-tint); color: var(--coral-text); font-weight: 500; }
+
+/* ---------- Footer ---------- */
+.foot { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: .9375rem; text-align: center; text-wrap: balance; }
+
+/* ---------- Motion (calm; off for reduced-motion) ---------- */
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes settle { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: none; } }
+h1 { animation: settle .8s var(--ease) both; }
+.review:not([hidden]) { animation: rise .45s var(--ease) both; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .btn:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#form">Skip to the form</a>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Acquiro by Avivo, overview"><span class="word">Acquiro</span> <span class="by">by Avivo</span></a>
+    <a class="nav-link" href="index.html">Back to overview</a>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap layout">
+
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">Send a deal</p>
+      <h1 id="page-title">Send a deal. Get <em>real numbers</em>.</h1>
+      <p class="lead">Tell us about a lot or teardown. This page writes the deal out as an email for you to send from your own mail app.</p>
+      <span class="chip">City of Austin lots and teardowns</span>
+      <ol class="steps">
+        <li><strong>Fill in the form.</strong> Address, ZIP, asking price and your contact details are required.</li>
+        <li><strong>Your email app opens.</strong> The deal is already written out, one line per field.</li>
+        <li><strong>You press send.</strong> Nothing goes out until you do.</li>
+      </ol>
+    </section>
+
+    <div class="stack">
+      <section class="card" aria-labelledby="form-title">
+        <h2 id="form-title" class="eyebrow" style="font-weight:500">The deal</h2>
+        <p class="req-note" style="margin-top:12px"><span aria-hidden="true">*</span> Required</p>
+        <noscript><p class="noscript">This form needs JavaScript to write your email. Without it, email prashant+deals@avivo.homes with the address, ZIP and asking price.</p></noscript>
+
+        <form id="form" method="post" novalidate>
+          <fieldset>
+            <legend>The property</legend>
+            <div class="grid two">
+              <div class="field">
+                <label for="address">Street address <span class="req" aria-hidden="true">*</span></label>
+                <input id="address" name="address" type="text" required aria-required="true" maxlength="120" autocomplete="off" autocapitalize="words" enterkeyhint="next" placeholder="1204 Example St" aria-describedby="h-address e-address">
+                <p class="hint" id="h-address">Street number and name.</p>
+                <p class="err" id="e-address" hidden></p>
+              </div>
+              <div class="field">
+                <label for="zip">ZIP <span class="req" aria-hidden="true">*</span></label>
+                <input id="zip" name="zip" type="text" inputmode="numeric" required aria-required="true" maxlength="10" autocomplete="off" enterkeyhint="next" placeholder="78704" aria-describedby="e-zip">
+                <p class="err" id="e-zip" hidden></p>
+              </div>
+              <div class="field">
+                <label for="ask">Asking price <span class="req" aria-hidden="true">*</span></label>
+                <input id="ask" name="ask" type="text" inputmode="decimal" required aria-required="true" maxlength="16" autocomplete="off" enterkeyhint="next" placeholder="650,000" aria-describedby="h-ask e-ask">
+                <p class="hint" id="h-ask">Whole dollars. 650000 or 650k both work.</p>
+                <p class="err" id="e-ask" hidden></p>
+              </div>
+              <div class="field">
+                <label for="lot_size">Lot size</label>
+                <div class="lot-row">
+                  <input id="lot_size" name="lot_size" type="text" inputmode="decimal" maxlength="12" autocomplete="off" enterkeyhint="next" placeholder="7,500" aria-describedby="h-lot e-lot_size">
+                  <select id="lot_unit" name="lot_unit" aria-label="Lot size unit">
+                    <option value="sf" selected>sq ft</option>
+                    <option value="acres">acres</option>
+                  </select>
+                </div>
+                <p class="hint" id="h-lot">Optional. We look it up too.</p>
+                <p class="err" id="e-lot_size" hidden></p>
+              </div>
+              <div class="field span-all">
+                <label for="arv">Your ARV (after-repair value)</label>
+                <input id="arv" name="arv" type="text" inputmode="decimal" maxlength="16" autocomplete="off" enterkeyhint="next" placeholder="1,250,000" aria-describedby="h-arv e-arv">
+                <p class="hint" id="h-arv">Optional. We keep it as your claim and screen on our own comps.</p>
+                <p class="err" id="e-arv" hidden></p>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>The existing house</legend>
+            <div class="grid three">
+              <div class="field">
+                <label for="beds">Beds</label>
+                <input id="beds" name="beds" type="text" inputmode="numeric" maxlength="2" autocomplete="off" enterkeyhint="next" placeholder="3" aria-describedby="e-beds">
+                <p class="err" id="e-beds" hidden></p>
+              </div>
+              <div class="field">
+                <label for="baths">Baths</label>
+                <input id="baths" name="baths" type="text" inputmode="decimal" maxlength="4" autocomplete="off" enterkeyhint="next" placeholder="2" aria-describedby="e-baths">
+                <p class="err" id="e-baths" hidden></p>
+              </div>
+              <div class="field">
+                <label for="existing_sf">House sq ft</label>
+                <input id="existing_sf" name="existing_sf" type="text" inputmode="numeric" maxlength="7" autocomplete="off" enterkeyhint="next" placeholder="1,450" aria-describedby="e-existing_sf">
+                <p class="err" id="e-existing_sf" hidden></p>
+              </div>
+            </div>
+            <p class="hint" style="margin-top:12px">Optional. Skip these for a vacant lot.</p>
+          </fieldset>
+
+          <fieldset>
+            <legend>The listing</legend>
+            <div class="field">
+              <label for="listing_url">Link to flyer or listing</label>
+              <input id="listing_url" name="listing_url" type="url" inputmode="url" maxlength="300" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="next" placeholder="https://" aria-describedby="e-listing_url">
+              <p class="err" id="e-listing_url" hidden></p>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>You</legend>
+            <div class="grid two">
+              <div class="field">
+                <label for="agent_name">Your name <span class="req" aria-hidden="true">*</span></label>
+                <input id="agent_name" name="agent_name" type="text" required aria-required="true" maxlength="80" autocomplete="name" enterkeyhint="next" aria-describedby="e-agent_name">
+                <p class="err" id="e-agent_name" hidden></p>
+              </div>
+              <div class="field">
+                <label for="agent_email">Your email <span class="req" aria-hidden="true">*</span></label>
+                <input id="agent_email" name="agent_email" type="email" inputmode="email" required aria-required="true" maxlength="120" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" aria-describedby="e-agent_email">
+                <p class="err" id="e-agent_email" hidden></p>
+              </div>
+              <div class="field">
+                <label for="agent_phone">Your phone</label>
+                <input id="agent_phone" name="agent_phone" type="tel" inputmode="tel" maxlength="30" autocomplete="tel" enterkeyhint="next" aria-describedby="e-agent_phone">
+                <p class="err" id="e-agent_phone" hidden></p>
+              </div>
+            </div>
+            <div class="field" style="margin-top:20px">
+              <label for="notes">Notes</label>
+              <textarea id="notes" name="notes" maxlength="600" rows="4" aria-describedby="h-notes size-meter e-notes"></textarea>
+              <p class="hint" id="h-notes">Optional. Seller timing, access, anything you have heard.</p>
+              <p class="size-meter" id="size-meter" hidden></p>
+              <p class="err" id="e-notes" hidden></p>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <p class="form-error" id="form-error" role="alert" hidden></p>
+            <button type="submit" id="send" class="btn btn-primary">Send to Acquiro</button>
+            <p class="note">This opens your email app. Nothing is stored on this page.</p>
+          </div>
+        </form>
+      </section>
+
+      <section class="card review" id="review" aria-labelledby="review-title" tabindex="-1" hidden>
+        <p class="eyebrow">Your email</p>
+        <h2 id="review-title">Ready to <em>send</em></h2>
+        <p class="copy">Your email app should be opening with this message. Check it, then press send there. If nothing opened, copy the text below and email it to the address shown.</p>
+        <dl class="meta">
+          <dt>To</dt><dd id="r-to">prashant+deals@avivo.homes</dd>
+          <dt>Subject</dt><dd id="r-subject"></dd>
+        </dl>
+        <label for="composed">Message</label>
+        <textarea id="composed" name="composed" readonly rows="12" spellcheck="false"></textarea>
+        <div class="row">
+          <button type="button" id="copy-btn" class="btn btn-secondary">Copy</button>
+          <a id="mailto-link" class="btn btn-secondary" href="mailto:prashant+deals@avivo.homes">Open email app again</a>
+        </div>
+        <p class="status" id="copy-status" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap"><p>Nothing sends from our side without a click. You'll hear back with real numbers.</p></div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var TO = 'prashant+deals@avivo.homes';
+  var FIELD_ORDER = ['Address', 'ZIP', 'Ask', 'Lot size', 'Claimed ARV', 'Existing sf', 'Listing URL', 'Agent name', 'Agent email', 'Agent phone', 'Notes'];
+  var MAX_ENCODED = 1800;          // URL-encoded body must stay under this
+  var WARN_ENCODED = 1400;         // show the size note from here
+  var NL = '\r\n';                 // RFC 6068 line break inside mailto bodies
+  var MIN_PRICE = 10000, MAX_PRICE = 100000000;
+  var CONTROLS = ['address', 'zip', 'ask', 'lot_size', 'arv', 'beds', 'baths', 'existing_sf', 'listing_url', 'agent_name', 'agent_email', 'agent_phone', 'notes'];
+
+  var form = document.getElementById('form');
+  var attempted = false;
+
+  function $(id) { return document.getElementById(id); }
+  function clean(s) { return String(s == null ? '' : s).replace(/[\u0000-\u001f\u007f\u2028\u2029]+/g, ' ').replace(/\s+/g, ' ').trim(); }
+  function val(id) { return clean($(id).value); }
+  function fmtInt(n) { return Math.round(n).toLocaleString('en-US'); }
+  function parseMoney(raw) {
+    var m = /^(\d+(?:\.\d+)?)(k|m)?$/.exec(raw.replace(/[$,\s]/g, '').toLowerCase());
+    if (!m) { return NaN; }
+    var n = parseFloat(m[1]);
+    if (m[2] === 'k') { n *= 1e3; }
+    if (m[2] === 'm') { n *= 1e6; }
+    return Math.round(n);
+  }
+  function parseNum(raw) {
+    var s = raw.replace(/[,\s]/g, '');
+    return /^\d+(?:\.\d+)?$/.test(s) ? parseFloat(s) : NaN;
+  }
+
+  // Reads the form. Returns the value for each label (in FIELD_ORDER) and the list of errors in page order.
+  function read() {
+    var out = {}, errors = [];
+    function fail(id, msg) { errors.push({ id: id, msg: msg }); }
+
+    function money(id, label, required, what) {
+      var raw = val(id), n = parseMoney(raw);
+      if (!raw) { if (required) { fail(id, 'Enter ' + what + '.'); } out[label] = ''; return; }
+      if (isNaN(n)) { fail(id, 'Use numbers only, like 650000 or 650k.'); out[label] = raw; return; }
+      if (n < MIN_PRICE || n > MAX_PRICE) { fail(id, 'Enter the full amount in dollars, like 650000 or 650k.'); out[label] = raw; return; }
+      out[label] = '$' + fmtInt(n);
+    }
+
+    var address = val('address');
+    if (address.length < 5) { fail('address', 'Enter the street address.'); }
+    out['Address'] = address;
+
+    var zip = val('zip'), zm = /^(\d{5})(?:-\d{4})?$/.exec(zip);
+    if (!zm) { fail('zip', 'Enter a 5-digit ZIP code.'); }
+    out['ZIP'] = zm ? zm[1] : zip;
+
+    money('ask', 'Ask', true, 'the asking price');
+
+    var lotRaw = val('lot_size'), unit = $('lot_unit').value;
+    if (!lotRaw) { out['Lot size'] = ''; }
+    else {
+      var lot = parseNum(lotRaw);
+      var lo = unit === 'acres' ? 0.01 : 500, hi = unit === 'acres' ? 50 : 2000000;
+      if (isNaN(lot)) { fail('lot_size', 'Enter the lot size as a number, like 7500.'); out['Lot size'] = lotRaw; }
+      else if (lot < lo || lot > hi) { fail('lot_size', 'Check the lot size and unit.'); out['Lot size'] = lotRaw; }
+      else if (unit === 'acres') { var ac = String(parseFloat(lot.toFixed(3))); out['Lot size'] = ac + (ac === '1' ? ' acre' : ' acres'); }
+      else { out['Lot size'] = fmtInt(lot) + ' sf'; }
+    }
+
+    money('arv', 'Claimed ARV', false, 'your ARV');
+
+    var sfRaw = val('existing_sf');
+    if (!sfRaw) { out['Existing sf'] = ''; }
+    else {
+      var sf = parseNum(sfRaw);
+      if (isNaN(sf) || sf < 100 || sf > 50000) { fail('existing_sf', 'Enter square feet as a number, like 1450.'); out['Existing sf'] = sfRaw; }
+      else { out['Existing sf'] = fmtInt(sf); }
+    }
+
+    var bedsRaw = val('beds'), bathsRaw = val('baths'), beds = '', baths = '';
+    if (bedsRaw) {
+      if (/^\d{1,2}$/.test(bedsRaw) && +bedsRaw <= 20) { beds = String(+bedsRaw); } else { fail('beds', 'Enter a whole number.'); }
+    }
+    if (bathsRaw) {
+      if (/^\d{1,2}(?:\.\d)?$/.test(bathsRaw) && parseFloat(bathsRaw) <= 20) { baths = String(parseFloat(bathsRaw)); } else { fail('baths', 'Use a number like 2 or 2.5.'); }
+    }
+
+    var link = val('listing_url');
+    if (!link) { out['Listing URL'] = ''; }
+    else {
+      var full = /^https?:\/\//i.test(link) ? link : 'https://' + link, okUrl = false;
+      if (!/\s/.test(link)) {
+        try { var u = new URL(full); okUrl = (u.protocol === 'http:' || u.protocol === 'https:') && u.hostname.indexOf('.') > 0; } catch (e) { okUrl = false; }
+      }
+      if (!okUrl) { fail('listing_url', 'Enter a full link, like https://example.com/flyer.'); out['Listing URL'] = link; }
+      else { out['Listing URL'] = full; }
+    }
+
+    var name = val('agent_name');
+    if (name.length < 2) { fail('agent_name', 'Enter your name.'); }
+    out['Agent name'] = name;
+
+    var email = val('agent_email');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { fail('agent_email', 'Enter a valid email address.'); }
+    out['Agent email'] = email;
+
+    var phone = val('agent_phone'), digits = phone.replace(/\D/g, '');
+    if (phone && (digits.length < 10 || digits.length > 15)) { fail('agent_phone', 'Enter a 10-digit phone number, or leave it blank.'); }
+    out['Agent phone'] = phone;
+
+    // Beds and baths have no label of their own in the contract, so they lead the Notes line.
+    var house = [];
+    if (beds) { house.push(beds + ' bed'); }
+    if (baths) { house.push(baths + ' bath'); }
+    var notes = [];
+    if (house.length) { notes.push('House: ' + house.join(' / ') + '.'); }
+    var free = val('notes');
+    if (free) { notes.push(free); }
+    out['Notes'] = notes.join(' ');
+
+    return { values: out, errors: errors };
+  }
+
+  function buildBody(values) {
+    return FIELD_ORDER.map(function (label) {
+      var v = values[label];
+      return label + ':' + (v ? ' ' + v : '');
+    }).join(NL);
+  }
+  function buildSubject(values) { return 'Deal: ' + values['Address']; }
+  function buildMailto(values) {
+    return 'mailto:' + TO + '?subject=' + encodeURIComponent(buildSubject(values)) + '&body=' + encodeURIComponent(buildBody(values));
+  }
+  function encodedSize(values) { return encodeURIComponent(buildBody(values)).length; }
+
+  function renderErrors(errors, moveFocus) {
+    var byId = {};
+    errors.forEach(function (e) { if (!byId[e.id]) { byId[e.id] = e.msg; } });
+    CONTROLS.forEach(function (id) {
+      var el = $(id), box = $('e-' + id);
+      if (byId[id]) { el.setAttribute('aria-invalid', 'true'); box.textContent = byId[id]; box.hidden = false; }
+      else { el.removeAttribute('aria-invalid'); box.textContent = ''; box.hidden = true; }
+    });
+    var summary = $('form-error'), n = Object.keys(byId).length;
+    if (n) { summary.textContent = n === 1 ? 'Please fix the field marked below.' : 'Please fix the ' + n + ' fields marked below.'; summary.hidden = false; }
+    else { summary.textContent = ''; summary.hidden = true; }
+    if (moveFocus && errors.length) { $(errors[0].id).focus(); }
+  }
+
+  function updateMeter(result) {
+    var size = encodedSize(result.values), meter = $('size-meter');
+    if (size >= WARN_ENCODED) {
+      meter.hidden = false;
+      meter.className = 'size-meter' + (size > MAX_ENCODED ? ' over' : '');
+      meter.textContent = 'Message size: ' + fmtInt(size) + ' of ' + fmtInt(MAX_ENCODED) + ' characters.';
+    } else { meter.hidden = true; meter.textContent = ''; }
+    return size;
+  }
+
+  function evaluate() {
+    var result = read(), size = updateMeter(result);
+    if (size > MAX_ENCODED) {
+      result.errors.push({ id: 'notes', msg: 'Too long for an email link by ' + fmtInt(size - MAX_ENCODED) + ' characters. Shorten the notes or the listing link.' });
+    }
+    return result;
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    attempted = true;
+    var result = evaluate();
+    renderErrors(result.errors, true);
+    if (result.errors.length) { return; }
+
+    var href = buildMailto(result.values), body = buildBody(result.values);
+    $('composed').value = body;
+    $('r-subject').textContent = buildSubject(result.values);
+    $('mailto-link').setAttribute('href', href);
+    $('copy-status').textContent = '';
+    $('copy-status').className = 'status';
+    var review = $('review');
+    review.hidden = false;
+    var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    review.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+    review.focus({ preventScroll: true });
+    window.location.href = href;   // hands off to the realtor's own mail app
+  });
+
+  function refresh() {
+    var result = evaluate();
+    if (attempted) { renderErrors(result.errors, false); }
+  }
+  form.addEventListener('input', refresh);
+  form.addEventListener('change', refresh);
+
+  $('copy-btn').addEventListener('click', function () {
+    var box = $('composed'), status = $('copy-status');
+    function done(ok) {
+      status.className = 'status' + (ok ? '' : ' bad');
+      status.textContent = ok ? 'Copied. Paste it into a new email.' : 'Could not copy. Select the text and copy it by hand.';
+    }
+    function legacy() {
+      box.focus(); box.select(); box.setSelectionRange(0, box.value.length);
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      done(ok);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(box.value).then(function () { done(true); }, legacy);
+    } else { legacy(); }
+  });
+
+  updateMeter(read());
+}());
+</script>
+</body>
+</html>

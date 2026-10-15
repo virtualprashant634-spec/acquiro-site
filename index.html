@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acquiro by Avivo | AI deal desk for realtors</title>
+<meta name="description" content="Acquiro is an AI deal desk for Avivo realtors. Forward a deal email and get independent sold comps, a per-lot screen, and either a Surface flag or a Gmail reply draft. Nothing sends until you click.">
+<meta name="theme-color" content="#FBF9F6">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Acquiro by Avivo">
+<meta property="og:description" content="An AI deal desk for Avivo realtors. Every deal email, answered with real numbers.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23E4572E'/%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M16 6 25 26h-4.5l-1.6-4h-5.8l-1.6 4H7zm0 7-1.7 5h3.4z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
+<script>document.documentElement.className+=' js'</script>
+<style>
+/* ==========================================================================
+   Acquiro by Avivo: landing page (T-20)
+   One file, inline CSS, no framework, no build step, no tracking.
+   ========================================================================== */
+
+:root{
+  /* palette */
+  --canvas:#FBF9F6;       /* page */
+  --surface:#F4F1EA;      /* soft section band */
+  --frame:#ECE7DE;        /* placeholder frames */
+  --paper:#FFFFFF;        /* cards */
+  --ink:#1A1714;
+  --muted:#6B6358;        /* body secondary and all small captions (AA) */
+  --faint:#8B8378;        /* decorative strokes only, never text */
+  --line:#ECE7E0;
+  --line-strong:#E2DBD0;
+  --coral:#E4572E;        /* glow, large numerals, focus ring */
+  --coral-fill:#CC4A22;   /* button fill: same hue, deepened so white text clears 4.5:1 */
+  --coral-tint:#FCEFE9;
+  --coral-ink:#B53F1C;    /* small coral text */
+  --night:#16120E;
+  --night-ink:#F5EFE7;
+  --night-muted:#B9AD9D;
+  --ok:#009767;
+  --ok-tint:#E3F5EE;
+  --ok-ink:#00704A;
+  /* type */
+  --sans:'Geist','Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --serif:'Instrument Serif','Newsreader',Georgia,'Times New Roman',serif;
+  --mono:'Geist Mono','JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  /* motion */
+  --ease:cubic-bezier(.22,1,.36,1);   /* ease-out-expo-ish */
+  --ease2:cubic-bezier(.16,1,.3,1);   /* ease-out-quint-ish */
+  /* shape */
+  --shadow:0 2px 6px rgba(26,23,20,.05),0 18px 40px -20px rgba(26,23,20,.22);
+  --gutter:20px;
+  --nav-h:64px;
+}
+@media (min-width:640px){:root{--gutter:32px}}
+@media (min-width:1024px){:root{--gutter:40px}}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--canvas);color:var(--ink);font:400 1rem/1.65 var(--sans);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+svg{display:block;max-width:100%}
+a{color:inherit}
+p{margin:0;text-wrap:pretty}
+ul,ol{margin:0;padding:0;list-style:none}
+h1,h2,h3{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--coral);outline-offset:3px}
+::selection{background:var(--coral-tint);color:var(--ink)}
+
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:16px;top:-120px;z-index:100;background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:500}
+.skip:focus{top:12px}
+
+/* ---------- layout ---------- */
+.wrap{width:100%;max-width:calc(1200px + 2 * var(--gutter));margin-inline:auto;padding-inline:var(--gutter)}
+.sec{position:relative;padding-block:clamp(72px,10vw,128px);overflow-x:clip}
+.sec-tight{padding-block:clamp(24px,4vw,48px)}
+section[id]{scroll-margin-top:calc(var(--nav-h) - 1px)}
+.band{background:linear-gradient(180deg,var(--canvas) 0%,var(--surface) 22%,var(--surface) 72%,var(--canvas) 100%)}
+.sec-head{max-width:780px;margin-bottom:clamp(36px,5vw,64px)}
+.sec-head.center{margin-inline:auto;text-align:center}
+
+/* ---------- type ---------- */
+.eyebrow{margin:0 0 20px;font:500 .75rem/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--coral-ink)}
+.display{font-family:var(--sans);font-weight:500;letter-spacing:-.03em;line-height:1.02;text-wrap:balance}
+h1.display{font-size:clamp(2.5rem,1.2rem + 5.2vw,4.5rem)}
+h2.display{font-size:clamp(2.375rem,1.45rem + 3.4vw,4rem)}
+.display em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.015em;font-size:1.08em}
+h3{font-weight:500;font-size:1.25rem;line-height:1.25;letter-spacing:-.015em}
+.lead{font-size:clamp(1.0625rem,1rem + .3vw,1.1875rem);line-height:1.65;color:var(--muted);max-width:60ch}
+.sec-head.center .lead{margin-inline:auto}
+.sec-head .lead{margin-top:24px}
+.muted{color:var(--muted)}
+.note{margin-top:clamp(24px,3vw,36px);text-align:center;color:var(--muted);font-size:.9375rem}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 26px;border-radius:999px;border:1px solid transparent;font-weight:500;font-size:1rem;line-height:1;text-decoration:none;white-space:nowrap;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s var(--ease),background-color .3s var(--ease),border-color .3s var(--ease)}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--coral-fill);color:#fff;box-shadow:0 4px 12px -2px rgba(228,87,46,.6)}
+.btn-primary:hover{box-shadow:0 8px 18px -4px rgba(228,87,46,.6)}
+.btn-secondary{background:rgba(255,255,255,.72);border-color:var(--line-strong);color:var(--ink)}
+.btn-secondary:hover{background:#fff;border-color:#D6CDBF}
+.btn-sm{min-height:44px;padding:0 18px;font-size:.9375rem}
+.cta-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+
+/* ---------- cards, tags, chips ---------- */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+.tag{display:inline-flex;align-items:center;align-self:flex-start;max-width:100%;padding:5px 11px;border-radius:999px;font:500 .72rem/1.25 var(--mono);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.tag-coming{background:var(--coral-tint);color:var(--coral-ink)}
+.tag-built{background:var(--ok-tint);color:var(--ok-ink)}
+.dots{display:inline-flex;align-items:center;gap:4px}
+.dots i{display:block;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.6}
+.chip-surface{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--ok-tint);border:1px solid rgba(0,151,103,.28);color:var(--ok-ink);font-weight:600;font-size:.875rem;line-height:1}
+.chip-surface i{display:block;width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.src{display:inline-block;padding:6px 10px;border-radius:999px;font:500 .72rem/1 var(--mono);white-space:nowrap}
+.src-sent{background:var(--surface);border:1px solid var(--line-strong);color:var(--muted)}
+.src-found{background:var(--ok-tint);border:1px solid rgba(0,151,103,.25);color:var(--ok-ink)}
+.sk{display:block;height:9px;border-radius:999px;background:var(--frame)}
+
+/* ==========================================================================
+   Nav
+   ========================================================================== */
+.nav{position:sticky;top:0;z-index:50;background:rgba(251,249,246,.94);border-bottom:1px solid var(--line)}
+@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  .nav{background:rgba(251,249,246,.74);-webkit-backdrop-filter:saturate(1.4) blur(16px);backdrop-filter:saturate(1.4) blur(16px)}
+}
+.nav-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:var(--nav-h)}
+.brand{display:inline-flex;align-items:baseline;gap:7px;min-height:44px;align-items:center;text-decoration:none}
+.brand-name{font-weight:600;font-size:1.1875rem;letter-spacing:-.03em}
+.brand-by{font:italic 400 1.0625rem/1 var(--serif);color:var(--muted)}
+.nav-actions{display:flex;align-items:center;gap:8px}
+.menu ul{display:flex;flex-direction:column}
+.menu a{display:flex;align-items:center;min-height:52px;font-size:1.0625rem;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}
+.menu li:last-child a{border-bottom:0}
+.menu-btn{position:relative;width:44px;height:44px;padding:0;border-radius:999px;border:1px solid var(--line-strong);background:#fff;cursor:pointer}
+.menu-btn span{position:absolute;left:13px;right:13px;height:2px;border-radius:2px;background:var(--ink);transition:transform .3s var(--ease),top .3s var(--ease)}
+.menu-btn span:nth-child(1){top:16px}
+.menu-btn span:nth-child(2){top:24px}
+.nav.open .menu-btn span:nth-child(1){top:20px;transform:rotate(45deg)}
+.nav.open .menu-btn span:nth-child(2){top:20px;transform:rotate(-45deg)}
+/* no-JS: links sit in a row under the bar and the toggle is hidden */
+html:not(.js) .menu-btn{display:none}
+html:not(.js) .nav-bar{flex-wrap:wrap}
+html:not(.js) .menu{order:3;width:100%}
+html:not(.js) .menu ul{flex-direction:row;flex-wrap:wrap;column-gap:18px}
+html:not(.js) .menu a{border:0;min-height:44px}
+/* JS: collapsible dropdown under 1024px */
+.js .menu{display:none;position:absolute;top:100%;left:0;right:0;padding:4px var(--gutter) 14px;background:var(--canvas);border-bottom:1px solid var(--line);box-shadow:0 22px 30px -22px rgba(26,23,20,.3)}
+.js .nav.open .menu{display:block}
+@media (min-width:1024px){
+  .menu-btn{display:none}
+  .js .menu,html:not(.js) .menu{display:block;position:static;order:0;width:auto;padding:0;background:none;border:0;box-shadow:none}
+  .menu ul,html:not(.js) .menu ul{flex-direction:row;gap:2px}
+  .menu a,html:not(.js) .menu a{min-height:44px;padding:0 14px;border:0;border-radius:999px;font-size:.9375rem;color:var(--muted);transition:color .3s var(--ease),background-color .3s var(--ease)}
+  .menu a:hover{color:var(--ink);background:rgba(26,23,20,.05)}
+}
+@media (max-width:359px){.brand-by{display:none}}
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+.hero{position:relative;isolation:isolate;overflow-x:clip;text-align:center;padding-block:clamp(56px,9vw,112px) clamp(64px,8vw,112px)}
+.hero::before{content:"";position:absolute;z-index:-1;inset:0 0 auto 0;height:min(760px,100%);background:radial-gradient(60% 80% at 50% 0%,rgba(228,87,46,.14),rgba(228,87,46,0) 70%);pointer-events:none}
+.hero .eyebrow{margin-bottom:24px}
+.hero h1{max-width:18ch;margin-inline:auto}
+.hero h1 em{color:var(--coral)}
+.hero .lead{margin:28px auto 0;max-width:58ch}
+.hero .cta-row{margin-top:36px}
+.built-with{margin-top:28px;font:400 .8125rem/1.5 var(--mono);letter-spacing:.02em;color:var(--muted)}
+.w{display:inline-block}
+
+.stage{position:relative;isolation:isolate;max-width:1080px;margin:clamp(48px,7vw,88px) auto 0;padding:clamp(14px,2.6vw,32px);text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:clamp(28px,4.5vw,48px);box-shadow:var(--shadow)}
+.stage::before{content:"";position:absolute;z-index:-1;inset:-14% 6% auto;height:75%;background:radial-gradient(closest-side,rgba(228,87,46,.2),rgba(228,87,46,0));filter:blur(10px);pointer-events:none}
+.stage-in{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.pane{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
+.pane-label{font:500 .72rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pane-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:34px}
+.mail-head{display:flex;align-items:center;gap:12px;margin-top:18px}
+.mail-dot{flex:none;width:34px;height:34px;border-radius:50%;background:var(--frame)}
+.mail-head .sk-lines{flex:1;margin:0}
+.sk-lines{display:grid;gap:10px;margin-top:18px}
+.fmt{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.fmt li{padding:8px 11px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:500 .72rem/1 var(--mono);color:var(--muted)}
+.flow{display:grid;place-items:center}
+.flow span{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--paper);border:1px solid var(--line-strong);box-shadow:0 8px 18px -10px rgba(26,23,20,.3)}
+.flow svg{width:20px;height:20px;transform:rotate(90deg)}
+.rows{margin-top:12px}
+.rows li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 14px;padding:13px 0;border-top:1px solid var(--line)}
+.rows li:first-child{border-top:0}
+.rows .k{display:block;margin-bottom:9px;font:500 .72rem/1 var(--mono);letter-spacing:.04em;color:var(--muted)}
+.rows .sk{height:10px}
+@media (min-width:860px){
+  .stage-in{grid-template-columns:minmax(0,1fr) auto minmax(0,1.2fr);align-items:center;gap:18px}
+  .flow svg{transform:none}
+}
+
+/* ==========================================================================
+   Problem
+   ========================================================================== */
+.split{display:grid;gap:clamp(36px,5vw,56px);align-items:center}
+@media (min-width:1024px){.split{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:80px}}
+.map{padding:14px;border-radius:32px;background:var(--canvas);border:1px solid var(--line);box-shadow:var(--shadow)}
+.map svg{width:100%;height:auto}
+
+/* ==========================================================================
+   How it works
+   ========================================================================== */
+.steps{display:grid;gap:20px}
+.step{display:flex;flex-direction:column;padding:clamp(24px,3vw,32px)}
+.num{font-weight:500;font-size:clamp(2.5rem,3vw,3rem);line-height:1;letter-spacing:-.04em;color:var(--coral);font-variant-numeric:tabular-nums}
+.step h3{margin-top:22px}
+.step p{margin:12px 0 28px;color:var(--muted)}
+.step p a,.cta .lead a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.mini{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:84px;margin-top:auto;padding:16px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
+.mini-bars{display:flex;align-items:flex-end;gap:10px;width:100%;height:52px}
+.mini-bars span{flex:1;border-radius:8px 8px 4px 4px;background:var(--frame);border:1px solid var(--line-strong)}
+.mini-bars .claimed{background:transparent;border:1.5px dashed var(--faint)}
+.mini-cap{display:flex;justify-content:space-between;gap:8px;width:100%;margin-top:-2px;font:500 .72rem/1.2 var(--mono);color:var(--muted)}
+.screening{display:inline-flex;align-items:center;gap:10px;padding:9px 14px;border-radius:999px;background:var(--paper);border:1px solid var(--line-strong);font:500 .75rem/1 var(--mono);color:var(--muted)}
+@media (min-width:1024px){.steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}}
+
+/* ==========================================================================
+   Features (2 rows x 3 columns on desktop)
+   ========================================================================== */
+.feat-grid{display:grid;gap:20px}
+.feat{display:flex;flex-direction:column;height:100%;padding:clamp(24px,3vw,32px)}
+.feat-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-height:48px}
+.ico{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.ico svg{width:24px;height:24px;fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.feat h3{margin-top:22px}
+.feat p{margin-top:10px;color:var(--muted);font-size:.9688rem}
+@media (min-width:640px){.feat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1024px){.feat-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}}
+
+/* ==========================================================================
+   Buy box
+   ========================================================================== */
+.stats{display:grid;gap:16px;margin-top:clamp(28px,4vw,40px)}
+.stat{display:flex;flex-direction:column;justify-content:center;padding:clamp(24px,3vw,32px);text-align:center}
+.stat strong{display:block;font-weight:500;font-size:clamp(1.625rem,1.3rem + 1vw,2.125rem);line-height:1.12;letter-spacing:-.03em;color:var(--coral);text-wrap:balance}
+.stat span{display:block;margin-top:10px;color:var(--muted)}
+@media (min-width:1024px){.stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}}
+
+/* ==========================================================================
+   Asset packs
+   ========================================================================== */
+.pack-cards{display:grid;gap:16px;counter-reset:pack}
+.pack-card{padding:26px;counter-increment:pack}
+.pack-card::before{content:counter(pack);display:grid;place-items:center;width:32px;height:32px;margin-bottom:18px;border-radius:50%;background:var(--coral-tint);color:var(--coral-ink);font:500 .8125rem/1 var(--mono)}
+.pack-card p{margin-top:10px;color:var(--muted);font-size:.9688rem}
+.packs{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(28px,4vw,44px)}
+.pack{display:inline-flex;align-items:center;flex-wrap:wrap;gap:10px;min-height:48px;padding:10px 14px 10px 18px;border-radius:14px;background:var(--paper);border:1px solid var(--line-strong);font-weight:500}
+.pack-on{background:var(--ink);border-color:var(--ink);color:#fff}
+.pack-line{margin-top:20px;color:var(--muted)}
+@media (min-width:640px){.pack-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1024px){.pack-cards{grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}}
+
+/* ==========================================================================
+   Human in the loop (night band)
+   ========================================================================== */
+.night-sec{padding-block:clamp(16px,3vw,32px)}
+.night-wrap{margin-inline:clamp(8px,2vw,24px)}
+.night{position:relative;isolation:isolate;overflow:hidden;border-radius:clamp(28px,4.5vw,56px);background:var(--night);color:var(--night-ink);padding-block:clamp(64px,9vw,120px)}
+.night::before{content:"";position:absolute;z-index:-1;inset:0 0 auto 0;height:70%;background:radial-gradient(55% 70% at 50% 0%,rgba(228,87,46,.18),rgba(228,87,46,0) 70%);pointer-events:none}
+.night .eyebrow{color:var(--coral)}
+.night .display{color:var(--night-ink)}
+.night-grid{display:grid;gap:16px}
+.night-card{padding:clamp(24px,3vw,32px);border-radius:24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);box-shadow:0 18px 40px -22px rgba(0,0,0,.7)}
+.night-card h3{color:var(--night-ink)}
+.night-card p{margin-top:10px;color:var(--night-muted)}
+@media (min-width:768px){.night-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}}
+
+/* ==========================================================================
+   Demo and screens
+   ========================================================================== */
+.video{position:relative;isolation:isolate;overflow:hidden;display:grid;place-items:center;width:100%;min-width:0;aspect-ratio:16/9;min-height:268px;padding:28px 24px;text-align:center;background:var(--frame);border:1px solid var(--line-strong);border-radius:clamp(28px,4.5vw,48px);box-shadow:var(--shadow)}
+.video::before{content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(45% 55% at 50% 45%,rgba(228,87,46,.16),rgba(228,87,46,0) 70%);pointer-events:none}
+.video-in{display:grid;justify-items:center}
+.play{display:grid;place-items:center;width:clamp(64px,8vw,88px);aspect-ratio:1;border-radius:50%;background:var(--coral-fill);box-shadow:0 8px 22px -6px rgba(228,87,46,.65)}
+.play svg{width:34%;height:34%;margin-left:6%;fill:#fff}
+.video-cap{margin-top:22px;max-width:44ch;font-size:clamp(.9688rem,.88rem + .4vw,1.125rem);line-height:1.5;color:var(--ink)}
+.shots{display:grid;gap:16px;margin:clamp(20px,3vw,32px) 0 0;padding:0}
+.shot{position:relative;height:100%;display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:230px;padding:18px 20px 20px;overflow:hidden;background:var(--frame);border:1px solid var(--line-strong);border-radius:28px}
+.shot-top{display:flex;align-items:center;gap:6px}
+.shot-top i{display:block;width:9px;height:9px;border-radius:50%;background:#D9D1C4}
+.shot-lines{display:grid;gap:9px;margin-top:20px}
+.shot-lines .sk{background:#E3DCCF;height:8px}
+.shot-n{display:block;margin-bottom:8px;font:500 .72rem/1 var(--mono);letter-spacing:.14em;color:var(--muted)}
+.shot p{font-size:.9688rem;line-height:1.45;color:var(--ink)}
+@media (min-width:640px){.shots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1280px){.shots{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* ==========================================================================
+   Roadmap: vertical on mobile, horizontal from 1120px
+   ========================================================================== */
+.timeline{position:relative;display:grid;gap:16px;padding-left:32px}
+.timeline::before{content:"";position:absolute;left:9px;top:12px;bottom:12px;width:1px;background:var(--line-strong);pointer-events:none}
+.tl{position:relative}
+.tl::before{content:"";position:absolute;left:-30px;top:24px;width:15px;height:15px;border-radius:50%;background:var(--paper);border:2px solid var(--faint)}
+.tl:first-child::before{background:var(--ok);border-color:var(--ok);box-shadow:0 0 0 5px rgba(0,151,103,.14)}
+.tl-card{display:flex;flex-direction:column;gap:12px;height:100%;padding:22px}
+.tl-card .tag{white-space:normal;border-radius:14px;letter-spacing:.05em;line-height:1.3}
+.tl-stage{font:500 .72rem/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--coral-ink)}
+.tl-text{font-size:.9688rem;line-height:1.5;color:var(--ink)}
+.tl-card .tag{margin-top:auto}
+.tl-card .tl-text{margin-bottom:6px}
+@media (min-width:1120px){
+  .tl-card{padding:20px 18px}
+  .timeline{grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;padding:40px 0 0}
+  .timeline::before{left:0;right:0;top:7px;bottom:auto;width:auto;height:1px}
+  .tl::before{left:20px;top:-40px}
+}
+
+/* ==========================================================================
+   FAQ
+   ========================================================================== */
+.faq{max-width:820px;margin-inline:auto;border-top:1px solid var(--line-strong)}
+.faq-item{border-bottom:1px solid var(--line-strong)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;gap:20px;width:100%;min-height:64px;padding:16px 0;background:none;border:0;text-align:left;font-weight:500;font-size:clamp(1.0625rem,1rem + .35vw,1.25rem);line-height:1.35;letter-spacing:-.01em;cursor:pointer}
+.faq-ico{position:relative;flex:none;width:36px;height:36px;border-radius:50%;background:var(--paper);border:1px solid var(--line-strong)}
+.faq-ico::before,.faq-ico::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:1.6px;margin:-.8px 0 0 -6px;border-radius:2px;background:var(--ink);transition:transform .3s var(--ease)}
+.faq-ico::after{transform:rotate(90deg)}
+.faq-item.open .faq-ico::after{transform:rotate(0)}
+.faq-panel{display:grid;grid-template-rows:1fr;transition:grid-template-rows .35s var(--ease)}
+.faq-panel > div{overflow:hidden;min-height:0;transition:visibility 0s}
+.faq-panel p{padding:0 56px 22px 0;color:var(--muted);max-width:62ch}
+.js .faq-item:not(.open) .faq-panel{grid-template-rows:0fr}
+.js .faq-item:not(.open) .faq-panel > div{visibility:hidden;transition-delay:.35s}
+
+/* ==========================================================================
+   Final CTA and footer
+   ========================================================================== */
+.cta{position:relative;isolation:isolate;overflow:hidden;text-align:center;padding:clamp(48px,8vw,104px) clamp(20px,5vw,64px);background:var(--coral-tint);border:1px solid #F6D9CC;border-radius:clamp(32px,5vw,56px);box-shadow:var(--shadow)}
+.cta::before{content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(60% 75% at 50% 0%,rgba(228,87,46,.2),rgba(228,87,46,0) 72%);pointer-events:none}
+.cta h2 em{color:var(--coral-ink)}
+.cta .lead{margin:24px auto 0;color:#5B5348}
+.cta .cta-row{margin-top:36px}
+.foot{padding:32px 0 48px;border-top:1px solid var(--line);text-align:center}
+.foot p{max-width:none;font:400 .8125rem/1.7 var(--mono);letter-spacing:.02em;color:var(--muted)}
+
+/* ==========================================================================
+   Motion (calm; everything here is off under prefers-reduced-motion)
+   ========================================================================== */
+@keyframes wordIn{from{opacity:0;filter:blur(10px);transform:translateY(.22em)}to{opacity:1;filter:blur(0);transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,151,103,.42)}70%{box-shadow:0 0 0 16px rgba(0,151,103,0)}100%{box-shadow:0 0 0 0 rgba(0,151,103,0)}}
+@keyframes dot{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+@media (prefers-reduced-motion:no-preference){
+  html{scroll-behavior:smooth}
+  .w{animation:wordIn .9s var(--ease2) backwards;animation-delay:calc(120ms + var(--i,0) * 60ms)}
+  .load{animation:fadeUp .8s var(--ease) backwards;animation-delay:calc(var(--d,0) * 1ms)}
+  .js .rise:not(.in){opacity:0}
+  .rise.in{animation:rise .5s var(--ease) backwards;animation-delay:calc(var(--i,0) * 80ms)}
+  .pulse{animation:pulse 1.8s var(--ease2) 2s 1}
+  .dots i{animation:dot 1.2s ease-in-out infinite}
+  .dots i:nth-child(2){animation-delay:.15s}
+  .dots i:nth-child(3){animation-delay:.3s}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ============================ 0. Top nav ============================ -->
+<header class="nav" id="nav">
+  <div class="wrap nav-bar">
+    <a class="brand" href="#top" aria-label="Acquiro by Avivo, back to top"><span class="brand-name">Acquiro</span> <span class="brand-by">by Avivo</span></a>
+    <nav class="menu" id="menu" aria-label="Primary">
+      <ul>
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#asset-packs">Asset packs</a></li>
+        <li><a href="#trust">Trust</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-primary btn-sm" href="#demo">See the demo</a>
+      <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Menu"><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============================ 1. Hero ============================ -->
+<section class="hero" id="top" aria-labelledby="hero-h">
+  <div class="wrap">
+    <p class="eyebrow load" style="--d:0">Agentic Society hackathon · Austin</p>
+    <h1 class="display" id="hero-h"><span class="w" style="--i:0">Every</span> <span class="w" style="--i:1">deal</span> <span class="w" style="--i:2">email,</span> <em><span class="w" style="--i:3">answered</span> <span class="w" style="--i:4">with</span> <span class="w" style="--i:5">real</span> <span class="w" style="--i:6">numbers.</span></em></h1>
+    <p class="lead load" style="--d:650">Acquiro is an AI deal desk for Avivo realtors. Forward a deal email. It checks the facts, pulls independent sold comps, and judges every lot. Then it flags the winners for you, or drafts the reply. Nothing sends until you click.</p>
+    <div class="cta-row load" style="--d:800">
+      <a class="btn btn-primary" href="#demo">See the demo</a>
+      <a class="btn btn-secondary" href="#how-it-works">How it works</a>
+    </div>
+    <p class="built-with load" style="--d:900">Built with Claude Code, Composio and Supabase.</p>
+
+    <!-- Placeholder product frame: replace with a real screen capture when one exists. -->
+    <div class="stage rise" role="img" aria-label="Illustration placeholder. A deal email on the left turns into a standard deal record on the right. Each fact in the record is tagged agent sent or we found, and the deal carries a green Surface flag.">
+      <div class="stage-in">
+        <div class="pane">
+          <p class="pane-label">Deal email</p>
+          <div class="mail-head">
+            <span class="mail-dot"></span>
+            <div class="sk-lines"><span class="sk" style="width:46%"></span><span class="sk" style="width:70%;opacity:.65"></span></div>
+          </div>
+          <div class="sk-lines">
+            <span class="sk" style="width:100%"></span>
+            <span class="sk" style="width:94%"></span>
+            <span class="sk" style="width:98%"></span>
+            <span class="sk" style="width:62%"></span>
+            <span class="sk" style="width:88%"></span>
+            <span class="sk" style="width:40%"></span>
+          </div>
+          <ul class="fmt"><li>Plain text</li><li>PDF flyer</li><li>MLS sheet</li></ul>
+        </div>
+        <div class="flow"><span><svg viewBox="0 0 24 24" fill="none" stroke="#1A1714" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+        <div class="pane">
+          <div class="pane-top"><p class="pane-label">Deal record</p><span class="chip-surface pulse"><i></i>Surface</span></div>
+          <ul class="rows">
+            <li><div><span class="k">Address</span><span class="sk" style="width:72%"></span></div><span class="src src-sent">agent sent</span></li>
+            <li><div><span class="k">Lot size</span><span class="sk" style="width:44%"></span></div><span class="src src-found">we found</span></li>
+            <li><div><span class="k">Zoning</span><span class="sk" style="width:34%"></span></div><span class="src src-found">we found</span></li>
+            <li><div><span class="k">After-repair value</span><span class="sk" style="width:52%"></span></div><span class="src src-sent">agent sent</span></li>
+            <li><div><span class="k">Sold comps</span><span class="sk" style="width:62%"></span></div><span class="src src-found">we found</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 2. The problem ============================ -->
+<section class="sec band" id="problem" aria-labelledby="problem-h">
+  <div class="wrap split">
+    <div class="rise">
+      <p class="eyebrow">The problem</p>
+      <h2 class="display" id="problem-h">Good lots get lost in the <em>inbox.</em></h2>
+      <p class="lead" style="margin-top:28px">Deal emails arrive all day from wholesalers, InvestorLift blasts and brokers. Each one claims an after-repair value. Checking it by hand takes time, so agents often never hear back. Agents who never hear back stop sending deals.</p>
+    </div>
+    <!-- Decorative line drawing: one lot on an Austin-style street grid. No text, no data. -->
+    <div class="map rise" style="--i:1" aria-hidden="true">
+      <svg viewBox="0 0 520 400" focusable="false">
+        <g stroke="#E2DBD0" stroke-width="1.5" stroke-dasharray="6 8" fill="none"><path d="M0 135H520M0 265H520M175 0V400M345 0V400"/></g>
+        <g fill="#fff" stroke="#E2DBD0" stroke-width="1.5">
+          <rect x="24" y="24" width="135" height="95" rx="10"/><rect x="191" y="24" width="138" height="95" rx="10"/><rect x="361" y="24" width="135" height="95" rx="10"/>
+          <rect x="24" y="151" width="135" height="98" rx="10"/><rect x="191" y="151" width="138" height="98" rx="10"/><rect x="361" y="151" width="135" height="98" rx="10"/>
+          <rect x="24" y="281" width="135" height="95" rx="10"/><rect x="191" y="281" width="138" height="95" rx="10"/><rect x="361" y="281" width="135" height="95" rx="10"/>
+        </g>
+        <g stroke="#ECE7E0" stroke-width="1.5" fill="none">
+          <path d="M69 24V119M114 24V119M237 24V119M283 24V119M406 24V119M451 24V119"/>
+          <path d="M69 151V249M114 151V249M237 151V249M283 151V249M406 151V249M451 151V249"/>
+          <path d="M69 281V376M114 281V376M237 281V376M283 281V376M406 281V376M451 281V376"/>
+        </g>
+        <rect x="237" y="151" width="46" height="98" fill="#FCEFE9" stroke="#1A1714" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <rect x="246" y="186" width="28" height="42" rx="3" fill="none" stroke="#1A1714" stroke-width="1.5"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 3. How it works ============================ -->
+<section class="sec" id="how-it-works" aria-labelledby="how-h">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <p class="eyebrow">How it works</p>
+      <h2 class="display" id="how-h">From deal email to decision, <em>in three steps.</em></h2>
+    </div>
+    <ol class="steps">
+      <li class="card step rise" style="--i:0">
+        <span class="num">01</span>
+        <h3>Forward the deal.</h3>
+        <p>Send the InvestorLift blast or broker email to <a href="mailto:prashant+deals@avivo.homes">prashant+deals@avivo.homes</a>, or fill in the <a href="submit.html">deal form</a>. The desk reads the text, the flyer or the MLS sheet and fills in one standard deal record. Every fact is tagged &ldquo;agent sent&rdquo; or &ldquo;we found.&rdquo;</p>
+        <div class="mini" aria-hidden="true"><span class="src src-sent">agent sent</span><span class="src src-found">we found</span></div>
+      </li>
+      <li class="card step rise" style="--i:1">
+        <span class="num">02</span>
+        <h3>It checks the comps.</h3>
+        <p>The desk pulls independent closed new-build sales from MLS sold data, within 0.25 to 0.5 mile of the lot, and sets their price per square foot beside the number the wholesaler claimed. Their after-repair value is shown, but never used in the math.</p>
+        <div class="mini" aria-hidden="true">
+          <div class="mini-bars"><span style="height:56%"></span><span style="height:78%"></span><span style="height:66%"></span><span class="claimed" style="height:72%"></span></div>
+          <div class="mini-cap"><span>Closed comps</span><span>Claimed</span></div>
+        </div>
+      </li>
+      <li class="card step rise" style="--i:2">
+        <span class="num">03</span>
+        <h3>You get a verdict.</h3>
+        <p>It works out the profit per lot for a 2-house and a 3-house plan. At $600k or more profit per lot and a 20% margin on cost, the deal is flagged <strong>Surface</strong> for you. If not, a 3-bullet reply with the real numbers and the price that works waits in your Gmail drafts.</p>
+        <div class="mini" aria-hidden="true"><span class="screening">Screening<span class="dots"><i></i><i></i><i></i></span></span><span class="chip-surface"><i></i>Surface</span></div>
+      </li>
+    </ol>
+    <p class="note rise">Nothing goes out until you click send.</p>
+  </div>
+</section>
+
+<!-- ============================ 4. Features ============================ -->
+<section class="sec" id="features" aria-labelledby="features-h" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <p class="eyebrow">What it does</p>
+      <h2 class="display" id="features-h">The due diligence, <em>done before you open it.</em></h2>
+    </div>
+    <ul class="feat-grid">
+      <li class="card feat rise" style="--i:0">
+        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 8 8 6 8-6"/></svg></span></div>
+        <h3>Reads any deal email</h3>
+        <p>Plain text, PDF flyers, MLS sheets and InvestorLift blasts become one standard deal record.</p>
+      </li>
+      <li class="card feat rise" style="--i:1">
+        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="12" cy="12" r="2.5"/><path d="M7 12h2.5M14.5 12H17"/></svg></span></div>
+        <h3>Facts you can trace</h3>
+        <p>Every field shows where it came from: &ldquo;agent sent&rdquo; or &ldquo;we found.&rdquo; Lot size and zoning are looked up on their own, not copied from the flyer.</p>
+      </li>
+      <li class="card feat rise" style="--i:2">
+        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5"/></svg></span></div>
+        <h3>Independent sold comps</h3>
+        <p>Closed new-build sales from MLS sold data, within 0.25 to 0.5 mile of the lot and over the last 12 months, with the count, median, low and high. Under 3 comps, it says &ldquo;insufficient comps.&rdquo; It never passes a deal on thin data.</p>
+      </li>
+      <li class="card feat rise" style="--i:0">
+        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 4v16M4 12h8"/></svg></span></div>
+        <h3>Judged per lot</h3>
+        <p>2 houses or 3, whichever makes more. Profit is measured on the lot, not on the house or on a percentage.</p>
+      </li>
+      <li class="card feat rise" style="--i:1">
+        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 21V4M6 5h11l-2 4 2 4H6"/></svg></span></div>
+        <h3>Surface or draft</h3>
+        <p>A Surface flag when a lot clears $600k profit and a 20% margin on cost. Otherwise a 3-bullet Gmail reply with the price that works.</p>
+      </li>
+      <li class="card feat rise" style="--i:2">
+        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20h16M6 20V9l6-4 6 4v11M10 20v-5h4v5"/></svg></span><span class="tag tag-coming">Coming</span></div>
+        <h3>Austin permit pull</h3>
+        <p>Reads City of Austin public permit records to list teardown sites and active builders. Lists only.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================ 5. Buy box ============================ -->
+<section class="sec sec-tight" id="buy-box" aria-labelledby="buybox-h">
+  <div class="wrap">
+    <h2 class="eyebrow rise" id="buybox-h" style="text-align:center;margin:0">The buy box</h2>
+    <ul class="stats">
+      <li class="card stat rise" style="--i:0"><strong>5,000+ sq ft</strong><span>of new construction per lot</span></li>
+      <li class="card stat rise" style="--i:1"><strong>$650 to $700+ per sq ft</strong><span>new-construction comps</span></li>
+      <li class="card stat rise" style="--i:2"><strong>$600k per lot</strong><span>profit floor, plus a 20% margin on cost</span></li>
+    </ul>
+    <p class="note rise">City of Austin lots and teardowns in four ZIPs: 78703, 78704, 78746 and 78757. 78731 is a watch ZIP. These are the screening rules the desk applies. They are not results.</p>
+  </div>
+</section>
+
+<!-- ============================ 6. Asset packs ============================ -->
+<section class="sec band" id="asset-packs" aria-labelledby="packs-h">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <p class="eyebrow">One engine, swappable packs</p>
+      <h2 class="display" id="packs-h">Built for lots. <em>Ready for the next asset class.</em></h2>
+      <p class="lead">The engine is the same for every deal: email in, standard record, facts checked, value worked out, scored, then a flag or a draft. Only the asset pack changes. A pack holds four things.</p>
+    </div>
+    <ol class="pack-cards">
+      <li class="card pack-card rise" style="--i:0"><h3>Buy box rules.</h3><p>The gates a deal must pass: where, how big, how strong the comps.</p></li>
+      <li class="card pack-card rise" style="--i:1"><h3>Value method.</h3><p>How a deal is valued. For lots: sold new-build comps, price per square foot.</p></li>
+      <li class="card pack-card rise" style="--i:2"><h3>Comp sources.</h3><p>Where the comps come from. For lots: an MLS sold export now, a live feed later.</p></li>
+      <li class="card pack-card rise" style="--i:3"><h3>Scoring threshold.</h3><p>The line a deal must clear. For lots: $600k profit per lot and a 20% margin on cost.</p></li>
+    </ol>
+    <ul class="packs rise">
+      <li class="pack pack-on">Lots <span class="tag tag-built">Built for the hackathon</span></li>
+      <li class="pack">Light industrial <span class="tag tag-coming">Coming</span></li>
+      <li class="pack">Strip retail <span class="tag tag-coming">Coming</span></li>
+      <li class="pack">Multifamily <span class="tag tag-coming">Coming</span></li>
+      <li class="pack">Storage <span class="tag tag-coming">Coming</span></li>
+    </ul>
+    <p class="pack-line rise">Future packs swap in income and rent comps or rent rolls. The engine stays the same.</p>
+  </div>
+</section>
+
+<!-- ============================ 7. Human in the loop ============================ -->
+<section class="night-sec" id="trust" aria-labelledby="trust-h">
+  <div class="night-wrap">
+    <div class="night">
+      <div class="wrap">
+        <div class="sec-head rise">
+          <p class="eyebrow">You stay in charge</p>
+          <h2 class="display" id="trust-h">It does the homework. <em>You make the call.</em></h2>
+        </div>
+        <ul class="night-grid">
+          <li class="night-card rise" style="--i:0"><h3>Nothing sends without a click.</h3><p>Replies are drafts in your Gmail. The desk has no send button.</p></li>
+          <li class="night-card rise" style="--i:1"><h3>Pricing is your call.</h3><p>The desk shows the math and the price that works. You decide.</p></li>
+          <li class="night-card rise" style="--i:2"><h3>Missing facts become questions.</h3><p>If the email leaves something out, the draft asks the agent for it.</p></li>
+          <li class="night-card rise" style="--i:3"><h3>No guessing.</h3><p>A weak address match comes back &ldquo;not found.&rdquo; The wholesaler&rsquo;s after-repair value is shown, never trusted.</p></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 8. Demo and screens ============================ -->
+<section class="sec" id="demo" aria-labelledby="demo-h">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <p class="eyebrow">See it run</p>
+      <h2 class="display" id="demo-h">One real deal email, <em>start to finish.</em></h2>
+      <p class="lead">Screens and a demo video are coming. The frames below show what each one will be.</p>
+    </div>
+
+    <!-- Swap this frame for a <video> (with poster) when the recording exists. -->
+    <div class="video rise" role="img" aria-label="Video placeholder. Demo video coming: forward a lot blast, get comps and a verdict.">
+      <div class="video-in">
+        <span class="play"><svg viewBox="0 0 24 24" focusable="false"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg></span>
+        <p class="video-cap">Demo video coming: forward a lot blast, get comps and a verdict.</p>
+      </div>
+    </div>
+
+    <!-- Swap each frame for a real screenshot; keep the caption and alt text. -->
+    <ol class="shots">
+      <li class="rise" style="--i:0"><div class="shot" role="img" aria-label="Screenshot placeholder 1. The deal record, with agent sent and we found tags.">
+        <div><div class="shot-top"><i></i><i></i><i></i></div><div class="shot-lines"><span class="sk" style="width:80%"></span><span class="sk" style="width:58%"></span><span class="sk" style="width:70%"></span></div></div>
+        <div><span class="shot-n">01</span><p>The deal record, with &ldquo;agent sent&rdquo; and &ldquo;we found&rdquo; tags.</p></div>
+      </div></li>
+      <li class="rise" style="--i:1"><div class="shot" role="img" aria-label="Screenshot placeholder 2. Our comps beside the wholesaler's claimed value.">
+        <div><div class="shot-top"><i></i><i></i><i></i></div><div class="shot-lines"><span class="sk" style="width:90%"></span><span class="sk" style="width:90%"></span><span class="sk" style="width:90%"></span></div></div>
+        <div><span class="shot-n">02</span><p>Our comps beside the wholesaler&rsquo;s claimed value.</p></div>
+      </div></li>
+      <li class="rise" style="--i:2"><div class="shot" role="img" aria-label="Screenshot placeholder 3. The per-lot math for 2 and 3 houses.">
+        <div><div class="shot-top"><i></i><i></i><i></i></div><div class="shot-lines"><span class="sk" style="width:46%"></span><span class="sk" style="width:62%"></span><span class="sk" style="width:38%"></span></div></div>
+        <div><span class="shot-n">03</span><p>The per-lot math for 2 and 3 houses.</p></div>
+      </div></li>
+      <li class="rise" style="--i:3"><div class="shot" role="img" aria-label="Screenshot placeholder 4. The Surface flag, or the 3-bullet draft in Gmail.">
+        <div><div class="shot-top"><i></i><i></i><i></i></div><div class="shot-lines"><span class="sk" style="width:34%"></span><span class="sk" style="width:76%"></span><span class="sk" style="width:60%"></span></div></div>
+        <div><span class="shot-n">04</span><p>The Surface flag, or the 3-bullet draft in Gmail.</p></div>
+      </div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============================ 9. Roadmap ============================ -->
+<section class="sec band" id="roadmap" aria-labelledby="roadmap-h">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <p class="eyebrow">Roadmap</p>
+      <h2 class="display" id="roadmap-h">What is next, <em>in order.</em></h2>
+    </div>
+    <ol class="timeline">
+      <li class="tl rise" style="--i:0"><div class="card tl-card"><p class="tl-stage">Now</p><p class="tl-text">Lot pack: email in, deal record, MLS comps from an agent export, per-lot screen, Surface flag or Gmail draft</p><span class="tag tag-built">Built for the hackathon</span></div></li>
+      <li class="tl rise" style="--i:1"><div class="card tl-card"><p class="tl-stage">Next</p><p class="tl-text">Deal board: every screened deal on one page, Surface deals on top</p><span class="tag tag-coming">Coming</span></div></li>
+      <li class="tl rise" style="--i:2"><div class="card tl-card"><p class="tl-stage">Next</p><p class="tl-text">Austin permit pull: teardown sites and active builders, lists only</p><span class="tag tag-coming">Coming</span></div></li>
+      <li class="tl rise" style="--i:3"><div class="card tl-card"><p class="tl-stage">Later</p><p class="tl-text">Live MLS sold feed through a broker-sponsored Unlock MLS connection</p><span class="tag tag-coming">Coming</span></div></li>
+      <li class="tl rise" style="--i:4"><div class="card tl-card"><p class="tl-stage">Later</p><p class="tl-text">More asset packs: light industrial, strip retail, multifamily, storage</p><span class="tag tag-coming">Coming</span></div></li>
+    </ol>
+    <p class="note rise">Today the comps come from an agent&rsquo;s MLS export, not a live feed. We say so on screen.</p>
+  </div>
+</section>
+
+<!-- ============================ 10. FAQ ============================ -->
+<section class="sec" id="faq" aria-labelledby="faq-h">
+  <div class="wrap">
+    <h2 class="eyebrow rise" id="faq-h" style="text-align:center;margin-bottom:clamp(28px,4vw,44px)">FAQ</h2>
+    <div class="faq rise">
+      <div class="faq-item open">
+        <h3 class="faq-h"><button class="faq-q" type="button" id="q1" aria-expanded="true" aria-controls="a1"><span>Does it send emails on its own?</span><span class="faq-ico" aria-hidden="true"></span></button></h3>
+        <div class="faq-panel" id="a1" role="region" aria-labelledby="q1"><div><p>No. It writes drafts. You read them and click send.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-h"><button class="faq-q" type="button" id="q2" aria-expanded="false" aria-controls="a2"><span>Where do the comps come from?</span><span class="faq-ico" aria-hidden="true"></span></button></h3>
+        <div class="faq-panel" id="a2" role="region" aria-labelledby="q2"><div><p>Right now, an MLS sold export from an agent. We use closed new-build sales within 0.25 to 0.5 mile of the lot. A broker-sponsored live MLS feed comes later.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-h"><button class="faq-q" type="button" id="q3" aria-expanded="false" aria-controls="a3"><span>Why per lot?</span><span class="faq-ico" aria-hidden="true"></span></button></h3>
+        <div class="faq-panel" id="a3" role="region" aria-labelledby="q3"><div><p>We build 2 or 3 houses on a lot. The lot is what we buy, so the lot is what we judge.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-h"><button class="faq-q" type="button" id="q4" aria-expanded="false" aria-controls="a4"><span>Does it work outside Austin or beyond lots?</span><span class="faq-ico" aria-hidden="true"></span></button></h3>
+        <div class="faq-panel" id="a4" role="region" aria-labelledby="q4"><div><p>Not yet. New areas and asset classes are new asset packs on the same engine.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 11. Final CTA ============================ -->
+<section class="sec" id="contact" aria-labelledby="cta-h" style="padding-top:0">
+  <div class="wrap">
+    <div class="cta rise">
+      <h2 class="display" id="cta-h">Send us a deal. <em>Get real numbers back.</em></h2>
+      <p class="lead">Avivo realtors: forward your next lot or teardown to <a href="mailto:prashant+deals@avivo.homes">prashant+deals@avivo.homes</a> and see what the desk says.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#demo">See the demo</a>
+        <a class="btn btn-secondary" href="submit.html">Send a deal</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Acquiro by Avivo · Built at the Agentic Society hackathon, Austin, October 2026 · Claude Code · Composio · Supabase</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  var d = document;
+  function all(sel, ctx) { return Array.prototype.slice.call((ctx || d).querySelectorAll(sel)); }
+  function showAll() { all('.rise').forEach(function (el) { el.classList.add('in'); }); }
+
+  try {
+    /* Nav: mobile menu toggle */
+    var nav = d.getElementById('nav'), btn = d.getElementById('menu-btn'), menu = d.getElementById('menu');
+    function setMenu(open) {
+      nav.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) { e.stopPropagation(); setMenu(!nav.classList.contains('open')); });
+    all('a', menu).forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
+    d.addEventListener('click', function (e) { if (!nav.contains(e.target)) setMenu(false); });
+    d.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && nav.classList.contains('open')) { setMenu(false); btn.focus(); }
+    });
+
+    /* FAQ accordion */
+    all('.faq-q').forEach(function (q) {
+      q.addEventListener('click', function () {
+        var item = q.closest('.faq-item'), open = !item.classList.contains('open');
+        item.classList.toggle('open', open);
+        q.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    });
+
+    /* Rise on scroll (CSS keeps everything visible under prefers-reduced-motion) */
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || !('IntersectionObserver' in window)) {
+      showAll();
+    } else {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+        });
+      }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+      all('.rise').forEach(function (el) { io.observe(el); });
+    }
+  } catch (err) {
+    showAll(); /* never leave content hidden if something above fails */
+  }
+})();
+</script>
+</body>
+</html>
