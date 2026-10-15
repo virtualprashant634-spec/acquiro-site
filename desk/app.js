@@ -327,7 +327,7 @@ function tbl(name) { return S.sb.from(name); }
 async function loadIndex() {
   var out = [], from = 0;
   for (;;) {
-    var data = await q(tbl('deals_index').select('*').order('created_at', { ascending: false }).range(from, from + 999));
+    var data = await q(tbl('deals_index').select('*').neq('status', 'merged').order('created_at', { ascending: false }).range(from, from + 999));
     out = out.concat(data);
     if (data.length < 1000) break;
     from += 1000;
