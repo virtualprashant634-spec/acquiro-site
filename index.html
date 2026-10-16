@@ -223,7 +223,10 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,t
 /* the home sections */
 .band{background:var(--ink);color:var(--bg);padding:clamp(56px,7vw,96px) 0}
 .band .big{max-width:1000px;font:600 clamp(28px,4.4vw,56px)/1.1 var(--d);letter-spacing:-.03em;text-wrap:balance}
-.band .small2{max-width:720px;margin-top:28px;font-size:clamp(18px,2vw,24px);line-height:1.5;opacity:.82}
+.band .small2{max-width:720px;margin-top:28px;font-size:clamp(18px,2vw,24px);line-height:1.5;opacity:.82;text-wrap:balance}
+.eyebrow+.grid{margin-top:20px}
+.agents{--min:440px}
+.aproof{margin-top:auto;padding-top:16px;border-top:1px solid var(--b14);font-size:15px;font-weight:600;line-height:1.35;color:var(--accent)}
 .herorow{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:32px;margin-top:clamp(28px,4vw,48px)}
 .herocopy{flex:1 1 420px;max-width:660px}
 .herocopy .btns{margin-top:28px}
@@ -371,32 +374,34 @@ details.q p{margin-top:10px;opacity:.82}
 
 <section class="band">
 <div class="wrap">
-<p class="big">Acquiro is the AI acquisitions team that does the work you can't get to.</p>
-<p class="small2">It reads every deal, pulls the comps, runs the numbers and answers the agent.</p>
+<h2 class="big">Four agents. One desk.</h2>
+<p class="small2">A hire, not a tool. Each one has a job, and each one is working today.</p>
 </div>
 </section>
 
-<section class="sec">
+<section class="sec" id="agents">
 <div class="wrap">
-<h2 class="h2">Doesn't summarize. Underwrites.</h2>
-<div class="grid">
+<p class="eyebrow">Doesn't summarize. Underwrites.</p>
+<div class="grid agents">
 <article class="card">
-<div class="pills"><span class="pill">Text</span><span class="pill">Email</span><span class="pill">Flyer</span><span class="pill">MLS sheet</span><span class="pill">InvestorLift blast</span></div>
-<h3 class="h3">Takes any deal</h3>
-<p class="dim">Text, email, flyer, MLS sheet or InvestorLift blast. An address and an asking price is enough.</p>
+<h3 class="h3">The Scout</h3>
+<p class="dim">Reads any deal that comes in: text, email, PDF flyer, MLS sheet, InvestorLift blast, listing alert. Address and asking price are enough.</p>
+<p class="aproof">405 deals read this week.</p>
 </article>
 <article class="card">
-<div class="ca">
-<div class="r1"><span>Asking price $800,000</span><span class="tag t24 pg">agent sent</span></div>
-<div class="r2"><span>Lot size 7,476 sf</span><span class="tag t24 found">we found</span></div>
-</div>
-<h3 class="h3">Finds the facts itself</h3>
-<p class="dim">Lot, zoning, flood, trees and closed new-build comps within half a mile. Every fact is tagged agent sent or we found.</p>
+<h3 class="h3">The Underwriter</h3>
+<p class="dim">Finds the lot, zoning, floodplain and tree canopy itself, pulls closed new-build comps within half a mile, runs two homes against three, and prices the lot against your buy box.</p>
+<p class="aproof">Every fact tagged agent sent or we found.</p>
 </article>
 <article class="card">
-<div class="pills"><span class="pill on">Review</span><span class="pill off">Decline</span></div>
-<h3 class="h3">Answers with the number</h3>
-<p class="dim">You teach it your buy box: minimum profit per lot, margin on cost, return on equity, cash-on-cash, lot size, ZIPs. Clear it and the deal is a Review. Miss it and it is a Decline, with the reply sent.</p>
+<h3 class="h3">The Closer</h3>
+<p class="dim">Answers every agent the same day. Review comes to you with the weak spots flagged. Decline goes back on its own with the max price, in your voice.</p>
+<p class="aproof">Three bullets, named comps, one number.</p>
+</article>
+<article class="card">
+<h3 class="h3">The Caller</h3>
+<p class="dim">Works a list of 18,636 Austin realtors by email and AI phone calls so the next lot comes to you first, and texts once the carrier clears the number.</p>
+<p class="aproof">Every realtor touched every 30 to 45 days.</p>
 </article>
 </div>
 </div>
