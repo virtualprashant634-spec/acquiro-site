@@ -54,9 +54,11 @@ h1,h2,h3,h4{margin:0}
 @supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
   .top{background:color-mix(in srgb,var(--canvas) 88%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px)}}
 .top .col{display:flex;align-items:center;justify-content:space-between;gap:.75rem;min-height:3.5rem;padding-top:env(safe-area-inset-top)}
-.brand{display:flex;flex-direction:column;line-height:1.15;text-decoration:none;color:var(--ink);min-width:0}
-.brand b{font-weight:600;font-size:1.25rem;letter-spacing:-.03em}
-.brand span{font-size:.8125rem;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* The lockup from the landing page: the arrow mark (28 px) then the lowercase wordmark; the mark is a CSS image because the header is drawn by app.js */
+.brand{--m:28px;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:calc(var(--m)*.3);align-items:center;min-height:44px;line-height:1.15;text-decoration:none;color:var(--ink);min-width:0}
+.brand::before{content:"";grid-row:1 / span 2;grid-column:1;width:var(--m);height:var(--m);background:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%201%20100%20100'%3E%3Cdefs%3E%3ClinearGradient%20id='r'%20gradientUnits='userSpaceOnUse'%20x1='8'%20y1='92'%20x2='92'%20y2='8'%3E%3Cstop%20offset='0'%20stop-color='%23174A2E'/%3E%3Cstop%20offset='.25'%20stop-color='%231F5C3A'/%3E%3Cstop%20offset='.5'%20stop-color='%232E8B57'/%3E%3Cstop%20offset='1'%20stop-color='%236FD9A6'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='a'%20gradientUnits='userSpaceOnUse'%20x1='8'%20y1='92'%20x2='92'%20y2='8'%3E%3Cstop%20offset='0'%20stop-color='%231F5C3A'/%3E%3Cstop%20offset='.5'%20stop-color='%232E8B57'/%3E%3Cstop%20offset='1'%20stop-color='%236FD9A6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg%20fill='none'%20stroke-width='16'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M8%2060A32%2032%200%201%201%2072%2060A32%2032%200%201%201%208%2060Z'%20stroke='url(%23r)'/%3E%3Cpath%20d='M68%2092C74%2062%2072%2028%2092%2010M66%2010H92V36'%20stroke='url(%23a)'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat}
+.brand b{grid-column:2;font-weight:700;font-size:calc(var(--m)*.875);line-height:1;letter-spacing:-.02em;text-transform:lowercase}
+.brand span{grid-column:2;font-size:.8125rem;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tools{display:flex;align-items:center;gap:.5rem}
 .dot{display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:0 .75rem;border-radius:999px;border:1px solid var(--hair2);background:var(--card);
   font:500 .8125rem/1 var(--mono);color:var(--ink2);text-decoration:none;white-space:nowrap}
