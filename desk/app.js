@@ -15,6 +15,7 @@ var SDK = {
          'https://unpkg.com/@supabase/supabase-js@2.117.2/dist/umd/supabase.js']
 };
 var GMAIL_DRAFT = 'https://mail.google.com/mail/u/0/#drafts/';
+var CLOSE_LEAD = 'https://app.close.com/lead/';
 var PAGE = 20;                         // deals drawn at a time
 var COMPS_CAP = 15;                    // rows in a comps table
 var DESK_ONLINE_MS = 2 * 60 * 1000;    // a worker seen this recently is "online"
@@ -30,7 +31,7 @@ var GATE_CLASS = { pass: 'ok', amber: 'warn', fail: 'bad', insufficient: 'mute' 
 var TREE_CLASS = { low: 'ok', medium: 'warn', high: 'bad', unknown: 'mute' };
 var RFQ_ROLES = ['architect', 'civil', 'structural', 'interior'];
 var KIND_LABEL = {
-  approve_send: 'Approve & send', hold: 'Hold', decline: 'Decline', pass: 'Decline', reopen: 'Reopen', note: 'Note', offer: 'Offer draft', rescreen: 'Re-screen',
+  approve_send: 'Approve & send', hold: 'Hold', decline: 'Decline', pass: 'Decline', reopen: 'Reopen', note: 'Note', offer: 'Offer draft', rescreen: 'Re-screen', apply_whatif: 'Apply what-if',
   make_dossier: 'Dossier', make_lender_packet: 'Lender packet', make_rfq: 'Vendor RFQ', make_permit_intake: 'Permit intake',
   make_uw_copy: 'UW copy', run_pass: 'Run a pass', call_contact: 'AI call to the agent', email_contact: 'Email to the agent',
   add_to_call_list: 'Call list', refresh_buybox: 'Refresh buy box', sync_close: 'Sync Close', feed_pull: 'Pull the MLS feed', ping: 'Test the desk'
@@ -38,7 +39,6 @@ var KIND_LABEL = {
 // What the worker has no code for yet. The worker publishes the real list (and its wording) into the workspace settings; this is only
 // what the page assumes before it has read them.
 var SOON_FALLBACK = {
-  rescreen: 'Re-screening with what-if inputs is coming soon.',
   call_contact: 'Calling the agent from the desk is coming soon.',
   email_contact: 'Emailing the agent from the desk is coming soon.',
   add_to_call_list: 'The call list is coming soon.',
@@ -46,7 +46,7 @@ var SOON_FALLBACK = {
   sync_close: 'Starting the Close sync from the desk is coming soon.',
   feed_pull: 'Pulling the MLS feed on demand is coming soon.'
 };
-var OWNER_ONLY = { approve_send: 1, offer: 1, rescreen: 1, make_dossier: 1, make_lender_packet: 1, make_rfq: 1, make_permit_intake: 1, make_uw_copy: 1,
+var OWNER_ONLY = { approve_send: 1, offer: 1, rescreen: 1, apply_whatif: 1, make_dossier: 1, make_lender_packet: 1, make_rfq: 1, make_permit_intake: 1, make_uw_copy: 1,
   run_pass: 1, call_contact: 1, email_contact: 1, add_to_call_list: 1, refresh_buybox: 1, sync_close: 1, feed_pull: 1 };
 
 // ---------------------------------------------------------------------------------------------------------------------------------
@@ -158,7 +158,8 @@ function toast(text, kind) {
   var box = $('#toasts');
   var t = h('div', { class: 'toast' + (kind === 'bad' ? ' bad' : '') }, text);
   box.appendChild(t);
-  setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, kind === 'bad' ? 7000 : 4500);
+  var ms = Math.max(kind === 'bad' ? 7000 : 4500, Math.min(12000, String(text).length * 55));      // a long answer (a what-if's one line) gets time to be read
+  setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, ms);
 }
 
 var sheetStack = [];
@@ -385,7 +386,7 @@ async function refreshAll(opts) {
   try {
     var res = await Promise.all([loadIndex(), loadActions(), loadWorkers(), loadRuns()]);
     S.index = res[0]; S.idx = new Map(S.index.map(function (r) { return [r.id, r]; }));
-    indexActions(res[1]); S.workers = res[2]; S.runs = res[3];
+    indexActions(res[1]); watchWhatIf(); S.workers = res[2]; S.runs = res[3];
     S.error = null;
     await ensureRows(visibleIds());
     S.loadedOnce = true;
@@ -452,17 +453,41 @@ function tagOf(d, field) {
   var t = obj(d.field_sources)[field];
   return t === 'agent_sent' || t === 'we_found' || t === 'listing' ? t : null;
 }
-function targetLabel() {
-  var t = num(obj(S.settings.pack).target_profit_per_lot);
-  if (!t || t <= 0) return null;
-  return t % 1000 === 0 ? '$' + NF.format(t / 1000) + 'k' : usd(t);
+// The money hurdles (T-77, docs/BUYBOX.md). A stored screen carries the hurdles it was made under (screen.hurdles: the required value, or null when
+// that test is off). A screen from before that has none, so the published pack's profit target and margin stand in; the two return hurdles did not exist then.
+function pctText(x) { x = num(x); return x == null ? '' : (Math.round(x * 1000) / 10) + '%'; }
+function shortUsd(t) { return t % 1000 === 0 ? '$' + NF.format(t / 1000) + 'k' : usd(t); }
+function hurdlesOf(screen) {
+  var hz = obj(screen.hurdles), pack = obj(S.settings.pack), stored = Object.keys(hz).length > 0;
+  function above0(v) { v = num(v); return v != null && v > 0 ? v : null; }       // a floor or margin of 0 means "no such test"
+  return {
+    stored: stored,                                                            // false = an older screen: the pack's numbers stand in for the caption, but no pass/miss is judged
+    profit_floor: above0(stored ? hz.profit_floor : pack.target_profit_per_lot),
+    margin: above0(stored ? hz.margin : pack.min_margin_on_cost),
+    cash_on_cash: num(hz.cash_on_cash),                                        // null = not applied; 0 is a real hurdle (not a loss)
+    return_on_equity: num(hz.return_on_equity)
+  };
+}
+// the number the seller-facing max price is: the lowest across every configured test (max_price_for_600k is the same number under its old name)
+function maxPrice(screen) { var v = num(screen.max_price_for_buy_box); return v != null ? v : num(screen.max_price_for_600k); }
+// which test set that max price, in words
+function bindingWords(screen) {
+  var b = screen.max_price_binding_test, hz = hurdlesOf(screen);
+  if (b === 'profit_floor') return 'profit floor';                    // the caption already says what the floor is
+  if (b === 'margin') return (hz.margin ? pctText(hz.margin) + ' ' : '') + 'margin test';
+  if (b === 'cash_on_cash') return (hz.cash_on_cash != null ? pctText(hz.cash_on_cash) + ' ' : '') + 'cash-on-cash hurdle';
+  if (b === 'return_on_equity') return (hz.return_on_equity != null ? pctText(hz.return_on_equity) + ' ' : '') + 'return-on-equity hurdle';
+  return null;
 }
 function bindingCaption(screen) {
-  var t = targetLabel(), cap = t ? 'seller-facing · still makes ' + t + '/lot' : 'seller-facing';
-  var b = screen.max_price_binding_test, m = num(obj(S.settings.pack).min_margin_on_cost);
-  if (b === 'margin') cap += m ? ' · binds: ' + (Math.round(m * 1000) / 10) + '% margin' : ' · binds: margin';
-  else if (b === 'profit_floor') cap += t ? ' · binds: ' + t + ' floor' : ' · binds: profit floor';
-  return cap;
+  var f = hurdlesOf(screen).profit_floor, cap = f ? 'seller-facing · still makes ' + shortUsd(f) + '/lot' : 'seller-facing', w = bindingWords(screen);
+  return w ? cap + ' · binds: ' + w : cap;
+}
+// pass or miss next to a number and the hurdle it was held to (nothing when either is missing)
+function passMark(value, hurdle) {
+  if (value == null || hurdle == null) return null;
+  var ok = value >= hurdle - 1e-9;
+  return h('span', { class: 'mark ' + (ok ? 'pass' : 'fail') }, ok ? 'pass' : 'miss');
 }
 function replied(d) { return d.status === 'sent' || d.status === 'bounced'; }
 function canSendDraft(d) { return !!String(d.reply_draft_id || '').trim() && !replied(d); }
@@ -547,7 +572,7 @@ function flagsLine(d) {
   return h('p', { class: 'flagsline' }, h('b', null, fl.length === 1 ? '1 flag' : fl.length + ' flags'), ' · ' + short.join(' · '));
 }
 function tagEl(t) { return TAG_LABEL[t] ? h('span', { class: 'tag ' + t }, TAG_LABEL[t]) : null; }
-function note1(label, text) { return h('p', { class: 'note1' }, h('b', null, label), text); }
+function note1(label, text) { var p = h('p', { class: 'note1' }, h('b', null, label), text); for (var i = 2; i < arguments.length; i++) add(p, arguments[i]); return p; }
 
 function statusChips(d) {
   var out = [];
@@ -565,12 +590,13 @@ function statusChips(d) {
   else if (canSendDraft(d)) out.push(chip('ok', 'Draft in Gmail'));
   var talk = textTalk(d);
   if (talk.blocked) out.push(chip('warn', 'Text blocked (10DLC pending)'));
+  else if (talk.noLead) out.push(chip('warn', 'Waiting for a Close lead'));
   else if (talk.answered) out.push(chip('ok', 'Texted back'));
   return out;
 }
 
 function moneyLine(d) {
-  var s = obj(d.screen), profit = num(s.profit_per_lot), price = num(s.max_price_for_600k), ask = num(d.ask_price);
+  var s = obj(d.screen), profit = num(s.profit_per_lot), price = maxPrice(s), ask = num(d.ask_price);
   var parts = h('div', { class: 'money1' });
   if (profit != null) parts.appendChild(h('span', { class: 'big' + (profit < 0 ? ' neg' : '') }, usdK(profit), h('span', { class: 'small' }, ' profit/lot')));
   if (price != null && price > 0) parts.appendChild(h('span', { class: 'small' }, 'max ', h('b', null, usdK(price))));
@@ -623,22 +649,51 @@ function gateChips(d) {
   return items.length ? h('ul', { class: 'gates', 'aria-label': 'Gates' }, items) : null;
 }
 
+// "Worked on 35% equity, a 65% loan at 11%, held 14 months, 1% origination." from screen.financing; '' when the screen has none
+function financingText(fin) {
+  var bits = [], eq = num(fin.equity_pct), loan = num(fin.loan_pct), rate = num(fin.loan_rate), m = num(fin.hold_months), orig = num(fin.origination_pct);
+  if (eq != null) bits.push(pctText(eq) + ' equity');
+  if (loan != null) bits.push('a ' + pctText(loan) + ' loan' + (rate != null ? ' at ' + pctText(rate) : ''));
+  else if (rate != null) bits.push('a loan at ' + pctText(rate));
+  if (m != null) bits.push('held ' + (Math.round(m * 10) / 10) + ' month' + (m === 1 ? '' : 's'));
+  if (orig != null && orig > 0) bits.push(pctText(orig) + ' origination');
+  return bits.length ? 'Worked on ' + bits.join(', ') + '.' : '';
+}
+// The Returns block (T-77): what the best option returns on the money put in, with each hurdle beside its number. Old screens carry none of these fields: no block.
+function returnsBlock(d) {
+  var s = obj(d.screen), hz = hurdlesOf(s);
+  var defs = [['Equity in', num(s.equity_in), usdK, null], ['Financing cost', num(s.financing_cost), usdK, null], ['Profit after financing', num(s.profit_after_financing), usdK, null],
+    ['Cash-on-cash', num(s.cash_on_cash), pctText, hz.cash_on_cash], ['Return on equity', num(s.return_on_equity), pctText, hz.return_on_equity]];
+  var rows = [];
+  defs.forEach(function (r) {
+    var v = r[1], want = r[3];
+    if (v == null && want == null) return;
+    rows.push(h('div', { class: 'rrow' }, h('dt', null, r[0]),
+      h('dd', null, v != null ? h('b', null, r[2](v)) : h('span', { class: 'na' }, 'not worked out'), want != null ? h('span', { class: 'want' }, 'you want ' + pctText(want)) : null, passMark(v, want))));
+  });
+  if (!rows.length) return null;
+  var fin = financingText(obj(s.financing)), cap = (s.best_units ? 'For the chosen option, ' + s.best_units + ' units. ' : '') + fin;
+  return h('div', null, h('p', { class: 'lbl' }, 'Returns'), h('dl', { class: 'ret' }, rows), cap.trim() ? h('p', { class: 'cap' }, cap.trim()) : null);
+}
+
 function moneyBlock(d) {
   var s = obj(d.screen);
   if (!Object.keys(s).length) return null;
-  var profit = num(s.profit_per_lot), price = num(s.max_price_for_600k), down = num(s.downturn_profit_per_lot), margin = num(s.margin_on_cost);
+  var profit = num(s.profit_per_lot), price = maxPrice(s), down = num(s.downturn_profit_per_lot), margin = num(s.margin_on_cost), hz = hurdlesOf(s);
   var out = [];
   if (profit == null && price == null) out.push(h('p', { class: 'empty' }, 'No profit or price quoted.'));
   else {
     var units = s.best_units ? ' at ' + s.best_units + ' units' : '';
     var p = profit == null ? h('span', { class: 'v na' }, 'no ask, so not worked out') : h('span', { class: 'v' + (profit < 0 ? ' neg' : '') }, usdK(profit));
+    var pcap = profit != null && hz.stored && hz.profit_floor ? h('span', { class: 'cap' }, 'you want ' + shortUsd(hz.profit_floor) + ' ', passMark(profit, hz.profit_floor)) : null;
     var m, cap = null;
     if (price == null) m = h('span', { class: 'v na' }, 'not quoted');
     else if (price <= 0) m = h('span', { class: 'v na' }, 'none: even free land misses');
     else { m = h('span', { class: 'v' }, usdK(price)); cap = h('span', { class: 'cap' }, bindingCaption(s)); }
-    out.push(h('div', { class: 'money' }, h('div', null, h('span', { class: 'lbl' }, 'Profit per lot' + units), p), h('div', null, h('span', { class: 'lbl' }, 'Max purchase price'), m, cap)));
+    out.push(h('div', { class: 'money' }, h('div', null, h('span', { class: 'lbl' }, 'Profit per lot' + units), p, pcap), h('div', null, h('span', { class: 'lbl' }, 'Max price for your buy box'), m, cap)));
   }
-  if (margin != null && (profit != null || price != null)) out.push(note1('Margin', Math.round(margin * 100) + '% on all-in cost at the ask'));
+  out.push(returnsBlock(d));
+  if (margin != null && (profit != null || price != null)) out.push(note1('Margin', pctText(margin) + ' on all-in cost at the ask', hz.stored && hz.margin ? h('span', { class: 'want' }, ' · you want ' + pctText(hz.margin) + ' ') : null, hz.stored ? passMark(margin, hz.margin) : null));
   if (down != null && down < 0) out.push(h('p', { class: 'down' }, 'In a downturn this loses ' + usdK(Math.abs(down)) + ' per lot.'));
   else if (down != null && down > 0) out.push(h('p', { class: 'down ok' }, 'In a downturn profit is still ' + usdK(down) + ' per lot.'));
   else if (down === 0) out.push(h('p', { class: 'down ok' }, 'In a downturn it breaks even.'));
@@ -675,6 +730,8 @@ function textTalk(d) {
   return {
     has: !!Object.keys(sms).length, sms: sms, ack: ack, fs: fs, fe: fe,
     blocked: ack.status === 'blocked_10dlc' || fs.status === 'blocked_10dlc',
+    noLead: ack.status === 'no_lead' || fs.status === 'no_lead',             // waiting for a Close lead: tried again every pass
+    close: obj(sms.close), person: obj(sms.person),
     answered: fs.status === 'sent' || fe.status === 'sent' || (ack.kind === 'one_thing' && ack.status === 'sent')
   };
 }
@@ -709,9 +766,16 @@ function textBlock(d) {
   else if (t.ack.status === 'failed') lines.push(talkLine('bad', 'Ack text failed', t.ack.text));
   else if (t.ack.status === 'skipped') lines.push(talkLine('mute', 'Ack not sent' + (skipped(t.ack) ? ': ' + skipped(t.ack) : '')));
   else if (t.ack.status === 'expired') lines.push(talkLine('mute', 'Ack skipped: the text was too old'));
+  else if (t.ack.status === 'no_lead') lines.push(talkLine('warn', 'Waiting for a Close lead'));
   var email = String(d.agent_email || '').trim(), name = String(d.agent_name || '').trim();
   if (email) lines.push(h('p', { class: 'note1' }, h('b', null, 'Contact'), (name ? name + ' · ' : '') + email));
   else if (!(t.fs.status === 'skipped' && skipped(t.fs))) lines.push(talkLine('warn', name ? 'Awaiting email' : 'Awaiting name + email'));
+  // what the people table says about the sender (facts.sms_in.person: role, brokerage; the name lands on agent_name). The Contact line already names them when it shows.
+  var pname = String(t.person.name || '').trim() || (email ? '' : name);
+  var prole = String(t.person.role || '').trim().replace(/_/g, ' '), pbro = String(t.person.brokerage || '').trim();
+  var hasPerson = !!(prole || pbro || String(t.person.name || '').trim() || t.person.opted_out);
+  var pbits = hasPerson ? [pname, prole, pbro, t.person.opted_out ? 'opted out' : ''].filter(function (x) { return x; }) : [];
+  if (pbits.length) { pbits[0] = cap1(pbits[0]); lines.push(note1('Person', pbits.join(' · '))); }
   var sent = [];
   if (t.fs.status === 'sent') sent.push('texted ' + (fmtTime(t.fs.at) || ''));
   if (t.fe.status === 'sent') sent.push('emailed ' + (fmtTime(t.fe.at) || ''));
@@ -720,8 +784,14 @@ function textBlock(d) {
   else if (t.fs.status === 'deferred') lines.push(talkLine('line', 'Numbers text waits for quiet hours to end'));
   else if (t.fs.status === 'failed') lines.push(talkLine('bad', 'Numbers text failed', t.fs.text));
   else if (t.fs.status === 'skipped') lines.push(talkLine('mute', 'Numbers text not sent' + (skipped(t.fs) ? ': ' + skipped(t.fs) : '')));
+  else if (t.fs.status === 'no_lead' && t.ack.status !== 'no_lead') lines.push(talkLine('warn', 'Numbers text: waiting for a Close lead'));
   if (t.fe.status === 'failed') lines.push(talkLine('bad', 'Email failed'));
   else if (t.fe.status === 'skipped') lines.push(talkLine('mute', 'Email not sent' + (skipped(t.fe) ? ': ' + skipped(t.fe) : '')));
+  var leadId = String(t.close.lead_id || '').trim();
+  if (/^[A-Za-z0-9_-]{4,80}$/.test(leadId)) {          // the Close lead that holds the number; only a plain id is put in the address
+    lines.push(h('div', { class: 'smsline' }, h('a', { class: 'btn sm', href: CLOSE_LEAD + leadId + '/', target: '_blank', rel: 'noopener noreferrer' }, 'Open in Close ↗'),
+      t.close.created === true ? h('span', { class: 'fine' }, 'lead created by the desk') : null));
+  }
   stored.forEach(function (text) { lines.push(h('blockquote', { class: 'smstext' }, text)); });
   return lines.length ? h('div', { class: 'smstalk' }, lines) : null;
 }
@@ -803,13 +873,22 @@ function unitsBlock(d) {
   var s = obj(d.screen), bu = obj(s.by_units), keys = Object.keys(bu).sort(function (a, b) { return Number(a) - Number(b); });
   if (!keys.length) return null;
   var best = keys.map(function (k) { return s.best_units != null && String(s.best_units) === k; });
-  var rowsDef = [['Buildable sf', 'buildable_sf', function (v) { return NF.format(v); }], ['Sales', 'sales', usdK], ['All-in cost', 'all_in_cost', usdK], ['Profit per lot', 'profit_per_lot', usdK]];
+  var rowsDef = [['Buildable sf', 'buildable_sf', function (v) { return NF.format(v); }, null], ['Sales', 'sales', usdK, null], ['All-in cost', 'all_in_cost', usdK, null], ['Profit per lot', 'profit_per_lot', usdK, null]];
+  var hz = hurdlesOf(s), withReturns = false;
+  [['Cash-on-cash', 'cash_on_cash', hz.cash_on_cash], ['Return on equity', 'return_on_equity', hz.return_on_equity]].forEach(function (r) {
+    if (!keys.some(function (k) { return num(obj(bu[k])[r[1]]) != null; })) return;           // an old screen has neither: no empty rows
+    withReturns = true;
+    rowsDef.push([r[0], r[1], pctText, r[2]]);
+  });
   var head = h('tr', null, h('th', null, 'Per lot'), keys.map(function (k, i) { return h('th', { class: 'num' }, k + ' units', best[i] ? ' ' : null, best[i] ? h('span', { class: 'tag we_found' }, 'chosen') : null); }));
   var body = rowsDef.map(function (r) {
-    return h('tr', null, h('td', null, r[0]), keys.map(function (k, i) { var v = num(obj(bu[k])[r[1]]); return h('td', { class: 'num' + (best[i] ? ' best' : '') }, v != null ? r[2](v) : '-'); }));
+    return h('tr', null, h('td', null, r[0], r[3] != null ? h('span', { class: 'want sub' }, 'you want ' + pctText(r[3])) : null), keys.map(function (k, i) {
+      var v = num(obj(bu[k])[r[1]]), under = v != null && r[3] != null && v < r[3] - 1e-9;
+      return h('td', { class: 'num' + (best[i] ? ' best' : '') + (under ? ' under' : '') }, v != null ? r[2](v) : '-', under ? h('span', { class: 'sr' }, ' (under what you want)') : null);
+    }));
   });
   return h('div', null, h('p', { class: 'lbl' }, 'Units compared'), h('div', { class: 'tscroll' }, h('table', { class: 't' }, h('thead', null, head), h('tbody', null, body))),
-    h('p', { class: 'cap' }, 'Read from the stored screen. Sales, cost and profit are at the ask; blank where the comps were too thin to price.'));
+    h('p', { class: 'cap' }, 'Read from the stored screen. Sales, cost and profit are at the ask; blank where the comps were too thin to price.' + (withReturns ? ' Returns are worked on the same financing for every option.' : '')));
 }
 var SRC_NAME = { austin_gis_zoning: 'City of Austin GIS', tcad_parcel_shape: 'TCAD parcel shape', agent_sent: 'agent sent', listing: 'MLS listing' };
 function recordBlock(d) {
@@ -865,6 +944,7 @@ async function requestAction(kind, dealId, params, opts) {
       toast(explain(r.error), 'bad'); return null;
     }
     indexActions([r.data].concat(S.actions));
+    watchWhatIf();
     var online = workerState().online, soon = isSoon(kind);
     var base = opts.toast || (soon ? 'Queued for the desk · coming soon' : 'Queued for the desk.' + (online ? ' It starts within seconds.' : ''));
     toast(base + (!soon && !online ? ' The desk worker is not running right now, so it happens on the next pass.' : ''));
@@ -899,13 +979,13 @@ function soonSheet(kind, d, label) {
 }
 
 function offerSheet(d) {
-  var s = obj(d.screen), prev = obj(obj(d.facts).offer), max = num(s.max_price_for_600k), ask = num(d.ask_price);
+  var s = obj(d.screen), prev = obj(obj(d.facts).offer), max = maxPrice(s), ask = num(d.ask_price);
   var offerCfg = obj(S.settings.offer), terms = obj(offerCfg.terms), unset = offerCfg.unset || '[set in packs/offer.yaml]';
   var termKeys = arr(offerCfg.order).filter(function (k) { return terms[k]; });
   if (!termKeys.length) termKeys = Object.keys(terms);
   var maxR = max != null && max > 0 ? Math.round(max / 1000) * 1000 : null;       // the same nearest-$1,000 the Review note and the replies quote
   var price = h('input', { class: 'price', id: 'offer-price', type: 'text', inputmode: 'numeric', autocomplete: 'off', 'aria-label': 'Offer price', value: (num(prev.price) || maxR) ? NF.format(num(prev.price) || maxR) : '' });
-  var warn = h('p', { class: 'warn1', hidden: true }, 'This is above the max purchase price.');
+  var warn = h('p', { class: 'warn1', hidden: true }, 'This is above the max price for your buy box.');
   function parsed() { var v = num(String(price.value).replace(/[^0-9.]/g, '')); return v; }
   price.addEventListener('input', function () { var v = parsed(); warn.hidden = !(v != null && maxR != null && v > maxR); });
   var fields = {}, termEls = [];
@@ -928,7 +1008,7 @@ function offerSheet(d) {
     title: 'Make an offer · ' + titleOf(d),
     body: [
       h('div', { class: 'stack' },
-        maxR != null ? h('p', null, h('span', { class: 'lbl' }, 'Max purchase price'), h('br'), h('b', null, usd(maxR)), h('span', { class: 'muted' }, ' · ' + bindingCaption(s).replace('seller-facing · ', ''))) : h('p', { class: 'muted' }, 'No max purchase price from the screen.'),
+        maxR != null ? h('p', null, h('span', { class: 'lbl' }, 'Max price for your buy box'), h('br'), h('b', null, usd(maxR)), h('span', { class: 'muted' }, ' · ' + bindingCaption(s).replace('seller-facing · ', ''))) : h('p', { class: 'muted' }, 'No max price from the screen.'),
         ask != null ? h('p', { class: 'muted' }, 'Their ask: ' + usd(ask)) : null),
       h('label', null, 'Your offer price', price), warn,
       termEls,
@@ -1010,10 +1090,299 @@ function resultSheet(a, d) {
   openSheet({ title: (KIND_LABEL[a.kind] || a.kind) + (d ? ' · ' + titleOf(d) : ''), body: body });
 }
 
+// ---------------------------------------------------------------------------------------------------------------------------------
+// what-if (T-60, docs/WHATIF.md). The sheet asks, the worker answers into deals.facts.whatif_last, the card draws it, Apply makes it real.
+// Nothing here works a number out: the page sends the owner's inputs and prints what the worker stored.
+var WHATIF_KINDS = { rescreen: 1, apply_whatif: 1 };
+var WHATIF_NOTE_MAX = 280;
+var WHATIF_UNITS_FALLBACK = [2, 3];
+// the form, in the order the worker's table lists the inputs. A percent is typed as 30 and sent as 0.30 (the worker refuses a bare 30).
+var WHATIF_FIELDS = [
+  { key: 'ask_price', label: 'Ask price', type: 'usd' },
+  { key: 'units', label: 'Units', type: 'units' },
+  { key: 'cost_psf', label: 'Cost per sf', type: 'psf' },
+  { key: 'sale_psf', label: 'Sale $/sf', type: 'psf' },
+  { key: 'lot_sf', label: 'Lot sf', type: 'sf' },
+  { key: 'hold_months', label: 'Hold months', type: 'months' },
+  { key: 'equity_pct', label: 'Equity %', type: 'pct' },
+  { key: 'loan_rate', label: 'Loan rate %', type: 'pct' }
+];
+var WHATIF_FROM = { own: "Deal's own", stored: 'Stored', pack: 'Pack default' };
+var WHATIF_TEXT = {                                          // an input in words, for "Changed:" and the history (the advanced ones too)
+  ask_price: function (v) { return 'ask ' + usd(v); },
+  units: function (v) { return v === 'both' ? 'both unit counts' : v + ' units'; },
+  cost_psf: function (v) { return 'cost $' + NF.format(v) + '/sf'; },
+  sale_psf: function (v) { return 'sales $' + NF.format(v) + '/sf'; },
+  lot_sf: function (v) { return 'lot ' + NF.format(v) + ' sf'; },
+  hold_months: function (v) { return 'held ' + (Math.round(v * 10) / 10) + ' months'; },
+  equity_pct: function (v) { return pctText(v) + ' equity'; },
+  loan_rate: function (v) { return pctText(v) + ' loan rate'; },
+  sale_costs_pct: function (v) { return pctText(v) + ' sale costs'; },
+  rate: function (v) { return pctText(v) + ' construction loan rate'; },
+  ltc: function (v) { return pctText(v) + ' loan to cost'; }
+};
+function whatifInputsText(inputs) {
+  inputs = obj(inputs);
+  return Object.keys(inputs).filter(function (k) { return k !== 'note' && inputs[k] != null && inputs[k] !== ''; }).map(function (k) {
+    var v = inputs[k], n = num(v), say = WHATIF_TEXT[k];
+    if (say && (n != null || k === 'units')) return say(k === 'units' ? v : n);
+    return k.replace(/_/g, ' ') + ' ' + String(v);
+  }).join(' · ');
+}
+
+// "850,000", "$850,000" and "850000" are numbers; letters and signs are not guessed at
+function plainNumber(text) {
+  var t = String(text == null ? '' : text).trim().replace(/^\$\s*/, '').replace(/,/g, '');
+  return /^(?:\d+\.?\d*|\.\d+)$/.test(t) ? Number(t) : null;
+}
+// One box of the sheet -> {blank} | {value} | {error}. 30 and 30% both mean thirty percent and go out as 0.3. A bare number under 1 in a percent box is
+// asked about, not guessed: 0.35 is far more likely a fraction typed by habit than a 0.35% loan.
+function readWhatifField(f, text) {
+  var t = String(text == null ? '' : text).trim(), pct = f.type === 'pct';
+  if (!t) return { blank: true };
+  if (f.type === 'units') return { value: t === 'both' ? 'both' : Number(t) };
+  var signed = pct && /%\s*$/.test(t), n = plainNumber(pct ? t.replace(/%\s*$/, '') : t);
+  if (n == null) return { error: f.label + ' must be a number' + (pct ? ', like 30 for 30%.' : '.') };
+  if (pct) {
+    if (!signed && n > 0 && n < 1) return { error: f.label + ': ' + n + ' reads as ' + n + '%. Type ' + Math.round(n * 1000) / 10 + ' for ' + Math.round(n * 1000) / 10 + '%.' };
+    var zeroOk = f.key === 'loan_rate';
+    if (zeroOk ? !(n >= 0 && n < 100) : !(n > 0 && n <= 100)) return { error: f.label + ' must be ' + (zeroOk ? 'from 0 to under 100.' : 'above 0 and at most 100.') };
+    return { value: Number((n / 100).toPrecision(12)) };
+  }
+  if (f.type === 'months') return n > 0 && n <= 120 ? { value: n } : { error: f.label + ' must be above 0 and at most 120.' };
+  return n > 0 ? { value: n } : { error: f.label + ' must be above 0.' };
+}
+
+// What the deal is screened on now, so each blank can say what it keeps: the deal's own numbers (facts.overrides, put there by an applied what-if),
+// else what the stored screen was worked on, else the pack default the worker publishes in the workspace settings.
+function whatifNow(d) {
+  var s = obj(d.screen), f = obj(d.facts), pk = obj(obj(S.settings.pack).whatif_defaults), fin = obj(s.financing), out = {};
+  var own = Object.assign({}, obj(s.overrides), obj(f.overrides)), row = obj(obj(s.by_units)[String(s.best_units)]);
+  function put(key, ownV, storedV, packV) {
+    [['own', ownV], ['stored', storedV], ['pack', packV]].some(function (p) {
+      var v = num(p[1]);
+      if (v == null || (v <= 0 && key !== 'loan_rate')) return false;
+      out[key] = { v: v, from: p[0] };
+      return true;
+    });
+  }
+  put('ask_price', null, d.ask_price, null);
+  put('lot_sf', null, d.lot_sf, null);
+  put('cost_psf', own.cost_psf, null, pk.cost_psf);
+  put('sale_psf', own.sale_psf, row.comps_median_psf != null ? row.comps_median_psf : obj(s.comps).median_psf, null);
+  put('hold_months', own.hold_months, fin.hold_months, pk.hold_months);
+  put('equity_pct', own.equity_pct, fin.equity_pct, pk.equity_pct);
+  put('loan_rate', own.loan_rate, fin.loan_rate, pk.loan_rate);
+  return out;
+}
+function whatifShown(f, v) {
+  if (f.type === 'usd') return usd(v);
+  if (f.type === 'psf') return '$' + (v % 1 ? String(Math.round(v * 100) / 100) : NF.format(v)) + '/sf';
+  if (f.type === 'sf') return NF.format(v) + ' sf';
+  if (f.type === 'months') return (Math.round(v * 10) / 10) + ' months';
+  return pctText(v);
+}
+function whatifPlaceholder(f, v) {
+  if (f.type === 'pct') return String(Math.round(v * 1000) / 10);
+  if (f.type === 'months') return String(Math.round(v * 10) / 10);
+  return v % 1 ? String(Math.round(v * 100) / 100) : NF.format(v);
+}
+function whatifUnitsHint(d) {
+  var s = obj(d.screen), own = Object.assign({}, obj(s.overrides), obj(obj(d.facts).overrides)).units, priced = Object.keys(obj(s.by_units)).sort(), best = num(s.best_units), bits = [];
+  if (own != null) bits.push("deal's own " + (own === 'both' ? 'both' : own + ' units'));
+  if (best != null) bits.push('chose ' + best + (priced.length > 1 ? ' of ' + priced.join(' and ') : ''));
+  return bits.length ? 'Stored: ' + bits.join(' · ') : '';
+}
+function whatifStoredLine(d) {
+  var s = obj(d.screen), v = verdictOf(d), mp = maxPrice(s), bits = [];
+  if (v) bits.push(VERDICT_LABEL[v]);
+  if (num(s.profit_per_lot) != null) bits.push(usdK(s.profit_per_lot) + ' profit/lot');
+  if (mp != null && mp > 0) bits.push('max ' + usdK(mp));
+  return bits.length ? h('p', null, h('span', { class: 'lbl' }, 'Stored screen'), h('br'), h('b', null, bits.join(' · '))) : null;
+}
+
+// The Re-screen sheet's boxes. read() gives {params, count, error}: params holds only the boxes that were filled, in the worker's order, percents already
+// divided by 100, plus the note. onEnter runs when Enter is pressed in a box.
+function whatifForm(d, onEnter) {
+  var now = whatifNow(d), packUnits = arr(obj(obj(S.settings.pack).whatif_defaults).units).map(num).filter(function (u) { return u != null && u > 0; });
+  var units = packUnits.length ? packUnits : WHATIF_UNITS_FALLBACK, inputs = {}, cells = [], msg = h('div', { role: 'alert' });
+  function say(text, key) {
+    clear(msg); if (text) msg.appendChild(h('p', { class: 'msg bad' }, text));
+    Object.keys(inputs).forEach(function (k) { inputs[k].setAttribute('aria-invalid', text && k === key ? 'true' : 'false'); });
+  }
+  WHATIF_FIELDS.forEach(function (f) {
+    var el, hint, n = now[f.key];
+    if (f.type === 'units') {
+      el = h('select', { id: 'wi-units', name: 'units' }, h('option', { value: '' }, 'Keep'), units.map(function (u) { return h('option', { value: String(u) }, u + ' units'); }),
+        units.length > 1 ? h('option', { value: 'both' }, 'Both (' + units.join(' and ') + ')') : null);
+      hint = whatifUnitsHint(d);
+    } else {
+      el = h('input', { id: 'wi-' + f.key, name: f.key, type: 'text', inputmode: 'decimal', autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', placeholder: n ? whatifPlaceholder(f, n.v) : '' });
+      hint = n ? WHATIF_FROM[n.from] + ' ' + whatifShown(f, n.v) : 'Not stored';
+      el.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); onEnter(); } });
+    }
+    inputs[f.key] = el;
+    cells.push(h('label', null, f.label, el, hint ? h('span', { class: 'fine' }, hint) : null));
+  });
+  var noteEl = h('textarea', { id: 'wi-note', name: 'note', class: 'wi-note', maxlength: String(WHATIF_NOTE_MAX), placeholder: 'What are you testing? (optional)' });
+  return {
+    inputs: inputs, note: noteEl, say: say,
+    nodes: [h('p', { class: 'muted' }, 'Change what you want to test. A blank box keeps the deal\'s number. The stored screen is not touched and nothing is sent.'),
+      whatifStoredLine(d), msg, h('div', { class: 'wi-grid' }, cells),
+      h('label', null, 'Note', noteEl, h('span', { class: 'fine' }, 'Kept with the answer. ' + WHATIF_NOTE_MAX + ' characters at most.'))],
+    read: function () {
+      var params = {}, count = 0, error = null;
+      for (var i = 0; i < WHATIF_FIELDS.length && !error; i++) {
+        var f = WHATIF_FIELDS[i], r = readWhatifField(f, inputs[f.key].value);
+        if (r.error) error = { key: f.key, message: r.error };
+        else if (!r.blank) { params[f.key] = r.value; count++; }
+      }
+      var note = String(noteEl.value || '').replace(/[\u0000-\u001f\u007f]+/g, ' ').trim().slice(0, WHATIF_NOTE_MAX).trim();
+      if (note) params.note = note;
+      return { params: params, count: count, error: error };
+    }
+  };
+}
+function whatifSheet(d) {
+  var sheet, form;
+  function submit() {
+    var r = form.read();
+    if (r.error) { form.say(r.error.message, r.error.key); try { form.inputs[r.error.key].focus(); } catch (e) { /* not focusable */ } return; }
+    if (!r.count) { form.say('Fill in at least one number to ask what if.', 'ask_price'); try { form.inputs.ask_price.focus(); } catch (e) { /* not focusable */ } return; }
+    if (!ownerGate('rescreen')) return;
+    sheet.close();
+    requestAction('rescreen', d.id, r.params, { toast: 'Asking what if. The answer appears on this card in a moment.' });
+  }
+  form = whatifForm(d, submit);
+  sheet = openSheet({ title: 'What if · ' + titleOf(d), body: form.nodes,
+    footer: [h('button', { class: 'btn primary block', type: 'button', id: 'wi-go', onclick: submit }, 'Ask what if'),
+             h('button', { class: 'btn quiet block', type: 'button', onclick: function () { sheet.close(); } }, 'Cancel')] });
+  return sheet;
+}
+
+// Is the what-if still about the screen on the deal? A real re-screen (a pass, Apply, rescreen_all) makes the base it was compared with out of date.
+function sameStamp(a, b) {
+  a = a == null ? '' : String(a); b = b == null ? '' : String(b);
+  if (a === b) return true;
+  var da = parseDate(a), db = parseDate(b);
+  return !!(da && db && da.getTime() === db.getTime());
+}
+function kUsd(x) {            // $901k, $1,081k; small amounts stay whole dollars
+  x = num(x); if (x == null) return '';
+  var a = Math.abs(x);
+  return (x < 0 ? '-' : '') + '$' + (a >= 10000 ? NF.format(Math.round(a / 1000)) + 'k' : NF.format(Math.round(a)));
+}
+function dUsd(x) { x = num(x); if (x == null) return ''; return Math.round(x) === 0 ? 'same' : (x < 0 ? '-' : '+') + kUsd(Math.abs(x)); }
+function dPts(x) { x = num(x); if (x == null) return ''; var p = Math.round(x * 1000) / 10; return p === 0 ? 'same' : (p < 0 ? '' : '+') + p + ' pts'; }
+function whatifVerdictText(sm) {
+  var v = normVerdict(sm.verdict), line = String(sm.verdict_line || '').trim() || (v === 'insufficient' ? 'Would need comps' : VERDICT_LABEL[v] ? 'Would be ' + VERDICT_LABEL[v] : '');
+  var sv = VERDICT_LABEL[normVerdict(sm.stored_verdict)];
+  if (!line) return '';
+  return line + (sm.changed === true && sv ? ' (stored: ' + sv + ')' : sm.changed === false ? ' (as stored)' : '');
+}
+// The stored screen beside the what-if, as rows (a table of four columns does not fit a phone): "was -> now  change  pass". From summary.stored, summary and
+// summary.delta, as the worker wrote them. A hurdle marks the what-if number, and only on a screen that carries its own hurdles.
+function whatifRows(sm, hz) {
+  var st = obj(sm.stored), dl = obj(sm.delta), marks = hz.stored;
+  var defs = [
+    { label: 'Units', a: st.units, b: sm.units, show: function (v) { return String(v); } },
+    { label: 'Profit per lot', a: st.profit_per_lot, b: sm.profit_per_lot, show: kUsd, d: dl.profit_per_lot, dshow: dUsd, want: hz.profit_floor },
+    { label: 'Margin', a: st.margin_on_cost, b: sm.margin_on_cost, show: pctText, d: dl.margin_on_cost, dshow: dPts, want: hz.margin },
+    { label: 'Max price', a: st.max_price, b: sm.max_price, show: kUsd, d: dl.max_price, dshow: dUsd },
+    { label: 'Cash-on-cash', a: st.cash_on_cash, b: sm.cash_on_cash, show: pctText, d: dl.cash_on_cash, dshow: dPts, want: hz.cash_on_cash },
+    { label: 'Return on equity', a: st.return_on_equity, b: sm.return_on_equity, show: pctText, d: dl.return_on_equity, dshow: dPts, want: hz.return_on_equity }
+  ];
+  var rows = defs.filter(function (r) { return num(r.a) != null || num(r.b) != null; }).map(function (r) {
+    var a = num(r.a), b = num(r.b), dv = r.d == null ? null : num(r.d);
+    return h('div', { class: 'rrow' }, h('dt', null, r.label),
+      h('dd', null, h('span', { class: 'sr' }, 'stored '), h('span', { class: 'was' }, a != null ? r.show(a) : '-'), h('span', { class: 'arrow', 'aria-hidden': 'true' }, '→'),
+        h('span', { class: 'sr' }, 'what if '), b != null ? h('b', null, r.show(b)) : h('span', { class: 'was' }, '-'),
+        dv != null && r.dshow ? h('span', { class: 'chg' + (dv > 0 ? ' up' : dv < 0 ? ' dn' : '') }, h('span', { class: 'sr' }, 'change '), r.dshow(dv)) : null,
+        marks && b != null && r.want != null ? passMark(b, r.want) : null));
+  });
+  return rows.length ? h('dl', { class: 'ret wi-rows' }, rows) : null;
+}
+function whatifRunAgain(d, wl) {
+  var params = Object.assign({}, obj(wl.inputs));
+  var note = String(wl.note || '').trim(); if (note) params.note = note;
+  if (!ownerGate('rescreen')) return;
+  requestAction('rescreen', d.id, params, { toast: 'Asking what if again. The answer appears on this card in a moment.' });
+}
+// "Apply" changes the deal: confirm first, and say what moves and what does not.
+function applySheet(d, wl) {
+  var sm = obj(wl.summary), nv = VERDICT_LABEL[normVerdict(sm.verdict)], sv = VERDICT_LABEL[normVerdict(sm.stored_verdict)], changed = sm.changed === true && nv && sv;
+  var body = [
+    h('p', null, 'This changes the stored screen of ', h('b', null, titleOf(d)), '. ', changed ? 'The stored verdict will change from ' + sv + ' to ' + nv + '.' : 'The stored verdict stays ' + (nv || sv || 'as it is') + ', but the numbers behind it change.'),
+    h('p', null, 'The deal takes ', h('b', null, whatifInputsText(wl.inputs) || 'the what-if numbers'), ' as its own, so every later re-screen uses them.'),
+    h('p', { class: 'muted' }, 'It is screened again from the comps table, so the real numbers can differ a little from the what-if.'),
+    h('p', null, h('b', null, 'No reply is sent.'), ' No email, no text and no Gmail draft is made or changed.')
+  ];
+  if (changed && canSendDraft(d)) body.push(h('p', { class: 'warn1' }, 'This deal has a Gmail draft written for the old verdict. It is not replaced. Open it before you send anything.'));
+  if (isOffQueue(d)) body.push(h('p', { class: 'muted' }, 'It stays ' + (d.status === 'held' ? 'on hold' : 'declined by you') + '; only its screen and verdict change.'));
+  confirmSheet({ title: 'Apply what-if · ' + titleOf(d), intro: body, confirmLabel: 'Hold to apply', hold: true, onConfirm: async function () {
+    if (!ownerGate('apply_whatif')) return;
+    await requestAction('apply_whatif', d.id, { at: wl.at }, { toast: 'Applying it. Nothing is sent.' });
+  } });
+}
+function whatifPending(d) { return (S.byDeal.get(d.id) || []).find(function (a) { return WHATIF_KINDS[a.kind] && (a.status === 'queued' || a.status === 'running'); }) || null; }
+// The "What-if" block on a card and the Underwriting tab: the latest answer (deals.facts.whatif_last), clearly not the stored screen.
+function whatifBlock(d) {
+  var wl = obj(obj(d.facts).whatif_last), has = Object.keys(wl).length > 0, pend = whatifPending(d);
+  if (!has && !pend) return null;
+  var kids = [], fresh = has && sameStamp(wl.base_screened_at, obj(d.screen).screened_at), sm = obj(wl.summary);
+  if (pend && pend.kind === 'rescreen') kids.push(h('p', { class: 'msg', role: 'status' }, 'Working out the what-if. ' + pendingText(pend)));
+  if (has && fresh) {
+    var hz = hurdlesOf(obj(d.screen)), verdict = whatifVerdictText(sm), table = whatifRows(sm, hz), flags = arr(sm.flags).filter(function (f) { return String(f).trim(); });
+    var inputsText = whatifInputsText(wl.inputs), note = String(wl.note || '').trim();
+    kids.push(h('div', { class: 'wi-top' }, h('p', { class: 'lbl' }, 'What-if'), chip('accent', 'What-if, not the stored screen')));
+    if (verdict) kids.push(h('p', { class: 'wi-verdict ' + (normVerdict(sm.verdict) || '') }, verdict));
+    if (String(sm.headline || '').trim()) kids.push(h('p', { class: 'cap wi-head' }, redact(sm.headline)));
+    if (inputsText) kids.push(note1('Changed', inputsText));
+    kids.push(table);
+    flags.forEach(function (f) { kids.push(h('p', { class: 'warn1 flag1' }, cap1(redact(f)))); });
+    if (wl.base_replay_matches === false) kids.push(h('p', { class: 'warn1' }, 'The pack or the comps have moved since this deal was screened, so part of this change is drift, not your numbers.'));
+    if (note) kids.push(note1('Note', redact(note)));
+    kids.push(h('p', { class: 'fine' }, 'Asked ' + (fmtCT(wl.at) || 'earlier') + (wl.at ? ' · ' + rel(wl.at) : '')));
+    if (wl.applied_at) kids.push(chip('ok', 'Applied ' + (fmtCT(wl.applied_at) || '')));
+    else if (replied(d)) kids.push(h('p', { class: 'fine' }, 'This deal is already replied (' + d.status + '), so the what-if stays a what-if.'));
+    else if (Object.keys(obj(wl.inputs)).length) {
+      kids.push(h('div', { class: 'wi-actions' }, actionTile(d, { kind: 'apply_whatif', label: 'Apply what-if', hint: 'Make it the stored screen. Nothing is sent.', since: parseDate(wl.at),
+        tap: function (a) {
+          if (a && (a.status === 'queued' || a.status === 'running')) return toast(pendingText(a));
+          if (!ownerGate('apply_whatif')) return;
+          applySheet(d, wl);
+        } })));
+    }
+  } else if (has) {
+    var done = !!wl.applied_at, was = whatifInputsText(wl.inputs);          // applying re-screens the deal, so an applied what-if is always "old" too
+    kids.push(h('div', { class: 'wi-top' }, h('p', { class: 'lbl' }, 'What-if'), done ? chip('ok', 'Applied ' + (fmtCT(wl.applied_at) || '')) : chip('mute', 'Out of date')));
+    kids.push(h('p', { class: 'muted wi-stale' }, done ? 'Applied. The stored screen now includes it.' : 'What-if from before the last re-screen'));
+    if (was) kids.push(note1('Asked', was));
+    if (!done && !pend && Object.keys(obj(wl.inputs)).length) kids.push(h('div', { class: 'links' }, h('button', { class: 'btn sm', type: 'button', 'data-kind': 'rescreen', onclick: function () { whatifRunAgain(d, wl); } }, 'Run it again')));
+  }
+  return kids.length ? h('section', { class: 'wi' + (fresh ? '' : ' stale'), 'aria-label': 'What-if' }, kids) : null;
+}
+
+// A what-if answers in seconds. When one this page saw queued or running finishes, the action's own message is the toast
+// ("Would be Review (stored: Decline); profit ..."), or the reason it was refused.
+var watching = {};
+function watchWhatIf() {
+  S.actions.forEach(function (a) {
+    if (!WHATIF_KINDS[a.kind]) return;
+    if (a.status === 'queued' || a.status === 'running') { watching[a.id] = true; return; }
+    if (!watching[a.id]) return;
+    delete watching[a.id];
+    var m = String(obj(a.result).message || '').trim();
+    toast(m || (a.status === 'done' ? 'The what-if is ready.' : 'The what-if did not work.'), a.status === 'done' ? null : 'bad');
+  });
+}
+
 // the whole set of buttons for one deal
 function actionTile(d, o) {
-  // o: {kind, label, hint, cls, tap}
-  var a = latest(d.id, o.kind), st = actState(a);
+  // o: {kind, label, hint, cls, tap, since}: since (a Date) ignores an earlier request of the kind, so last week's Apply does not read as this what-if's
+  var a = latest(d.id, o.kind), st;
+  if (a && o.since && parseDate(a.requested_at) && parseDate(a.requested_at) < o.since) a = null;
+  st = actState(a);
   var sub = st ? st.sub : o.hint;
   var btn = h('button', { class: 'act' + (o.cls ? ' ' + o.cls : ''), type: 'button', 'data-kind': o.kind, 'data-s': st ? st.s : null, 'aria-disabled': o.disabled ? 'true' : null,
     onclick: function () { o.tap(a); } }, h('b', null, o.label), h('small', null, sub));
@@ -1055,7 +1424,7 @@ function actionPanel(d, compact) {
   var offerSub = fin ? 'Already replied' : (offerA && (offerA.status === 'queued' || offerA.status === 'running')) ? (offerA.status === 'running' ? 'Making the draft...' : 'Queued · the draft is coming') :
     (offerA && offerA.status === 'failed' && Date.now() - parseDate(offerA.requested_at) < 6 * 3600e3) ? obj(offerA.result).message || 'It did not work.' :
     (offer.draft_id && offer.draft_id === d.reply_draft_id) ? 'Draft ready · ' + usd(offer.price) + ' · tap to revise' :
-    (num(obj(d.screen).max_price_for_600k) > 0 ? 'Drafts at up to ' + usdK(obj(d.screen).max_price_for_600k) : 'Pick a price, get a draft');
+    (maxPrice(obj(d.screen)) > 0 ? 'Drafts at up to ' + usdK(maxPrice(obj(d.screen))) : 'Pick a price, get a draft');
   var offerBtn = h('button', { class: 'act primary', type: 'button', 'data-kind': 'offer', 'data-s': offerA && !fin ? offerA.status : null,
     onclick: function () {
       if (fin) return toast('This deal is already replied. Make the offer from Gmail.');
@@ -1095,7 +1464,13 @@ function actionPanel(d, compact) {
         if (!ownerGate('make_uw_copy')) return;
         uwSheet(d, existing.length > 0);
       } },
-    { kind: 'rescreen', label: 'Re-screen · what if', hint: 'Change the ask, units or $/sf', tap: function (a) { if (a && (a.status === 'queued' || a.status === 'running')) return toast(pendingText(a)); soonSheet('rescreen', d, 'Re-screen · what if'); } },
+    { kind: 'rescreen', label: 'Re-screen · what if', hint: 'Change the ask, units or $/sf',
+      tap: function (a) {
+        if (a && (a.status === 'queued' || a.status === 'running')) return toast(pendingText(a));
+        if (!ownerGate('rescreen')) return;
+        if (!Object.keys(obj(d.screen)).length) return toast('This deal was never screened, so there is nothing to ask what if about.', 'bad');
+        whatifSheet(d);
+      } },
     { kind: 'call_contact', label: 'Call this agent (AI)', hint: 'Coming soon', tap: function (a) { if (a && (a.status === 'queued')) return toast(pendingText(a)); soonSheet('call_contact', d, 'Call this agent (AI)'); } },
     { kind: 'email_contact', label: 'Email this agent', hint: 'Coming soon', tap: function (a) { if (a && (a.status === 'queued')) return toast(pendingText(a)); soonSheet('email_contact', d, 'Email this agent'); } },
     { kind: 'add_to_call_list', label: 'Add to call list', hint: 'Coming soon', tap: function (a) { if (a && (a.status === 'queued')) return toast(pendingText(a)); soonSheet('add_to_call_list', d, 'Add to call list'); } }
@@ -1120,6 +1495,7 @@ function timeline(d) {
     var extra = [];
     if (a.kind === 'note' && obj(a.params).text) extra.push(h('p', null, '"' + String(obj(a.params).text) + '"'));
     if (a.kind === 'offer' && num(obj(a.params).price)) extra.push(h('p', { class: 'muted' }, 'Price ' + usd(obj(a.params).price)));
+    if (a.kind === 'rescreen' && whatifInputsText(a.params)) extra.push(h('p', { class: 'muted' }, 'Asked: ' + whatifInputsText(a.params)));
     if (r.message) extra.push(h('p', { class: st === 'failed' ? 'down' : '' }, String(r.message)));
     var acts = [];
     arr(r.artifacts).forEach(function (art) { acts.push(h('button', { class: 'btn sm', type: 'button', onclick: function () { openArtifact(art); } }, 'Open ' + (art.title || art.name))); });
@@ -1132,7 +1508,7 @@ function timeline(d) {
 // ---------------------------------------------------------------------------------------------------------------------------------
 // the card
 function summaryBody(d) {
-  var kids = [factsBlock(d), compsInfo(d), gateChips(d), moneyBlock(d), warnReasons(d), outcomeBlock(d), textBlock(d), linkRow(d)];
+  var kids = [factsBlock(d), compsInfo(d), gateChips(d), moneyBlock(d), warnReasons(d), whatifBlock(d), outcomeBlock(d), textBlock(d), linkRow(d)];
   return kids;
 }
 function dealCard(row, pin) {
@@ -1246,7 +1622,7 @@ function screenDeal() {
     shell([h('a', { class: 'back', href: '#/deals' }, icon('back'), 'Deals'), S.loadedOnce && !ix ? h('p', { class: 'empty' }, 'This deal is not in your workspace.') : h('p', { class: 'muted' }, 'Loading the deal...')]);
     return;
   }
-  var v = verdictOf(d), s = obj(d.screen), profit = num(s.profit_per_lot), price = num(s.max_price_for_600k);
+  var v = verdictOf(d), s = obj(d.screen), profit = num(s.profit_per_lot), price = maxPrice(s);
   var tabs = [['underwriting', 'Underwriting'], ['comps', 'Comps'], ['documents', 'Documents'], ['timeline', 'Timeline'], ['source', 'Source']];
   var tab = S.route.tab && tabs.some(function (t) { return t[0] === S.route.tab; }) ? S.route.tab : 'underwriting';
   var pane = h('div', { class: 'pane' });
@@ -1375,6 +1751,10 @@ function packRows(pack) {
   var rows = [];
   if (num(pack.target_profit_per_lot)) rows.push(['Profit target', usd(pack.target_profit_per_lot) + ' per lot']);
   if (num(pack.min_margin_on_cost)) rows.push(['Minimum margin', Math.round(pack.min_margin_on_cost * 100) + '% on all-in cost']);
+  if (num(pack.min_cash_on_cash) != null) rows.push(['Cash-on-cash hurdle', pctText(pack.min_cash_on_cash) + ' of equity in']);          // T-77: published only when the pack applies it
+  if (num(pack.min_return_on_equity) != null) rows.push(['Return on equity hurdle', pctText(pack.min_return_on_equity) + ' a year']);
+  var fin = financingText(obj(pack.financing));
+  if (fin) rows.push(['Financing', fin.replace(/^Worked on /, '').replace(/\.$/, '')]);
   if (arr(pack.zips).length) rows.push(['We buy in', pack.zips.join(', ')]);
   if (arr(pack.watch_zips).length) rows.push(['Watch list', pack.watch_zips.join(', ')]);
   if (num(pack.min_buildable_sf)) rows.push(['Buildable', NF.format(pack.min_buildable_sf) + '+ sf']);
