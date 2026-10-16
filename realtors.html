@@ -11,7 +11,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="For Realtors | Acquiro">
 <meta property="og:description" content="Send us an address and an asking price. Text or email. You get a written number within a day.">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2096%2096'%3E%3Cpath%20fill='%231F5C3A'%20d='M22,0H74A22,22%200%200%201%2096,22V74A22,22%200%200%201%2074,96H22A22,22%200%200%201%200,74V22A22,22%200%200%201%2022,0ZM22.46,59L9,59L9,69L18.78,69L14,82L34,82L38.78,69L57.22,69L62,82L82,82L77.22,69L87,69L87,59L73.54,59L57,14L39,14ZM48,43.92L53.54,59L42.46,59Z'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%201%20100%20100'%3E%3Cdefs%3E%3ClinearGradient%20id='r'%20gradientUnits='userSpaceOnUse'%20x1='8'%20y1='92'%20x2='92'%20y2='8'%3E%3Cstop%20offset='0'%20stop-color='%23174A2E'/%3E%3Cstop%20offset='.25'%20stop-color='%231F5C3A'/%3E%3Cstop%20offset='.5'%20stop-color='%232E8B57'/%3E%3Cstop%20offset='1'%20stop-color='%236FD9A6'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='a'%20gradientUnits='userSpaceOnUse'%20x1='8'%20y1='92'%20x2='92'%20y2='8'%3E%3Cstop%20offset='0'%20stop-color='%231F5C3A'/%3E%3Cstop%20offset='.5'%20stop-color='%232E8B57'/%3E%3Cstop%20offset='1'%20stop-color='%236FD9A6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg%20fill='none'%20stroke-width='16'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M8%2060A32%2032%200%201%201%2072%2060A32%2032%200%201%201%208%2060Z'%20stroke='url(%23r)'/%3E%3Cpath%20d='M68%2092C74%2062%2072%2028%2092%2010M66%2010H92V36'%20stroke='url(%23a)'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Schibsted+Grotesk:wght@500;600;700&amp;display=swap">
 <style>
 :root{
@@ -58,18 +58,18 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,t
 /* chrome */
 .wrap{max-width:1280px;margin:0 auto;padding:0 var(--gutter)}
 .top{max-width:1280px;margin:0 auto;padding:16px var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand{--m:28px;display:inline-flex;align-items:center;gap:calc(var(--m)*.25);min-height:44px;font:700 26px/1 var(--d);letter-spacing:-.03em;text-decoration:none}
-.brand .mark{display:block;flex:none;width:var(--m);height:var(--m);fill:currentColor}
-.brand .word{margin-right:-.2em;font:600 calc(var(--m)*.375)/1 var(--d);letter-spacing:.2em}
+.brand{--m:28px;display:inline-flex;align-items:center;gap:calc(var(--m)*.3);min-height:44px;text-decoration:none}
+.brand .mark{display:block;flex:none;width:var(--m);height:var(--m);overflow:visible}
+.brand .word{font:700 calc(var(--m)*.875)/1 var(--d);letter-spacing:-.02em;color:var(--ink)}
 @media (min-width:700px){.brand{--m:32px}}
-.brand:hover{color:var(--accent)}
+.brand:hover .word{color:var(--accent)}
 .nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;font-weight:500;text-decoration:none}
 .nav a[aria-current=page]{font-weight:600;text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:2px}
 .nav a.cta{justify-content:center;padding:0 22px;border-radius:10px;background:var(--accent);color:#fff;font:600 16px/1.2 var(--d);text-decoration:none}
 .foot{border-top:1px solid var(--b14)}
 .foot .in{max-width:1280px;margin:0 auto;padding:32px var(--gutter) 48px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 32px}
-.foot .brand{--m:24px;gap:10px;font-size:22px}
+.foot .brand{--m:24px;min-width:44px;justify-content:center}
 .foot nav{display:flex;flex-wrap:wrap;align-items:center;gap:4px 20px;font-size:16px}
 .foot nav a{display:inline-flex;align-items:center;min-height:44px}
 
@@ -280,8 +280,8 @@ details.q p{margin-top:10px;opacity:.82}
 <header>
 <div class="top">
 <a class="brand" href="index.html" aria-label="Acquiro home">
-<svg class="mark" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><path d="M22,0H74A22,22 0 0 1 96,22V74A22,22 0 0 1 74,96H22A22,22 0 0 1 0,74V22A22,22 0 0 1 22,0ZM22.46,59L9,59L9,69L18.78,69L14,82L34,82L38.78,69L57.22,69L62,82L82,82L77.22,69L87,69L87,59L73.54,59L57,14L39,14ZM48,43.92L53.54,59L42.46,59Z"/></svg>
-<span class="word">ACQUIRO</span>
+<svg class="mark" viewBox="0 1 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="mk-realtors-h-ring" gradientUnits="userSpaceOnUse" x1="8" y1="92" x2="92" y2="8"><stop offset="0" stop-color="#174A2E"/><stop offset=".25" stop-color="#1F5C3A"/><stop offset=".5" stop-color="#2E8B57"/><stop offset="1" stop-color="#6FD9A6"/></linearGradient><linearGradient id="mk-realtors-h-arrow" gradientUnits="userSpaceOnUse" x1="8" y1="92" x2="92" y2="8"><stop offset="0" stop-color="#1F5C3A"/><stop offset=".5" stop-color="#2E8B57"/><stop offset="1" stop-color="#6FD9A6"/></linearGradient></defs><g fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"><path d="M8 60A32 32 0 1 1 72 60A32 32 0 1 1 8 60Z" stroke="url(#mk-realtors-h-ring)"/><path d="M68 92C74 62 72 28 92 10M66 10H92V36" stroke="url(#mk-realtors-h-arrow)"/></g></svg>
+<span class="word">acquiro</span>
 </a>
 <nav class="nav" aria-label="Main">
 <a href="realtors.html" aria-current="page">For realtors</a>
@@ -385,7 +385,7 @@ details.q p{margin-top:10px;opacity:.82}
 
 <footer class="foot">
 <div class="in">
-<a class="brand" href="index.html"><svg class="mark" viewBox="0 0 96 96" aria-hidden="true" focusable="false"><path d="M22,0H74A22,22 0 0 1 96,22V74A22,22 0 0 1 74,96H22A22,22 0 0 1 0,74V22A22,22 0 0 1 22,0ZM22.46,59L9,59L9,69L18.78,69L14,82L34,82L38.78,69L57.22,69L62,82L82,82L77.22,69L87,69L87,59L73.54,59L57,14L39,14ZM48,43.92L53.54,59L42.46,59Z"/></svg>Acquiro</a>
+<a class="brand" href="index.html" aria-label="Acquiro home"><svg class="mark" viewBox="0 1 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="mk-realtors-f-ring" gradientUnits="userSpaceOnUse" x1="8" y1="92" x2="92" y2="8"><stop offset="0" stop-color="#174A2E"/><stop offset=".25" stop-color="#1F5C3A"/><stop offset=".5" stop-color="#2E8B57"/><stop offset="1" stop-color="#6FD9A6"/></linearGradient><linearGradient id="mk-realtors-f-arrow" gradientUnits="userSpaceOnUse" x1="8" y1="92" x2="92" y2="8"><stop offset="0" stop-color="#1F5C3A"/><stop offset=".5" stop-color="#2E8B57"/><stop offset="1" stop-color="#6FD9A6"/></linearGradient></defs><g fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"><path d="M8 60A32 32 0 1 1 72 60A32 32 0 1 1 8 60Z" stroke="url(#mk-realtors-f-ring)"/><path d="M68 92C74 62 72 28 92 10M66 10H92V36" stroke="url(#mk-realtors-f-arrow)"/></g></svg></a>
 <nav aria-label="Footer">
 <a href="index.html">Home</a>
 <a href="submit.html">Send a deal</a>
