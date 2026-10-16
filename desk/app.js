@@ -19,8 +19,9 @@ var PAGE = 20;                         // deals drawn at a time
 var COMPS_CAP = 15;                    // rows in a comps table
 var DESK_ONLINE_MS = 2 * 60 * 1000;    // a worker seen this recently is "online"
 
-var VERDICTS = ['surface', 'pass', 'insufficient'];
-var VERDICT_LABEL = { surface: 'Surface', pass: 'Pass', insufficient: 'Insufficient' };
+var VERDICTS = ['review', 'decline', 'insufficient'];
+var VERDICT_LABEL = { review: 'Review', decline: 'Decline', insufficient: 'Needs comps' };
+var LEGACY_VERDICT = { surface: 'review', pass: 'decline' };   // what a row held before 2026-10-16
 var SOURCE_LABEL = { investorlift: 'InvestorLift', avivo_inbox: 'Agent', forwarded: 'Forwarded', listing_feed: 'MLS listing feed' };
 var COMPS_SOURCE = { listprice_proxy: 'list-price proxy', mls_export: 'MLS export', mls_sold: 'MLS sold', origin_closed: 'Origin closed sales' };
 var TAG_LABEL = { agent_sent: 'agent sent', we_found: 'we found', not_found: 'not found', listing: 'listing' };
@@ -29,7 +30,7 @@ var GATE_CLASS = { pass: 'ok', amber: 'warn', fail: 'bad', insufficient: 'mute' 
 var TREE_CLASS = { low: 'ok', medium: 'warn', high: 'bad', unknown: 'mute' };
 var RFQ_ROLES = ['architect', 'civil', 'structural', 'interior'];
 var KIND_LABEL = {
-  approve_send: 'Approve & send', hold: 'Hold', pass: 'Pass', reopen: 'Reopen', note: 'Note', offer: 'Offer draft', rescreen: 'Re-screen',
+  approve_send: 'Approve & send', hold: 'Hold', decline: 'Decline', pass: 'Decline', reopen: 'Reopen', note: 'Note', offer: 'Offer draft', rescreen: 'Re-screen',
   make_dossier: 'Dossier', make_lender_packet: 'Lender packet', make_rfq: 'Vendor RFQ', make_permit_intake: 'Permit intake',
   make_uw_copy: 'UW copy', run_pass: 'Run a pass', call_contact: 'AI call to the agent', email_contact: 'Email to the agent',
   add_to_call_list: 'Call list', refresh_buybox: 'Refresh buy box', sync_close: 'Sync Close', feed_pull: 'Pull the MLS feed', ping: 'Test the desk'
@@ -100,6 +101,7 @@ function parseDate(s) {
 }
 var CT = { timeZone: 'America/Chicago' };
 function fmtDate(s) { var d = parseDate(s); return d ? new Intl.DateTimeFormat('en-US', Object.assign({ month: 'short', day: 'numeric', year: 'numeric' }, CT)).format(d) : null; }
+function fmtTime(s) { var d = parseDate(s); return d ? new Intl.DateTimeFormat('en-US', Object.assign({ hour: 'numeric', minute: '2-digit' }, CT)).format(d) : null; }
 function fmtCT(s) { var d = parseDate(s); return d ? new Intl.DateTimeFormat('en-US', Object.assign({ month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }, CT)).format(d) : null; }
 function rel(s) {
   var d = parseDate(s); if (!d) return '';
@@ -146,7 +148,7 @@ var S = {
   started: false, starting: false, demo: false,
   index: [], idx: new Map(), rows: new Map(), raws: new Map(), actions: [], byDeal: new Map(), workers: [], runs: [], comps: new Map(),
   artifacts: new Map(),
-  tab: 'surface', q: '', shown: PAGE, open: new Set(), detailTab: 'underwriting',
+  tab: 'review', q: '', shown: PAGE, open: new Set(), detailTab: 'underwriting',
   route: { name: 'deals' }, busy: false, again: false, timer: null, rt: null, loadedOnce: false, error: null, demoDone: false
 };
 
@@ -427,10 +429,12 @@ document.addEventListener('visibilitychange', function () { if (S.started && doc
 // derived: what a deal is, in the board's own words
 function hasStreet(d) { return !!String(d.street || '').trim() || /^\d+\s/.test(String(d.address || '').trim()); }
 function isFeed(d) { return !!obj(d.facts).listing_feed || d.is_feed === true; }
+function normVerdict(v) { return LEGACY_VERDICT[v] || v; }
 function verdictOf(d) {
-  var s = obj(d.screen);
-  return VERDICTS.indexOf(d.verdict) >= 0 ? d.verdict : (VERDICTS.indexOf(s.verdict) >= 0 ? s.verdict : null);
+  var s = obj(d.screen), v = normVerdict(d.verdict), sv = normVerdict(s.verdict);
+  return VERDICTS.indexOf(v) >= 0 ? v : (VERDICTS.indexOf(sv) >= 0 ? sv : null);
 }
+function isOffQueue(d) { return d.status === 'held' || d.status === 'declined' || d.status === 'passed'; }
 function titleOf(d) {
   var street = hasStreet(d), addr = String(d.address || '').trim();
   if (street && addr) return addr;
@@ -486,10 +490,10 @@ function workerState() {
 // tabs
 function tabOf(d) {
   // a deal sits in exactly one of: held (you put it aside), replied, or by verdict; Feed is a cross-cut
-  if (d.status === 'held' || d.status === 'passed') return 'held';
+  if (isOffQueue(d)) return 'held';
   if (replied(d)) return 'replied';
   var v = verdictOf(d);
-  return v === 'surface' ? 'surface' : 'pass';
+  return v === 'review' ? 'review' : v === 'insufficient' ? 'needs' : 'decline';
 }
 function inTab(d, tab) {
   if (tab === 'all') return true;
@@ -499,7 +503,7 @@ function inTab(d, tab) {
 function inwood() { return S.index.find(function (r) { return !r.is_feed && /2501 Inwood Pl/i.test(r.address || ''); }) || S.index.find(function (r) { return /2501 Inwood Pl/i.test(r.address || ''); }) || null; }
 function sortList(list, tab) {
   var out = list.slice();
-  if (tab === 'surface') {
+  if (tab === 'review') {
     out.sort(function (a, b) { return (a.is_feed ? 1 : 0) - (b.is_feed ? 1 : 0) || (num(b.profit) || -Infinity) - (num(a.profit) || -Infinity); });
   } else {
     out.sort(function (a, b) { return String(b.created_at).localeCompare(String(a.created_at)); });
@@ -517,7 +521,7 @@ function filtered() {
   return sortList(list, S.tab);
 }
 function counts() {
-  var c = { all: S.index.length, surface: 0, pass: 0, replied: 0, feed: 0, held: 0, insufficient: 0, drafts: 0 };
+  var c = { all: S.index.length, review: 0, decline: 0, needs: 0, replied: 0, feed: 0, held: 0, insufficient: 0, drafts: 0 };
   S.index.forEach(function (d) {
     c[tabOf(d)]++;
     if (isFeed(d)) c.feed++;
@@ -527,23 +531,30 @@ function counts() {
   return c;
 }
 function todayDeals() {
-  var list = S.index.filter(function (d) { return tabOf(d) === 'surface'; });
-  return sortList(list, 'surface').slice(0, 5);
+  var list = S.index.filter(function (d) { return tabOf(d) === 'review'; });
+  return sortList(list, 'review').slice(0, 5);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------------
 // building blocks of a deal card
 function chip(cls, text) { return h('span', { class: 'chip ' + cls }, text); }
-function verdictChip(v) { return v ? chip(v, VERDICT_LABEL[v]) : chip('none', 'Not screened'); }
+function verdictChip(v) { v = normVerdict(v); return v && VERDICT_LABEL[v] ? chip(v, VERDICT_LABEL[v]) : chip('none', 'Not screened'); }
+// the screen's flags on the closed card: a short line the owner sees before he opens it (the full list is in the card body)
+function flagsLine(d) {
+  var fl = arr(obj(d.screen).flags).map(String).filter(function (f) { return f.trim(); });
+  if (!fl.length || replied(d)) return null;
+  var short = fl.map(function (f) { return f.split(':')[0].split(' (')[0]; });
+  return h('p', { class: 'flagsline' }, h('b', null, fl.length === 1 ? '1 flag' : fl.length + ' flags'), ' · ' + short.join(' · '));
+}
 function tagEl(t) { return TAG_LABEL[t] ? h('span', { class: 'tag ' + t }, TAG_LABEL[t]) : null; }
 function note1(label, text) { return h('p', { class: 'note1' }, h('b', null, label), text); }
 
 function statusChips(d) {
   var out = [];
-  if (d.status === 'sent') out.push(chip('ok', d.sent_at ? 'Replied · sent ' + fmtCT(d.sent_at) : 'Replied'));
+  if (d.status === 'sent') out.push(chip('ok', (d.sent_at ? 'Replied · sent ' + fmtCT(d.sent_at) : 'Replied') + (obj(obj(d.facts).auto_decline).to ? ' · auto-decline' : '')));
   else if (d.status === 'bounced') out.push(chip('bad', d.sent_at ? 'Replied · bounced (sent ' + fmtCT(d.sent_at) + ')' : 'Replied · bounced'));
   else if (d.status === 'held') out.push(chip('warn', 'On hold'));
-  else if (d.status === 'passed') out.push(chip('mute', 'Passed by you'));
+  else if (d.status === 'declined' || d.status === 'passed') out.push(chip('mute', 'Declined by you'));
   if (isFeed(d)) out.push(chip('line', 'MLS feed'));
   var offer = obj(obj(d.facts).offer);
   var pOffer = (S.byDeal.get(d.id) || []).find(function (a) { return a.kind === 'offer' && (a.status === 'queued' || a.status === 'running'); });
@@ -552,6 +563,9 @@ function statusChips(d) {
   else if (pOffer) out.push(chip('accent', 'Offer queued' + (num(obj(pOffer.params).price) ? ' · ' + usd(obj(pOffer.params).price) : '')));
   else if (offer.draft_id && offer.draft_id === d.reply_draft_id && !replied(d)) out.push(chip('ok', 'Offer draft ready' + (num(offer.price) ? ' · ' + usd(offer.price) : '')));
   else if (canSendDraft(d)) out.push(chip('ok', 'Draft in Gmail'));
+  var talk = textTalk(d);
+  if (talk.blocked) out.push(chip('warn', 'Text blocked (10DLC pending)'));
+  else if (talk.answered) out.push(chip('ok', 'Texted back'));
   return out;
 }
 
@@ -637,11 +651,11 @@ function outcomeBlock(d) {
   var quote = bullets.length ? h('blockquote', null, h('ul', null, bullets.map(function (b) { return h('li', null, b); }))) : null;
   if (replied(d)) {
     kids.push(d.status === 'bounced' ? chip('bad', 'Replied · bounced') : chip('ok', d.sent_at ? 'Replied · sent ' + fmtCT(d.sent_at) : 'Replied'), quote);
-  } else if (v === 'surface') {
+  } else if (v === 'review') {
     var sn = String(d.surface_note || '').trim();
-    kids.push(h('p', { class: 'lbl' }, 'Surface note'), h('p', { class: 'snote' }, sn || 'No note recorded.'));
+    kids.push(h('p', { class: 'lbl' }, 'Review note'), h('p', { class: 'snote' }, sn || 'No note recorded.'));
     if (draft) kids.push(h('p', { class: 'lbl' }, 'Draft'), draftLink(draft));
-  } else if (v === 'pass' || v === 'insufficient') {
+  } else if (v === 'decline' || v === 'insufficient') {
     if (draft) kids.push(draftLink(draft), quote);
     else if (inquire) kids.push(h('a', { class: 'btn sm', href: inquire, target: '_blank', rel: 'noopener noreferrer' }, 'Inquire on InvestorLift'), quote);
     else if (bullets.length && isFeed(d)) kids.push(chip('line', 'Listing feed · screened, no reply drafted'), quote);
@@ -652,6 +666,64 @@ function outcomeBlock(d) {
 }
 function draftLink(id) {
   return h('a', { class: 'btn sm', href: GMAIL_DRAFT + encodeURIComponent(id), target: '_blank', rel: 'noopener noreferrer' }, 'Open the Gmail draft ↗');
+}
+// A deal that came by text keeps where the conversation stands in deals.facts.sms_in (src/acquiro/sms_reply.py): the ack, the contact the
+// sender gave us, the numbers texted and emailed back. A text Close would not send yet (A2P 10DLC) is stored on the deal to send by hand.
+var SKIP_WORDS = { opt_out: 'they opted out', personal_number: 'a personal number' };
+function textTalk(d) {
+  var sms = obj(obj(d.facts).sms_in), ack = obj(sms.ack), fb = obj(sms.feedback), fs = obj(fb.sms), fe = obj(fb.email);
+  return {
+    has: !!Object.keys(sms).length, sms: sms, ack: ack, fs: fs, fe: fe,
+    blocked: ack.status === 'blocked_10dlc' || fs.status === 'blocked_10dlc',
+    answered: fs.status === 'sent' || fe.status === 'sent' || (ack.kind === 'one_thing' && ack.status === 'sent')
+  };
+}
+function legacyCopy(text) {
+  var ta = document.createElement('textarea'), ok = false;
+  ta.value = text; ta.setAttribute('readonly', ''); ta.className = 'offscreen';
+  document.body.appendChild(ta); ta.select();
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  document.body.removeChild(ta);
+  return ok;
+}
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return legacyCopy(text); });
+  return Promise.resolve(legacyCopy(text));
+}
+function copyButton(text) {
+  return h('button', { class: 'btn sm', type: 'button', onclick: function () { copyText(text).then(function (ok) { toast(ok ? 'Text copied. Paste it into your messages.' : 'Could not copy. Select the text and copy it by hand.', ok ? null : 'bad'); }); } }, 'Copy text');
+}
+function talkLine(kind, label, text) {
+  var kids = [chip(kind, label)];
+  if (text) kids.push(copyButton(String(text)));
+  return h('div', { class: 'smsline' }, kids);
+}
+function textBlock(d) {
+  var t = textTalk(d);
+  if (!t.has || replied(d)) return null;
+  var lines = [], stored = [];
+  var skipped = function (item) { var w = String(item.message || '').split(':')[0]; return SKIP_WORDS[w] || null; };
+  if (t.ack.status === 'sent') lines.push(talkLine('ok', (t.ack.kind === 'one_thing' ? 'Question sent ' : 'Ack sent ') + (fmtTime(t.ack.at) || '')));
+  else if (t.ack.status === 'blocked_10dlc') { lines.push(talkLine('warn', 'Ack text blocked (10DLC pending)', t.ack.text)); if (t.ack.text) stored.push(t.ack.text); }
+  else if (t.ack.status === 'deferred') lines.push(talkLine('line', 'Ack waits for quiet hours to end'));
+  else if (t.ack.status === 'failed') lines.push(talkLine('bad', 'Ack text failed', t.ack.text));
+  else if (t.ack.status === 'skipped') lines.push(talkLine('mute', 'Ack not sent' + (skipped(t.ack) ? ': ' + skipped(t.ack) : '')));
+  else if (t.ack.status === 'expired') lines.push(talkLine('mute', 'Ack skipped: the text was too old'));
+  var email = String(d.agent_email || '').trim(), name = String(d.agent_name || '').trim();
+  if (email) lines.push(h('p', { class: 'note1' }, h('b', null, 'Contact'), (name ? name + ' · ' : '') + email));
+  else if (!(t.fs.status === 'skipped' && skipped(t.fs))) lines.push(talkLine('warn', name ? 'Awaiting email' : 'Awaiting name + email'));
+  var sent = [];
+  if (t.fs.status === 'sent') sent.push('texted ' + (fmtTime(t.fs.at) || ''));
+  if (t.fe.status === 'sent') sent.push('emailed ' + (fmtTime(t.fe.at) || ''));
+  if (sent.length) lines.push(talkLine('ok', 'Numbers ' + sent.join(' · ')));
+  if (t.fs.status === 'blocked_10dlc') { lines.push(talkLine('warn', 'Text blocked (10DLC pending)', t.fs.text)); if (t.fs.text) stored.push(t.fs.text); }
+  else if (t.fs.status === 'deferred') lines.push(talkLine('line', 'Numbers text waits for quiet hours to end'));
+  else if (t.fs.status === 'failed') lines.push(talkLine('bad', 'Numbers text failed', t.fs.text));
+  else if (t.fs.status === 'skipped') lines.push(talkLine('mute', 'Numbers text not sent' + (skipped(t.fs) ? ': ' + skipped(t.fs) : '')));
+  if (t.fe.status === 'failed') lines.push(talkLine('bad', 'Email failed'));
+  else if (t.fe.status === 'skipped') lines.push(talkLine('mute', 'Email not sent' + (skipped(t.fe) ? ': ' + skipped(t.fe) : '')));
+  stored.forEach(function (text) { lines.push(h('blockquote', { class: 'smstext' }, text)); });
+  return lines.length ? h('div', { class: 'smstalk' }, lines) : null;
 }
 function linkRow(d) {
   var items = [], uw = uwUrls(d), lu = safeUrl(d.listing_url);
@@ -752,7 +824,9 @@ function recordBlock(d) {
 }
 function warnReasons(d) {
   var s = obj(d.screen), out = [];
-  arr(s.warnings).filter(function (w) { return String(w).trim(); }).forEach(function (w) { out.push(h('p', { class: 'warn1' }, cap1(w))); });
+  // the screen's flags (2026-10-16): what to check before trusting the number; none of them blocks. An old screen has only warnings.
+  var flags = arr(s.flags).filter(function (w) { return String(w).trim(); });
+  (flags.length ? flags : arr(s.warnings).filter(function (w) { return String(w).trim(); })).forEach(function (w) { out.push(h('p', { class: 'warn1 flag1' }, cap1(w))); });
   var reasons = arr(s.reasons).filter(function (r) { return String(r).trim(); });
   if (reasons.length) out.push(h('div', null, h('p', { class: 'lbl' }, 'Why'), h('ul', { class: 'why' }, reasons.map(function (r) { return h('li', null, cap1(r)); }))));
   return out;
@@ -829,7 +903,7 @@ function offerSheet(d) {
   var offerCfg = obj(S.settings.offer), terms = obj(offerCfg.terms), unset = offerCfg.unset || '[set in packs/offer.yaml]';
   var termKeys = arr(offerCfg.order).filter(function (k) { return terms[k]; });
   if (!termKeys.length) termKeys = Object.keys(terms);
-  var maxR = max != null && max > 0 ? Math.round(max / 1000) * 1000 : null;       // the same nearest-$1,000 the Surface note and the replies quote
+  var maxR = max != null && max > 0 ? Math.round(max / 1000) * 1000 : null;       // the same nearest-$1,000 the Review note and the replies quote
   var price = h('input', { class: 'price', id: 'offer-price', type: 'text', inputmode: 'numeric', autocomplete: 'off', 'aria-label': 'Offer price', value: (num(prev.price) || maxR) ? NF.format(num(prev.price) || maxR) : '' });
   var warn = h('p', { class: 'warn1', hidden: true }, 'This is above the max purchase price.');
   function parsed() { var v = num(String(price.value).replace(/[^0-9.]/g, '')); return v; }
@@ -961,7 +1035,7 @@ function docTap(d, kind, sheetFn) {
 }
 
 function actionPanel(d, compact) {
-  var fin = replied(d), held = d.status === 'held' || d.status === 'passed';
+  var fin = replied(d), held = isOffQueue(d);
   var offerA = latest(d.id, 'offer'), sendA = latest(d.id, 'approve_send');
   var offer = obj(obj(d.facts).offer);
 
@@ -990,7 +1064,7 @@ function actionPanel(d, compact) {
       offerSheet(d);
     } }, h('b', null, 'Make an offer'), h('small', null, offerSub));
 
-  // 2  hold / pass / reopen / note
+  // 2  hold / decline / reopen / note
   var small = [];
   function quick(kind, label, hint) {
     var a = latest(d.id, kind), st = actState(a);
@@ -999,11 +1073,11 @@ function actionPanel(d, compact) {
         if (a && (a.status === 'queued' || a.status === 'running')) return toast(pendingText(a));
         if (kind === 'note') return noteSheet(d);
         if (fin) return toast('This deal is already replied (' + d.status + ').');
-        requestAction(kind, d.id, {}, { toast: kind === 'hold' ? 'Putting it on hold.' : kind === 'pass' ? 'Passing on it.' : 'Reopening.' });
+        requestAction(kind, d.id, {}, { toast: kind === 'hold' ? 'Putting it on hold.' : kind === 'decline' ? 'Declining it.' : 'Reopening.' });
       } }, h('b', null, label), h('small', null, st && (st.s === 'queued' || st.s === 'running') ? st.sub : hint)));
   }
   if (held) { quick('reopen', 'Reopen', 'Back in the queue'); quick('note', 'Note', 'Write it down'); }
-  else { quick('hold', 'Hold', 'Set it aside'); quick('pass', 'Pass', 'Not for us'); quick('note', 'Note', 'Write it down'); }
+  else { quick('hold', 'Hold', 'Set it aside'); quick('decline', 'Decline', 'Not for us'); quick('note', 'Note', 'Write it down'); }
 
   // 3  the rest of the tools
   var tools = [
@@ -1058,7 +1132,7 @@ function timeline(d) {
 // ---------------------------------------------------------------------------------------------------------------------------------
 // the card
 function summaryBody(d) {
-  var kids = [factsBlock(d), compsInfo(d), gateChips(d), moneyBlock(d), warnReasons(d), outcomeBlock(d), linkRow(d)];
+  var kids = [factsBlock(d), compsInfo(d), gateChips(d), moneyBlock(d), warnReasons(d), outcomeBlock(d), textBlock(d), linkRow(d)];
   return kids;
 }
 function dealCard(row, pin) {
@@ -1066,7 +1140,7 @@ function dealCard(row, pin) {
   var open = S.open.has(row.id);
   if (!d) {
     // the full row has not arrived yet: show what the light list knows
-    return h('article', { class: 'card v-' + (row.verdict || 'none'), 'data-id': row.id },
+    return h('article', { class: 'card v-' + (normVerdict(row.verdict) || 'none'), 'data-id': row.id },
       h('button', { class: 'head', type: 'button', onclick: function () { S.open.add(row.id); ensureRows([row.id]).then(render); render(); } },
         h('div', { class: 't1' }, h('h3', null, titleOf(row)), verdictChip(row.verdict)),
         h('div', { class: 'meta' }, h('span', null, 'Loading the details...'))));
@@ -1078,6 +1152,7 @@ function dealCard(row, pin) {
     h('div', { class: 't1' }, h('h3', null, titleOf(d)), h('span', { class: 'chips' }, verdictChip(v), h('span', { class: 'chev' }, icon('chev')))),
     h('div', { class: 'meta' }, h('span', { class: 'src' }, SOURCE_LABEL[src] || 'Unknown source'), date ? h('span', null, (received ? 'received ' : 'added ') + date) : null, zip5(d.zip) ? h('span', { class: 'mono' }, zip5(d.zip)) : null),
     moneyLine(d),
+    flagsLine(d),
     h('div', { class: 'chips' }, statusChips(d)));
   var card = h('article', { class: 'card v-' + (v || 'none') + (pin ? ' pin' : ''), id: 'd-' + d.id, 'data-id': d.id, 'data-open': open ? 'true' : 'false' }, head);
   if (open) {
@@ -1100,7 +1175,7 @@ function bottomBar() {
   var c = counts(), r = S.route.name;
   function item(href, ic, label, on, n) { return h('a', { href: href, 'aria-current': on ? 'page' : null }, icon(ic), label, n ? h('span', { class: 'n' }, n) : null); }
   return h('nav', { class: 'bar', 'aria-label': 'Main' }, h('div', { class: 'col' },
-    item('#/today', 'today', 'Today', r === 'today', c.surface || 0),
+    item('#/today', 'today', 'Today', r === 'today', c.review || 0),
     item('#/deals', 'deals', 'Deals', r === 'deals' || r === 'deal', 0),
     item('#/feed', 'feed', 'Feed', r === 'feed', 0),
     item('#/more', 'more', 'More', ['more', 'settings', 'buybox', 'runs', 'people', 'outreach'].indexOf(r) >= 0, 0)));
@@ -1117,18 +1192,18 @@ function shell(content) {
 }
 
 function screenToday() {
-  var c = counts(), kids = [h('h1', { class: 'h1' }, 'Today'), h('p', { class: 'sub' }, c.all + ' deals · ' + c.surface + ' Surface · ' + c.replied + ' replied' + (c.drafts ? ' · ' + c.drafts + ' draft' + (c.drafts === 1 ? '' : 's') + ' ready' : ''))];
+  var c = counts(), kids = [h('h1', { class: 'h1' }, 'Today'), h('p', { class: 'sub' }, c.all + ' deals · ' + c.review + ' Review · ' + c.replied + ' replied' + (c.drafts ? ' · ' + c.drafts + ' draft' + (c.drafts === 1 ? '' : 's') + ' ready' : ''))];
   var run = S.actions.filter(function (a) { return a.status === 'queued' || a.status === 'running'; });
   var bad = S.actions.filter(function (a) { return a.status === 'failed' && Date.now() - parseDate(a.requested_at) < 3 * 86400e3; }).slice(0, 8);
   var ws = workerState();
   if (run.length && !ws.online) kids.push(h('p', { class: 'msg warn' }, run.length + ' request' + (run.length === 1 ? ' is' : 's are') + ' waiting for the desk. They run on the next pass, or the moment the desk worker is started.'));
 
   var top = todayDeals();
-  kids.push(h('section', { class: 'sec' }, h('h2', null, 'Needs your yes', h('span', { class: 'k' }, c.surface + ' Surface')),
-    top.length ? h('div', { class: 'stack' }, top.map(function (r) { return dealCard(r); })) : h('p', { class: 'empty' }, 'No Surface deals right now. The next one that clears the profit line lands here.'),
-    c.surface > top.length ? h('p', null, h('a', { class: 'btn block', href: '#/deals/surface' }, 'See all ' + c.surface + ' Surface deals')) : null));
+  kids.push(h('section', { class: 'sec' }, h('h2', null, 'Needs your yes', h('span', { class: 'k' }, c.review + ' Review')),
+    top.length ? h('div', { class: 'stack' }, top.map(function (r) { return dealCard(r); })) : h('p', { class: 'empty' }, 'Nothing in Review right now. The next deal whose money clears lands here.'),
+    c.review > top.length ? h('p', null, h('a', { class: 'btn block', href: '#/deals/review' }, 'See all ' + c.review + ' deals in Review')) : null));
 
-  var drafts = S.index.filter(function (d) { return canSendDraft(d) && tabOf(d) !== 'held' && !(S.idx.get(d.id) || {}).is_feed && verdictOf(d) !== 'surface'; }).slice(0, 5);
+  var drafts = S.index.filter(function (d) { return canSendDraft(d) && tabOf(d) !== 'held' && !(S.idx.get(d.id) || {}).is_feed && verdictOf(d) !== 'review'; }).slice(0, 5);
   if (drafts.length) kids.push(h('section', { class: 'sec' }, h('h2', null, 'Drafts ready to send', h('span', { class: 'k' }, drafts.length)), h('div', { class: 'stack' }, drafts.map(function (r) { return dealCard(r); }))));
 
   kids.push(h('section', { class: 'sec' }, h('h2', null, 'Running now', h('span', { class: 'k' }, run.length)),
@@ -1152,7 +1227,7 @@ function actionList(list) {
 
 function screenDeals() {
   var c = counts(), list = filtered();
-  var tabs = [['surface', 'Surface'], ['pass', 'Pass'], ['replied', 'Replied'], ['feed', 'Feed'], ['held', 'Held'], ['all', 'All']];
+  var tabs = [['review', 'Review'], ['decline', 'Decline'], ['needs', 'Needs comps'], ['replied', 'Replied'], ['feed', 'Feed'], ['held', 'Held'], ['all', 'All']];
   var bar = h('div', { class: 'filters' },
     h('div', { class: 'tabs', role: 'group', 'aria-label': 'Filter deals' }, tabs.map(function (t) {
       return h('button', { type: 'button', 'aria-pressed': S.tab === t[0] ? 'true' : 'false', onclick: function () { S.tab = t[0]; S.shown = PAGE; location.hash = '#/deals/' + t[0]; } }, t[1], h('span', { class: 'k' }, c[t[0]] != null ? c[t[0]] : 0));
@@ -1162,7 +1237,7 @@ function screenDeals() {
   var pinId = S.demo ? (inwood() || {}).id : null;
   var cards = shown.length ? h('div', { class: 'stack' }, shown.map(function (r) { return dealCard(r, r.id === pinId); })) : h('p', { class: 'empty' }, S.loadedOnce ? 'No deals here.' : 'Loading the deals...');
   var more = list.length > S.shown ? h('button', { class: 'btn block', type: 'button', onclick: function () { S.shown += PAGE; ensureRows(visibleIds()).then(render); render(); } }, 'Show ' + Math.min(PAGE, list.length - S.shown) + ' more · ' + (list.length - S.shown) + ' left') : null;
-  shell([h('h1', { class: 'h1' }, 'Deals'), h('p', { class: 'sub' }, c.all + ' deals · ' + c.surface + ' Surface · ' + c.insufficient + ' insufficient · ' + c.replied + ' replied'), search, bar, h('div', { class: 'sec' }, cards, more)]);
+  shell([h('h1', { class: 'h1' }, 'Deals'), h('p', { class: 'sub' }, c.all + ' deals · ' + c.review + ' Review · ' + c.needs + ' need comps · ' + c.replied + ' replied'), search, bar, h('div', { class: 'sec' }, cards, more)]);
 }
 
 function screenDeal() {
@@ -1208,7 +1283,7 @@ function documentsPane(d) {
   }))));
   else if (!uw.length) kids.push(h('p', { class: 'empty' }, 'No documents yet. Ask the desk for a dossier, a lender packet, an RFQ or a permit intake.'));
   var bullets = arr(d.reply_bullets).filter(function (b) { return String(b).trim(); });
-  kids.push(h('div', null, h('p', { class: 'lbl' }, 'Reply'), outcomeBlock(d)));
+  kids.push(h('div', null, h('p', { class: 'lbl' }, 'Reply'), outcomeBlock(d), textBlock(d)));
   kids.push(actionPanel(d));
   return kids;
 }
@@ -1242,7 +1317,7 @@ function screenFeed() {
     if (it.a) return actionList([it.a]).firstChild;
     var r = it.run, errs = arr(r.errors);
     return h('li', null, h('div', { class: 'line' }, h('b', null, 'Pass'), chip(errs.length ? 'warn' : 'ok', errs.length ? errs.length + ' error' + (errs.length === 1 ? '' : 's') : 'clean'), h('span', { class: 'when' }, rel(it.t))),
-      h('p', { class: 'muted' }, (r.raw_seen || 0) + ' seen · ' + (r.deals_new || 0) + ' new · ' + (r.surfaced || 0) + ' Surface · ' + (r.drafted || 0) + ' drafted'));
+      h('p', { class: 'muted' }, (r.raw_seen || 0) + ' seen · ' + (r.deals_new || 0) + ' new · ' + (r.surfaced || 0) + ' Review · ' + (r.drafted || 0) + ' drafted'));
   });
   shell([h('h1', { class: 'h1' }, 'Feed'), h('p', { class: 'sub' }, 'Passes, and everything you asked the desk to do.'), list.length ? h('ul', { class: 'hist' }, list) : h('p', { class: 'empty' }, 'Nothing yet.')]);
 }
@@ -1284,7 +1359,7 @@ function screenSettings() {
     h('section', { class: 'sec' }, h('h2', null, 'Workspace'), kv([['Name', S.org ? S.org.name : '-'], ['You', S.email], ['Role', S.member ? S.member.role : '-']]),
       h('p', null, h('button', { class: 'btn block', type: 'button', onclick: signOut }, 'Sign out'))),
     h('section', { class: 'sec' }, h('h2', null, 'Desk worker'),
-      ws.w ? kv([['Status', ws.label], ['Host', ws.w.host || '-'], ['Revision', ws.w.git_rev || '-'], ['Last seen', fmtCT(ws.w.last_seen) || '-'], ['Last pass', ws.w.last_pass ? fmtCT(ws.w.last_pass) : 'none yet'], ['Surface alerts', ws.w.alerts_on ? 'on' : 'off']])
+      ws.w ? kv([['Status', ws.label], ['Host', ws.w.host || '-'], ['Revision', ws.w.git_rev || '-'], ['Last seen', fmtCT(ws.w.last_seen) || '-'], ['Last pass', ws.w.last_pass ? fmtCT(ws.w.last_pass) : 'none yet'], ['Review alerts', ws.w.alerts_on ? 'on' : 'off']])
         : h('p', { class: 'empty' }, 'No desk worker has reported in. Start one with python -m acquiro.actions --watch, or run a pass.'),
       h('div', { class: 'stack' }, toolButton('ping', 'Test the desk', 'Checks the worker answers'))),
     h('section', { class: 'sec' }, h('h2', null, 'Offer terms'), Object.keys(terms).length ? h('div', { class: 'stack' },
@@ -1316,7 +1391,7 @@ function screenBuybox() {
 }
 function screenRuns() {
   shell([h('a', { class: 'back', href: '#/more' }, icon('back'), 'More'), h('h1', { class: 'h1' }, 'Runs'),
-    S.runs.length ? h('div', { class: 'tscroll' }, h('table', { class: 't' }, h('thead', null, h('tr', null, ['When', 'Mode', 'Seen', 'New', 'Surface', 'Errors'].map(function (x, i) { return h('th', { class: i > 1 ? 'num' : null }, x); }))),
+    S.runs.length ? h('div', { class: 'tscroll' }, h('table', { class: 't' }, h('thead', null, h('tr', null, ['When', 'Mode', 'Seen', 'New', 'Review', 'Errors'].map(function (x, i) { return h('th', { class: i > 1 ? 'num' : null }, x); }))),
       h('tbody', null, S.runs.map(function (r) { var e = arr(r.errors).length; return h('tr', null, h('td', null, fmtCT(r.started_at) || '-'), h('td', null, r.mode || '-'), h('td', { class: 'num' }, r.raw_seen || 0), h('td', { class: 'num' }, r.deals_new || 0), h('td', { class: 'num' }, r.surfaced || 0), h('td', { class: 'num' }, e ? chip('warn', String(e)) : '0')); })))) : h('p', { class: 'empty' }, 'No runs yet.')]);
 }
 function screenPeople() {
@@ -1335,7 +1410,7 @@ function screenOutreach() {
 // router and render
 function parseRoute() {
   var hash = location.hash.replace(/^#\/?/, ''), parts = hash.split('/').filter(Boolean), name = parts[0] || '';
-  if (!name) return S.demo ? { name: 'deals', tab: 'surface' } : { name: 'today' };
+  if (!name) return S.demo ? { name: 'deals', tab: 'review' } : { name: 'today' };
   if (name === 'deal' && parts[1]) return { name: 'deal', id: parts[1], tab: parts[2] };
   if (name === 'deals') return { name: 'deals', tab: parts[1] };
   if (['today', 'feed', 'more', 'settings', 'buybox', 'runs', 'people', 'outreach'].indexOf(name) >= 0) return { name: name };
@@ -1345,7 +1420,7 @@ function onRoute() {
   if (!S.started) return;
   var prev = S.route.name + (S.route.id || '');
   S.route = parseRoute();
-  if (S.route.name === 'deals' && S.route.tab && ['surface', 'pass', 'replied', 'feed', 'held', 'all'].indexOf(S.route.tab) >= 0) { if (S.tab !== S.route.tab) S.shown = PAGE; S.tab = S.route.tab; }
+  if (S.route.name === 'deals' && S.route.tab && ['review', 'decline', 'needs', 'replied', 'feed', 'held', 'all'].indexOf(S.route.tab) >= 0) { if (S.tab !== S.route.tab) S.shown = PAGE; S.tab = S.route.tab; }
   document.body.classList.remove('locked');
   if (prev !== S.route.name + (S.route.id || '')) window.scrollTo(0, 0);
   ensureRows(visibleIds()).then(render).catch(function () { render(); });
@@ -1357,7 +1432,7 @@ function demoSetup() {
   if (!i) { S.demoDone = true; return; }
   S.demoDone = true;
   S.open.add(i.id);
-  if (S.route.name === 'deals' && S.tab !== 'surface') S.tab = 'surface';
+  if (S.route.name === 'deals' && S.tab !== 'review') S.tab = 'review';
   setTimeout(function () { var el = document.getElementById('d-' + i.id); if (el) el.scrollIntoView({ block: 'start' }); }, 80);
 }
 function render() {

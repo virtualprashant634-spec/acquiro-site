@@ -99,8 +99,8 @@ main{padding-top:1rem;outline:none}
 
 /* ---------- chips ---------- */
 .chip{display:inline-flex;align-items:center;gap:.375rem;border-radius:999px;padding:.25rem .75rem;font:600 .8125rem/1.2 var(--sans);white-space:nowrap}
-.chip.surface{background:var(--ok-fill);color:var(--on-ok)}
-.chip.pass{background:var(--bad-tint);color:var(--bad-ink);box-shadow:inset 0 0 0 1px var(--bad)}
+.chip.review{background:var(--ok-fill);color:var(--on-ok)}
+.chip.decline{background:var(--bad-tint);color:var(--bad-ink);box-shadow:inset 0 0 0 1px var(--bad)}
 .chip.insufficient,.chip.none,.chip.mute{background:var(--mute-tint);color:var(--mute-ink)}
 .chip.ok{background:var(--ok-tint);color:var(--ok-ink)}
 .chip.warn{background:var(--warn-tint);color:var(--warn-ink)}
@@ -153,7 +153,7 @@ main{padding-top:1rem;outline:none}
 
 /* ---------- deal card ---------- */
 .card{background:var(--card);border:1px solid var(--hair);border-radius:1.25rem;box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:8.5rem}
-.card.v-surface{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok),var(--shadow)}
+.card.v-review{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok),var(--shadow)}
 .card.pin{box-shadow:0 0 0 2px var(--accent),var(--shadow)}
 .card .head{display:block;width:100%;text-align:left;background:transparent;border:0;padding:1rem;display:grid;gap:.5rem}
 .card .t1{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem}
@@ -193,7 +193,13 @@ main{padding-top:1rem;outline:none}
 .outcome ul{margin:0;padding-left:1.125rem}
 .outcome li{margin:.25rem 0}
 .snote{font-size:1.0625rem;font-weight:500;line-height:1.45}
+.smstalk{display:grid;gap:.5rem}
+.smsline{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
+.smstext{margin:0;padding:.75rem 1rem;border-left:3px solid var(--warn);background:var(--warn-tint);color:var(--warn-ink);border-radius:0 1rem 1rem 0;font-size:.9375rem;overflow-wrap:anywhere}
+.offscreen{position:absolute;left:-9999px;top:0}
 .links{display:flex;flex-wrap:wrap;gap:.5rem}
+.flagsline{margin:.375rem 0 0;font-size:.875rem;color:var(--warn-ink)}
+.flagsline b{font-weight:600}
 .warn1{padding:.75rem 1rem;border-radius:1rem;background:var(--warn-tint);color:var(--warn-ink);font-size:.9375rem}
 
 /* ---------- action panel ---------- */
@@ -278,6 +284,10 @@ details.more>div{padding:0 1rem 1rem;display:grid;gap:.75rem}
 .links.bar1{padding:.625rem 1rem;border-bottom:1px solid var(--hair);flex:none}
 .hold{-webkit-touch-callout:none}
 .snote{font-size:1.0625rem;font-weight:500;line-height:1.45}
+.smstalk{display:grid;gap:.5rem}
+.smsline{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
+.smstext{margin:0;padding:.75rem 1rem;border-left:3px solid var(--warn);background:var(--warn-tint);color:var(--warn-ink);border-radius:0 1rem 1rem 0;font-size:.9375rem;overflow-wrap:anywhere}
+.offscreen{position:absolute;left:-9999px;top:0}
 .act.act-link{text-decoration:none;color:inherit}
 a.act{text-decoration:none;color:inherit}
 
