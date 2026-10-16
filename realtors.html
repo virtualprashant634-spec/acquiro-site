@@ -68,10 +68,11 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,t
 .brand .word{font:700 calc(var(--m)*.875)/1 var(--d);letter-spacing:-.02em;color:var(--ink)}
 @media (min-width:700px){.brand{--m:32px}}
 .brand:hover .word{color:var(--accent)}
-.nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;font-weight:500;text-decoration:none}
+.nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;font-weight:500;text-decoration:none}
 .nav a[aria-current=page]{font-weight:600;text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:2px}
-.nav a.cta{justify-content:center;padding:0 22px;border-radius:10px;background:var(--accent);color:#fff;font:600 16px/1.2 var(--d);text-decoration:none}
+.nav a.cta{justify-content:center;padding:0 20px;border-radius:10px;background:var(--accent);color:#fff;font:600 16px/1.2 var(--d);text-decoration:none}
+@media (min-width:700px){.nav{gap:8px}.nav a{padding:0 14px}.nav a.cta{padding:0 22px}}
 .foot{border-top:1px solid var(--b14)}
 .foot .in{max-width:1280px;margin:0 auto;padding:32px var(--gutter) 48px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 32px}
 .foot .brand{--m:24px;min-width:44px;justify-content:center}
@@ -290,6 +291,7 @@ details.q p{margin-top:10px;opacity:.82}
 </a>
 <nav class="nav" aria-label="Main">
 <a href="realtors.html" aria-current="page">For realtors</a>
+<a href="about.html">About</a>
 <a class="cta" href="submit.html">Send a deal</a>
 </nav>
 </div>
@@ -393,6 +395,7 @@ details.q p{margin-top:10px;opacity:.82}
 <a class="brand" href="index.html" aria-label="Acquiro home"><svg class="mark" viewBox="0 1 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="mk-realtors-f-ring" gradientUnits="userSpaceOnUse" x1="8" y1="92" x2="92" y2="8"><stop offset="0" stop-color="#174A2E"/><stop offset=".25" stop-color="#1F5C3A"/><stop offset=".5" stop-color="#2E8B57"/><stop offset="1" stop-color="#6FD9A6"/></linearGradient><linearGradient id="mk-realtors-f-arrow" gradientUnits="userSpaceOnUse" x1="8" y1="92" x2="92" y2="8"><stop offset="0" stop-color="#1F5C3A"/><stop offset=".5" stop-color="#2E8B57"/><stop offset="1" stop-color="#6FD9A6"/></linearGradient></defs><g fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"><path d="M8 60A32 32 0 1 1 72 60A32 32 0 1 1 8 60Z" stroke="url(#mk-realtors-f-ring)"/><path d="M68 92C74 62 72 28 92 10M66 10H92V36" stroke="url(#mk-realtors-f-arrow)"/></g></svg></a>
 <nav aria-label="Footer">
 <a href="index.html">Home</a>
+<a href="about.html">About</a>
 <a href="submit.html">Send a deal</a>
 <a href="sms:+15128661988">Text (512) 866-1988</a>
 <a href="mailto:prashant+deals@avivo.homes">prashant+deals@avivo.homes</a>

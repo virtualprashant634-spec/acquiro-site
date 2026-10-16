@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; frame-src https://www.youtube-nocookie.com; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>About | Acquiro</title>
+<meta name="description" content="Two minutes from the founder on why I built Acquiro. Every deal gets read and answered with a number, a Review or a Decline.">
+<meta name="theme-color" content="#F6F3EC">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:title" content="About | Acquiro">
+<meta property="og:description" content="Why I built Acquiro, in two minutes from the founder. Every deal gets a real answer, even a Decline.">
+<meta property="og:image" content="https://getacquiro.app/og.jpg">
+<meta property="og:image:width" content="800">
+<meta property="og:image:height" content="420">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://getacquiro.app/og.jpg">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%201%20100%20100'%3E%3Cdefs%3E%3ClinearGradient%20id='r'%20gradientUnits='userSpaceOnUse'%20x1='8'%20y1='92'%20x2='92'%20y2='8'%3E%3Cstop%20offset='0'%20stop-color='%23174A2E'/%3E%3Cstop%20offset='.25'%20stop-color='%231F5C3A'/%3E%3Cstop%20offset='.5'%20stop-color='%232E8B57'/%3E%3Cstop%20offset='1'%20stop-color='%236FD9A6'/%3E%3C/linearGradient%3E%3ClinearGradient%20id='a'%20gradientUnits='userSpaceOnUse'%20x1='8'%20y1='92'%20x2='92'%20y2='8'%3E%3Cstop%20offset='0'%20stop-color='%231F5C3A'/%3E%3Cstop%20offset='.5'%20stop-color='%232E8B57'/%3E%3Cstop%20offset='1'%20stop-color='%236FD9A6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg%20fill='none'%20stroke-width='16'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M8%2060A32%2032%200%201%201%2072%2060A32%2032%200%201%201%208%2060Z'%20stroke='url(%23r)'/%3E%3Cpath%20d='M68%2092C74%2062%2072%2028%2092%2010M66%2010H92V36'%20stroke='url(%23a)'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Schibsted+Grotesk:wght@500;600;700&amp;display=swap">
+<style>
+:root{
+  --bg:#F6F3EC;          /* page */
+  --ink:#15130F;         /* text */
+  --accent:#1F5C3A;      /* the one deep green */
+  --tint:#E3EDE6;        /* accent tint */
+  --card:#FBFAF6;        /* mockup surface */
+  --paper:#FFFFFF;
+  --line:#D9D3C4;        /* mockup borders */
+  --line-soft:#E6E1D3;
+  --head:#F7F4EC;
+  --muted:#5A554B;       /* mockup captions, 6:1 on card */
+  --chip:#EFEBE0;
+  --chip-line:#D8D2C2;
+  --bubble:#ECE8DD;
+  --stroke:#BDB7A8;      /* decorative chip and button strokes */
+  --b14:rgba(21,19,15,.14);
+  --b18:rgba(21,19,15,.18);
+  --b22:rgba(21,19,15,.22);
+  --b35:rgba(21,19,15,.35);
+  --b40:rgba(21,19,15,.4);
+  --b45:rgba(21,19,15,.45);
+  --focus:#2F7D52;
+  --err:#9B1C1C;
+  --gutter:clamp(16px,4vw,40px);
+  --d:'Schibsted Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --t:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.55 var(--t);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,p,ul,ol,dl,dd,figure{margin:0}
+a{color:inherit}
+[hidden]{display:none!important}
+.acc{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip{position:absolute;left:16px;top:-120px;z-index:100;display:inline-flex;align-items:center;min-height:44px;padding:0 20px;background:var(--ink);color:#fff;border-radius:999px;text-decoration:none;font-weight:500}
+.skip:focus{top:12px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--gutter)}
+.top{max-width:1280px;margin:0 auto;padding:16px var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{--m:28px;display:inline-flex;align-items:center;gap:calc(var(--m)*.3);min-height:44px;text-decoration:none}
+.brand .mark{display:block;flex:none;width:var(--m);height:var(--m);overflow:visible}
+.brand .word{font:700 calc(var(--m)*.875)/1 var(--d);letter-spacing:-.02em;color:var(--ink)}
+@media (min-width:700px){.brand{--m:32px}}
+.brand:hover .word{color:var(--accent)}
+.nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;font-weight:500;text-decoration:none}
+.nav a[aria-current=page]{font-weight:600;text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:2px}
+.nav a.cta{justify-content:center;padding:0 20px;border-radius:10px;background:var(--accent);color:#fff;font:600 16px/1.2 var(--d);text-decoration:none}
+@media (min-width:700px){.nav{gap:8px}.nav a{padding:0 14px}.nav a.cta{padding:0 22px}}
+.foot{border-top:1px solid var(--b14)}
+.foot .in{max-width:1280px;margin:0 auto;padding:32px var(--gutter) 48px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 32px}
+.foot .brand{--m:24px;min-width:44px;justify-content:center}
+.foot nav{display:flex;flex-wrap:wrap;align-items:center;gap:4px 20px;font-size:16px}
+.foot nav a{display:inline-flex;align-items:center;min-height:44px}
+.sec{padding:clamp(56px,7vw,96px) 0}
+.rule{border-top:1px solid var(--b14)}
+.hero{padding:clamp(24px,4vw,56px) 0 clamp(56px,7vw,96px)}
+.h2{font:700 clamp(34px,5vw,56px)/1.04 var(--d);letter-spacing:-.03em}
+.h2.close{font-size:clamp(40px,6.4vw,72px);line-height:1;letter-spacing:-.035em;max-width:900px}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 30px;border:1px solid transparent;border-radius:12px;font:600 18px/1.2 var(--d);text-decoration:none;cursor:pointer;transition:opacity .15s}
+.btn:hover{opacity:.86}
+.btn-solid{background:var(--accent);color:#fff}
+.cta-row{display:flex;flex-direction:column;align-items:flex-start;gap:32px}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
+/* about: the video beside the story */
+.h1{font:700 clamp(40px,7vw,72px)/1 var(--d);letter-spacing:-.04em;margin-top:16px}
+.pitch{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "vid" "body";gap:28px}
+.p-head{grid-area:head}
+.p-vid{grid-area:vid}
+.p-body{grid-area:body;min-width:0}
+.frame{width:100%;max-width:405px;margin:0 auto;aspect-ratio:9/16;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:#15130F}
+.frame:has(:focus-visible){outline:3px solid var(--focus);outline-offset:3px}
+.frame iframe{display:block;width:100%;height:100%;border:0;background:#15130F}
+.alt{max-width:405px;margin:4px auto 0;text-align:center}
+.story p{max-width:36em;font-size:clamp(18px,1.7vw,20px)}
+.story p+p{margin-top:20px}
+.story .sign{margin-top:28px;font:700 24px/1.2 var(--d);letter-spacing:-.02em}
+.more{margin-top:8px}
+.textlink{display:inline-flex;align-items:center;min-height:44px;font-weight:500;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+.textlink:hover{text-decoration-thickness:2px}
+@media (min-width:900px){
+  .pitch{grid-template-columns:405px minmax(0,1fr);grid-template-areas:"vid head" "vid body";grid-template-rows:auto 1fr;align-items:start;column-gap:clamp(48px,6vw,88px);row-gap:24px}
+  .frame{margin:0}
+  .alt{margin-left:0;text-align:left}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+<div class="top">
+<a class="brand" href="index.html" aria-label="Acquiro home">
+<svg class="mark" viewBox="0 1 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="mk-about-h-ring" gradientUnits="userSpaceOnUse" x1="8" y1="92" x2="92" y2="8"><stop offset="0" stop-color="#174A2E"/><stop offset=".25" stop-color="#1F5C3A"/><stop offset=".5" stop-color="#2E8B57"/><stop offset="1" stop-color="#6FD9A6"/></linearGradient><linearGradient id="mk-about-h-arrow" gradientUnits="userSpaceOnUse" x1="8" y1="92" x2="92" y2="8"><stop offset="0" stop-color="#1F5C3A"/><stop offset=".5" stop-color="#2E8B57"/><stop offset="1" stop-color="#6FD9A6"/></linearGradient></defs><g fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"><path d="M8 60A32 32 0 1 1 72 60A32 32 0 1 1 8 60Z" stroke="url(#mk-about-h-ring)"/><path d="M68 92C74 62 72 28 92 10M66 10H92V36" stroke="url(#mk-about-h-arrow)"/></g></svg>
+<span class="word">acquiro</span>
+</a>
+<nav class="nav" aria-label="Main">
+<a href="realtors.html">For realtors</a>
+<a href="about.html" aria-current="page">About</a>
+<a class="cta" href="submit.html">Send a deal</a>
+</nav>
+</div>
+</header>
+
+<main id="main">
+
+<section class="hero">
+<div class="wrap">
+<div class="pitch">
+<div class="p-head">
+<p class="eyebrow">Two minutes, from the founder</p>
+<h1 class="h1">Why I built <span class="acc">Acquiro.</span></h1>
+</div>
+<div class="p-vid">
+<div class="frame">
+<iframe src="https://www.youtube-nocookie.com/embed/hdKLeTcnUmw?rel=0&amp;modestbranding=1&amp;playsinline=1" title="Prashant's two-minute pitch for Acquiro" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" style="width:100%;height:100%;border:0;background:#15130F"></iframe>
+</div>
+<p class="alt"><a class="textlink" href="https://youtu.be/hdKLeTcnUmw">Watch on YouTube</a></p>
+</div>
+<div class="p-body">
+<div class="story">
+<p>I'm a developer in Austin. I was a realtor before that. Agents and wholesalers send me deals every week, each one with an after-repair value I can't trust. Checking one by hand takes 45 minutes, so most never heard back, and agents who never hear back stop sending deals.</p>
+<p>So I built the acquisitions team I needed: it reads the deal, finds the lot, the zoning, the flood map and the tree canopy on its own, pulls closed new-build comps within half a mile, runs two homes against three, and answers the agent with the number.</p>
+<p>If the money clears my buy box it comes to me as a Review with the weak spots flagged. If it doesn't, the agent still gets a real answer, a Decline with the max I'd pay. Nobody waits a week for silence.</p>
+<p class="sign">Prashant Vanka</p>
+</div>
+<p class="more"><a class="textlink" href="realtors.html">What we buy today</a></p>
+</div>
+</div>
+</div>
+</section>
+
+<section class="sec rule">
+<div class="wrap cta-row">
+<h2 class="h2 close">Send one deal. <span class="acc">See what comes back.</span></h2>
+<div class="btns">
+<a class="btn btn-solid" href="submit.html">Send a deal</a>
+</div>
+</div>
+</section>
+
+</main>
+
+<footer class="foot">
+<div class="in">
+<a class="brand" href="index.html" aria-label="Acquiro home"><svg class="mark" viewBox="0 1 100 100" aria-hidden="true" focusable="false"><defs><linearGradient id="mk-about-f-ring" gradientUnits="userSpaceOnUse" x1="8" y1="92" x2="92" y2="8"><stop offset="0" stop-color="#174A2E"/><stop offset=".25" stop-color="#1F5C3A"/><stop offset=".5" stop-color="#2E8B57"/><stop offset="1" stop-color="#6FD9A6"/></linearGradient><linearGradient id="mk-about-f-arrow" gradientUnits="userSpaceOnUse" x1="8" y1="92" x2="92" y2="8"><stop offset="0" stop-color="#1F5C3A"/><stop offset=".5" stop-color="#2E8B57"/><stop offset="1" stop-color="#6FD9A6"/></linearGradient></defs><g fill="none" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"><path d="M8 60A32 32 0 1 1 72 60A32 32 0 1 1 8 60Z" stroke="url(#mk-about-f-ring)"/><path d="M68 92C74 62 72 28 92 10M66 10H92V36" stroke="url(#mk-about-f-arrow)"/></g></svg></a>
+<nav aria-label="Footer">
+<a href="index.html">Home</a>
+<a href="realtors.html">For realtors</a>
+<a href="submit.html">Send a deal</a>
+<a href="sms:+15128661988">Text (512) 866-1988</a>
+<a href="mailto:prashant+deals@avivo.homes">prashant+deals@avivo.homes</a>
+</nav>
+</div>
+</footer>
+</body>
+</html>
