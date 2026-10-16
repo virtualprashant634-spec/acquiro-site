@@ -4,754 +4,540 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Acquiro | The acquisitions team you never had to hire</title>
-<meta name="description" content="Acquiro is a team of AI agents that scouts, screens and underwrites every deal for developers, investors, funds and flippers, and answers every agent with real numbers. Nothing sends until you click.">
-<meta name="theme-color" content="#FBF9F6">
+<meta name="description" content="Messy realtor deal email in. Completed due diligence and real feedback out.">
+<meta name="theme-color" content="#F6F3EC">
 <meta name="color-scheme" content="light">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Acquiro">
-<meta property="og:description" content="A team of AI agents that scouts, screens and underwrites every deal, and answers every agent with real numbers.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23E4572E'/%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M16 6 25 26h-4.5l-1.6-4h-5.8l-1.6 4H7zm0 7-1.7 5h3.4z'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
-<script>document.documentElement.className+=' js'</script>
+<meta property="og:description" content="Messy realtor deal email in. Completed due diligence and real feedback out.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231F5C3A'/%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M16 6 25 26h-4.5l-1.6-4h-5.8l-1.6 4H7zm0 7-1.7 5h3.4z'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Schibsted+Grotesk:wght@500;600;700&amp;display=swap">
 <style>
-/* ==========================================================================
-   Acquiro: landing page (T-20)
-   One file, inline CSS, no framework, no build step, no tracking.
-   ========================================================================== */
-
 :root{
-  /* palette */
-  --canvas:#FBF9F6;       /* page */
-  --surface:#F4F1EA;      /* soft section band */
-  --frame:#ECE7DE;        /* placeholder frames */
-  --paper:#FFFFFF;        /* cards */
-  --ink:#1A1714;
-  --muted:#6B6358;        /* body secondary and all small captions (AA) */
-  --faint:#8B8378;        /* decorative strokes only, never text */
-  --line:#ECE7E0;
-  --line-strong:#E2DBD0;
-  --coral:#E4572E;        /* glow, large numerals, focus ring */
-  --coral-fill:#CC4A22;   /* button fill: same hue, deepened so white text clears 4.5:1 */
-  --coral-tint:#FCEFE9;
-  --coral-ink:#B53F1C;    /* small coral text */
-  --night:#16120E;
-  --night-ink:#F5EFE7;
-  --night-muted:#B9AD9D;
-  --ok:#009767;
-  --ok-tint:#E3F5EE;
-  --ok-ink:#00704A;
-  /* type */
-  --sans:'Geist','Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
-  --serif:'Instrument Serif','Newsreader',Georgia,'Times New Roman',serif;
-  --mono:'Geist Mono','JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  /* motion */
-  --ease:cubic-bezier(.22,1,.36,1);   /* ease-out-expo-ish */
-  --ease2:cubic-bezier(.16,1,.3,1);   /* ease-out-quint-ish */
-  /* shape */
-  --shadow:0 2px 6px rgba(26,23,20,.05),0 18px 40px -20px rgba(26,23,20,.22);
-  --gutter:20px;
-  --nav-h:64px;
+  --bg:#F6F3EC;          /* page */
+  --ink:#15130F;         /* text */
+  --accent:#1F5C3A;      /* the one deep green */
+  --tint:#E3EDE6;        /* accent tint */
+  --card:#FBFAF6;        /* mockup surface */
+  --paper:#FFFFFF;
+  --line:#D9D3C4;        /* mockup borders */
+  --line-soft:#E6E1D3;
+  --head:#F7F4EC;
+  --muted:#5A554B;       /* mockup captions, 6:1 on card */
+  --chip:#EFEBE0;
+  --chip-line:#D8D2C2;
+  --bubble:#ECE8DD;
+  --stroke:#BDB7A8;      /* decorative chip and button strokes */
+  --b14:rgba(21,19,15,.14);
+  --b18:rgba(21,19,15,.18);
+  --b22:rgba(21,19,15,.22);
+  --b35:rgba(21,19,15,.35);
+  --b40:rgba(21,19,15,.4);
+  --b45:rgba(21,19,15,.45);
+  --focus:#2F7D52;
+  --err:#9B1C1C;
+  --gutter:clamp(16px,4vw,40px);
+  --d:'Schibsted Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --t:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
-@media (min-width:640px){:root{--gutter:32px}}
-@media (min-width:1024px){:root{--gutter:40px}}
-
-*,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{margin:0;background:var(--canvas);color:var(--ink);font:400 1rem/1.65 var(--sans);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
-svg{display:block;max-width:100%}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.55 var(--t);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,p,ul,ol,dl,dd,figure{margin:0}
 a{color:inherit}
-p{margin:0;text-wrap:pretty}
-ul,ol{margin:0;padding:0;list-style:none}
-h1,h2,h3{margin:0}
-button{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--coral);outline-offset:3px}
-::selection{background:var(--coral-tint);color:var(--ink)}
-
-.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
-.skip{position:absolute;left:16px;top:-120px;z-index:100;background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:500}
+[hidden]{display:none!important}
+.d{font-family:var(--d)}
+.blk{display:block}
+.acc{color:var(--accent)}
+.dim{opacity:.8}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip{position:absolute;left:16px;top:-120px;z-index:100;display:inline-flex;align-items:center;min-height:44px;padding:0 20px;background:var(--ink);color:#fff;border-radius:999px;text-decoration:none;font-weight:500}
 .skip:focus{top:12px}
 
-/* ---------- layout ---------- */
-.wrap{width:100%;max-width:calc(1200px + 2 * var(--gutter));margin-inline:auto;padding-inline:var(--gutter)}
-.sec{position:relative;padding-block:clamp(72px,10vw,128px);overflow-x:clip}
-.sec-tight{padding-block:clamp(24px,4vw,48px)}
-section[id]{scroll-margin-top:calc(var(--nav-h) - 1px)}
-.band{background:linear-gradient(180deg,var(--canvas) 0%,var(--surface) 22%,var(--surface) 72%,var(--canvas) 100%)}
-.sec-head{max-width:780px;margin-bottom:clamp(36px,5vw,64px)}
-.sec-head.center{margin-inline:auto;text-align:center}
+/* chrome */
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--gutter)}
+.top{max-width:1280px;margin:0 auto;padding:16px var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:inline-flex;align-items:center;min-height:44px;font:700 26px/1 var(--d);letter-spacing:-.03em;text-decoration:none}
+.nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;font-weight:500;text-decoration:none}
+.nav a[aria-current=page]{font-weight:600;text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:2px}
+.nav a.cta{justify-content:center;padding:0 22px;border-radius:10px;background:var(--accent);color:#fff;font:600 16px/1.2 var(--d);text-decoration:none}
+.foot{border-top:1px solid var(--b14)}
+.foot .in{max-width:1280px;margin:0 auto;padding:32px var(--gutter) 48px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 32px}
+.foot .brand{font-size:22px}
+.foot nav{display:flex;flex-wrap:wrap;align-items:center;gap:4px 20px;font-size:16px}
+.foot nav a{display:inline-flex;align-items:center;min-height:44px}
 
-/* ---------- type ---------- */
-.eyebrow{margin:0 0 20px;font:500 .75rem/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--coral-ink)}
-.display{font-family:var(--sans);font-weight:500;letter-spacing:-.03em;line-height:1.02;text-wrap:balance}
-h1.display{font-size:clamp(2.5rem,1.2rem + 5.2vw,4.5rem)}
-h2.display{font-size:clamp(2.375rem,1.45rem + 3.4vw,4rem)}
-.display em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.015em;font-size:1.08em}
-h3{font-weight:500;font-size:1.25rem;line-height:1.25;letter-spacing:-.015em}
-.lead{font-size:clamp(1.0625rem,1rem + .3vw,1.1875rem);line-height:1.65;color:var(--muted);max-width:60ch}
-.sec-head.center .lead{margin-inline:auto}
-.sec-head .lead{margin-top:24px}
-.muted{color:var(--muted)}
-.note{margin-top:clamp(24px,3vw,36px);text-align:center;color:var(--muted);font-size:.9375rem}
+/* sections and type */
+.sec{padding:clamp(56px,7vw,96px) 0}
+.rule{border-top:1px solid var(--b14)}
+.hero{padding:clamp(24px,4vw,56px) 0 clamp(56px,7vw,96px)}
+.h1{font:700 clamp(42px,8.4vw,88px)/.98 var(--d);letter-spacing:-.04em}
+.h2{font:700 clamp(34px,5vw,56px)/1.04 var(--d);letter-spacing:-.03em}
+.h2.close{font-size:clamp(40px,6.4vw,72px);line-height:1;letter-spacing:-.035em;max-width:900px}
+.h3{font:600 26px/1.15 var(--d);letter-spacing:-.02em}
+.sub{font-size:clamp(20px,2.3vw,28px);line-height:1.35}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 30px;border:1px solid transparent;border-radius:12px;font:600 18px/1.2 var(--d);text-decoration:none;cursor:pointer;transition:opacity .15s}
+.btn:hover{opacity:.86}
+.btn-solid{background:var(--accent);color:#fff}
+.btn-line{background:transparent;color:inherit;border-color:var(--b40)}
+.btn-md{min-height:52px;padding:0 26px;font-size:17px}
+.btn-sm{min-height:48px;padding:0 22px;font-size:16px;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(var(--min,320px),100%),1fr));gap:var(--gap,24px);margin-top:clamp(32px,4vw,48px)}
+.card{border:1px solid var(--b18);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{display:inline-flex;align-items:center;min-height:28px;padding:0 12px;border:1px solid var(--b35);border-radius:999px;font-size:14px}
+.pill.on{padding:0 14px;border-color:transparent;background:var(--accent);color:#fff;font-weight:600}
+.pill.off{padding:0 14px;border-color:currentColor;font-weight:600}
+.num{font:700 56px/1 var(--d);letter-spacing:-.04em;color:var(--accent)}
+.rowlist{list-style:none;padding:0;margin:0}
+.rowlist li{padding:20px 0;border-top:1px solid var(--b18);font:600 clamp(20px,2.2vw,26px)/1.3 var(--d);letter-spacing:-.01em}
+.rowlist li:last-child{border-bottom:1px solid var(--b18)}
+.split{display:flex;flex-wrap:wrap;gap:32px 64px;align-items:flex-start}
+.split>h2{flex:1 1 320px}
+.split>.rowlist,.split>dl{flex:1 1 440px;min-width:0}
+.cta-row{display:flex;flex-direction:column;align-items:flex-start;gap:32px}
 
-/* ---------- buttons ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 26px;border-radius:999px;border:1px solid transparent;font-weight:500;font-size:1rem;line-height:1;text-decoration:none;white-space:nowrap;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s var(--ease),background-color .3s var(--ease),border-color .3s var(--ease)}
-.btn:hover{transform:translateY(-1px)}
-.btn-primary{background:var(--coral-fill);color:#fff;box-shadow:0 4px 12px -2px rgba(228,87,46,.6)}
-.btn-primary:hover{box-shadow:0 8px 18px -4px rgba(228,87,46,.6)}
-.btn-secondary{background:rgba(255,255,255,.72);border-color:var(--line-strong);color:var(--ink)}
-.btn-secondary:hover{background:#fff;border-color:#D6CDBF}
-.btn-sm{min-height:44px;padding:0 18px;font-size:.9375rem}
-.cta-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+/* chips and flags */
+.tag{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:500;line-height:1;white-space:nowrap}
+.tag.t24{min-height:24px;padding:0 10px}
+.tag.sent{border:1px solid var(--stroke);color:var(--muted)}
+.tag.pg{border:1px solid var(--b35);color:inherit}
+.tag.found{background:var(--tint);color:var(--accent)}
+.flag{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:4px 10px;border-radius:999px;background:var(--chip);border:1px solid var(--chip-line);color:var(--ink);font-size:13px;font-weight:500;line-height:1.2}
+.flag svg{flex:none}
+.fact{display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border-radius:999px;background:var(--tint);color:var(--accent);font-size:13px;font-weight:500;white-space:nowrap}
 
-/* ---------- cards, tags, chips ---------- */
-.card{background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
-.tag{display:inline-flex;align-items:center;align-self:flex-start;max-width:100%;padding:5px 11px;border-radius:999px;font:500 .72rem/1.25 var(--mono);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
-.tag-coming{background:var(--coral-tint);color:var(--coral-ink)}
-.tag-built{background:var(--ok-tint);color:var(--ok-ink)}
-.dots{display:inline-flex;align-items:center;gap:4px}
-.dots i{display:block;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.6}
-.chip-surface{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--ok-tint);border:1px solid rgba(0,151,103,.28);color:var(--ok-ink);font-weight:600;font-size:.875rem;line-height:1}
-.chip-surface i{display:block;width:8px;height:8px;border-radius:50%;background:var(--ok)}
-.src{display:inline-block;padding:6px 10px;border-radius:999px;font:500 .72rem/1 var(--mono);white-space:nowrap}
-.src-sent{background:var(--surface);border:1px solid var(--line-strong);color:var(--muted)}
-.src-found{background:var(--ok-tint);border:1px solid rgba(0,151,103,.25);color:var(--ok-ink)}
-.sk{display:block;height:9px;border-radius:999px;background:var(--frame)}
+/* mockups (drawn in markup, no images) */
+.shots{display:flex;flex-direction:row-reverse;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:50px;margin-top:clamp(40px,6vw,72px)}
+.phone{flex:0 1 390px;width:100%;max-width:390px;align-self:center;background:#15130F;border:1px solid #3A362E;border-radius:44px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.screen{background:var(--card);color:var(--ink);border-radius:34px;overflow:hidden;font:400 14px/1.4 var(--t)}
+.scr{display:flex;flex-direction:column;gap:12px;padding:16px}
+.mcard{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--paper)}
+.mhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mname{font:600 13px var(--d);color:var(--muted);letter-spacing:.02em}
+.verdict{display:inline-flex;align-items:center;min-height:26px;padding:0 12px;border-radius:999px;background:var(--accent);color:#fff;font-size:13px;font-weight:600}
+.maddr{font:700 22px/1.1 var(--d);letter-spacing:-.02em}
+.flags{display:flex;flex-wrap:wrap;gap:6px}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line-soft)}
+.rl{display:flex;align-items:center;flex-wrap:wrap;gap:6px;color:var(--muted);font-size:13px}
+.rv{font:600 17px var(--d)}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px 0;border-top:1px solid var(--line-soft)}
+.row2>div{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.row2 .rl{font-size:13px}
+.small{color:var(--muted);font-size:12px}
+.acts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.mbtn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 4px;border:1px solid var(--stroke);border-radius:10px;background:var(--paper);color:var(--ink);font-size:13px;font-weight:600}
+.mbtn.go{border-color:var(--accent);background:var(--accent);color:#fff}
+.mbtn.no{border-color:var(--ink)}
+.thread-h{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.thread{display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.msg.me{align-items:flex-end}
+.who{font-size:12px;color:var(--muted)}
+.bub{max-width:88%;padding:9px 12px;border-radius:16px 16px 16px 4px;background:var(--bubble);font-size:14px}
+.msg.me .bub{background:var(--accent);color:#fff;border-radius:16px 16px 4px 16px}
+.bub.w{max-width:92%}
+.dframe{flex:1 1 520px;max-width:760px;min-width:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.06);font:400 14px/1.45 var(--t)}
+.dbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--chip);border-bottom:1px solid var(--line)}
+.dots{display:flex;gap:6px}
+.dots span{width:10px;height:10px;border-radius:50%;background:#CFC9BA}
+.url{flex:1;min-width:0;display:flex;justify-content:center}
+.url span{max-width:100%;padding:3px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dbody{display:flex;flex-direction:column;gap:20px;padding:24px}
+.dtop{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px}
+.dtop>div{min-width:0}
+.daddr{font:700 28px/1.1 var(--d);letter-spacing:-.025em}
+.dask{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px}
+.dask b{font:600 18px var(--d)}
+.dverdict{display:inline-flex;align-items:center;min-height:34px;padding:0 18px;border-radius:999px;background:var(--accent);color:#fff;font-size:15px;font-weight:600}
+.dflags{display:flex;flex-wrap:wrap;gap:8px}
+.dfound{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.dfound .lab,.cap{margin-right:4px;color:var(--muted);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.panel{border:1px solid var(--line);border-radius:12px;background:var(--paper);overflow:hidden}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;background:var(--head)}
+.phead.ln{border-bottom:1px solid var(--line-soft)}
+.phead .cap{margin:0;font-weight:600}
+.pbody{display:flex;flex-direction:column;gap:14px;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(120px,100%),1fr));gap:12px}
+.stats .small{font-size:12px}
+.stat{font:700 20px var(--d)}
+.maxbox{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;padding:12px 14px;border-radius:10px;background:var(--tint)}
+.maxbox .l{font-size:13px;font-weight:500}
+.maxbox .v{font:700 26px var(--d);letter-spacing:-.02em;color:var(--accent)}
+.maxbox .n{flex-basis:100%;font-size:12.5px;color:#4A463D}
+.kv{display:flex;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.kv b{font-weight:600}
+.tbl{overflow-x:auto}
+.tbl table{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{padding:8px 16px;font-size:12px;font-weight:500;color:var(--muted)}
+.tbl td{padding:10px 16px}
+.tbl tr{border-top:1px solid var(--line-soft)}
+.tbl thead tr{border-top:0}
+.tbl .r{text-align:right}
+.tbl .l{text-align:left}
+.tbl td.r{font-weight:600}
+.tbl tfoot td{background:var(--head);font-size:13px;color:var(--muted)}
+.replyh{color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.dframe ul{margin:8px 0 0;padding-left:20px;font-size:14px}
+.dframe li+li{margin-top:4px}
+.dacts{display:flex;flex-wrap:wrap;gap:8px}
+.dacts .mbtn{padding:0 18px;font-size:14px}
 
-/* ==========================================================================
-   Nav
-   ========================================================================== */
-.nav{position:sticky;top:0;z-index:50;background:rgba(251,249,246,.94);border-bottom:1px solid var(--line)}
-@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
-  .nav{background:rgba(251,249,246,.74);-webkit-backdrop-filter:saturate(1.4) blur(16px);backdrop-filter:saturate(1.4) blur(16px)}
-}
-.nav-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:var(--nav-h)}
-.brand{display:inline-flex;align-items:baseline;gap:7px;min-height:44px;align-items:center;text-decoration:none}
-.brand-name{font-weight:600;font-size:1.1875rem;letter-spacing:-.03em}
-.nav-actions{display:flex;align-items:center;gap:8px}
-.menu ul{display:flex;flex-direction:column}
-.menu a{display:flex;align-items:center;min-height:52px;font-size:1.0625rem;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}
-.menu li:last-child a{border-bottom:0}
-.menu-btn{position:relative;width:44px;height:44px;padding:0;border-radius:999px;border:1px solid var(--line-strong);background:#fff;cursor:pointer}
-.menu-btn span{position:absolute;left:13px;right:13px;height:2px;border-radius:2px;background:var(--ink);transition:transform .3s var(--ease),top .3s var(--ease)}
-.menu-btn span:nth-child(1){top:16px}
-.menu-btn span:nth-child(2){top:24px}
-.nav.open .menu-btn span:nth-child(1){top:20px;transform:rotate(45deg)}
-.nav.open .menu-btn span:nth-child(2){top:20px;transform:rotate(-45deg)}
-/* no-JS: links sit in a row under the bar and the toggle is hidden */
-html:not(.js) .menu-btn{display:none}
-html:not(.js) .nav-bar{flex-wrap:wrap}
-html:not(.js) .menu{order:3;width:100%}
-html:not(.js) .menu ul{flex-direction:row;flex-wrap:wrap;column-gap:18px}
-html:not(.js) .menu a{border:0;min-height:44px}
-/* JS: collapsible dropdown under 1024px */
-.js .menu{display:none;position:absolute;top:100%;left:0;right:0;padding:4px var(--gutter) 14px;background:var(--canvas);border-bottom:1px solid var(--line);box-shadow:0 22px 30px -22px rgba(26,23,20,.3)}
-.js .nav.open .menu{display:block}
-@media (min-width:1024px){
-  .menu-btn{display:none}
-  .js .menu,html:not(.js) .menu{display:block;position:static;order:0;width:auto;padding:0;background:none;border:0;box-shadow:none}
-  .menu ul,html:not(.js) .menu ul{flex-direction:row;gap:2px}
-  .menu a,html:not(.js) .menu a{min-height:44px;padding:0 14px;border:0;border-radius:999px;font-size:.9375rem;color:var(--muted);transition:color .3s var(--ease),background-color .3s var(--ease)}
-  .menu a:hover{color:var(--ink);background:rgba(26,23,20,.05)}
-}
+/* tabs and panels */
+.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:24px;margin-top:clamp(32px,4vw,48px)}
+.cmp>div{display:flex;flex-direction:column;gap:14px;padding:28px;border-radius:16px}
+.cmp .a{border:1px solid var(--b18)}
+.cmp .a .lab{opacity:.7}
+.cmp .a .say{opacity:.8}
+.cmp .b{background:var(--tint)}
+.cmp .lab{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.cmp .b .lab{color:var(--accent)}
+.cmp .say{font:600 clamp(24px,2.6vw,32px)/1.2 var(--d);letter-spacing:-.02em}
+.tabbox{margin-top:24px;padding:clamp(20px,3vw,32px);border:1px solid var(--b18);border-radius:16px}
+.tablist{display:none;flex-wrap:wrap;gap:8px}
+.js .tablist{display:flex}
+.tab{min-height:44px;padding:0 20px;border:1px solid var(--b35);border-radius:999px;background:transparent;color:inherit;font:600 16px/1.2 var(--d);cursor:pointer}
+.tab[aria-selected=true]{background:var(--ink);color:var(--bg)}
+.tp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:24px;align-items:end;margin-top:28px}
+.tp .lead{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.tp .big{font:700 clamp(48px,6vw,72px)/1 var(--d);letter-spacing:-.04em}
+.tp .big.sm{font-size:clamp(40px,5vw,60px)}
+.tp p.say{font-size:20px;line-height:1.45;max-width:560px}
+.tp+.tp{border-top:1px solid var(--b14);padding-top:28px}
+.js .tp+.tp{border-top:0;padding-top:0}
 
-/* ==========================================================================
-   Hero
-   ========================================================================== */
-.hero{position:relative;isolation:isolate;overflow-x:clip;text-align:center;padding-block:clamp(56px,9vw,112px) clamp(64px,8vw,112px)}
-.hero::before{content:"";position:absolute;z-index:-1;inset:0 0 auto 0;height:min(760px,100%);background:radial-gradient(60% 80% at 50% 0%,rgba(228,87,46,.14),rgba(228,87,46,0) 70%);pointer-events:none}
-.hero .eyebrow{margin-bottom:24px}
-.hero h1{max-width:18ch;margin-inline:auto}
-.hero h1 em{color:var(--coral)}
-.hero .lead{margin:28px auto 0;max-width:58ch}
-.hero .cta-row{margin-top:36px}
-.w{display:inline-block}
+/* the home sections */
+.band{background:var(--ink);color:var(--bg);padding:clamp(56px,7vw,96px) 0}
+.band .big{max-width:1000px;font:600 clamp(28px,4.4vw,56px)/1.1 var(--d);letter-spacing:-.03em;text-wrap:balance}
+.band .small2{max-width:720px;margin-top:28px;font-size:clamp(18px,2vw,24px);line-height:1.5;opacity:.82}
+.herorow{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:32px;margin-top:clamp(28px,4vw,48px)}
+.herocopy{flex:1 1 420px;max-width:660px}
+.herocopy .btns{margin-top:28px}
+.proof{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:20px}
+.proof .n{font:700 clamp(56px,7vw,88px)/1 var(--d);letter-spacing:-.04em;color:var(--accent)}
+.ca{display:flex;flex-direction:column;gap:8px}
+.ca .r1{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--b14);font-size:15px}
+.ca .r2{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:15px}
+.steps{list-style:none;padding:0;margin:clamp(32px,4vw,48px) 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:32px}
+.steps li{display:flex;flex-direction:column;gap:12px;padding-top:20px;border-top:2px solid currentColor}
+.ondesk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:28px;padding:16px;border:1px solid var(--b18);border-radius:14px}
+.ondesk .cap{margin-right:6px;color:inherit;opacity:.7;font-weight:600;letter-spacing:.08em}
+.ondesk .mbtn{padding:0 18px;font-size:15px;background:transparent;color:inherit;border-color:var(--b40)}
+.ondesk .mbtn.go{background:var(--accent);border-color:var(--accent);color:#fff}
+.ondesk .mbtn.no{border-color:currentColor}
+.strip{background:var(--tint);border-radius:24px;padding:clamp(28px,5vw,56px);display:flex;flex-wrap:wrap;gap:32px 48px;align-items:center;justify-content:space-between}
+.strip .l{flex:1 1 420px;max-width:680px}
+.strip .l h2{margin-top:12px;font:700 clamp(28px,3.6vw,44px)/1.1 var(--d);letter-spacing:-.03em}
+.strip .r{flex:0 1 340px;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.strip .r p{font:600 24px/1.2 var(--d)}
+.strip .r .btn{margin-top:10px}
+.next li{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.next .pill{font-size:13px;font-weight:500}
+.faq{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));gap:0 64px;margin-top:clamp(32px,4vw,48px)}
+.faq.one{grid-template-columns:minmax(0,820px)}
+details.q{padding:12px 0 20px;border-top:1px solid var(--b22)}
+details.q summary{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-height:44px;padding-top:8px;list-style:none;cursor:pointer}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary::after{content:"";flex:none;width:10px;height:10px;margin-top:12px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
+details.q[open] summary::after{transform:rotate(-135deg);margin-top:16px}
+details.q h3{font:600 22px/1.25 var(--d);letter-spacing:-.01em}
+details.q p{margin-top:10px;opacity:.82}
 
-.stage{position:relative;isolation:isolate;max-width:1080px;margin:clamp(48px,7vw,88px) auto 0;padding:clamp(14px,2.6vw,32px);text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:clamp(28px,4.5vw,48px);box-shadow:var(--shadow)}
-.stage::before{content:"";position:absolute;z-index:-1;inset:-14% 6% auto;height:75%;background:radial-gradient(closest-side,rgba(228,87,46,.2),rgba(228,87,46,0));filter:blur(10px);pointer-events:none}
-.stage-in{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
-.pane{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
-.pane-label{font:500 .72rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.pane-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:34px}
-.mail-head{display:flex;align-items:center;gap:12px;margin-top:18px}
-.mail-dot{flex:none;width:34px;height:34px;border-radius:50%;background:var(--frame)}
-.mail-head .sk-lines{flex:1;margin:0}
-.sk-lines{display:grid;gap:10px;margin-top:18px}
-.fmt{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
-.fmt li{padding:8px 11px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:500 .72rem/1 var(--mono);color:var(--muted)}
-.flow{display:grid;place-items:center}
-.flow span{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--paper);border:1px solid var(--line-strong);box-shadow:0 8px 18px -10px rgba(26,23,20,.3)}
-.flow svg{width:20px;height:20px;transform:rotate(90deg)}
-.rows{margin-top:12px}
-.rows li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 14px;padding:13px 0;border-top:1px solid var(--line)}
-.rows li:first-child{border-top:0}
-.rows .k{display:block;margin-bottom:9px;font:500 .72rem/1 var(--mono);letter-spacing:.04em;color:var(--muted)}
-.rows .sk{height:10px}
-@media (min-width:860px){
-  .stage-in{grid-template-columns:minmax(0,1fr) auto minmax(0,1.2fr);align-items:center;gap:18px}
-  .flow svg{transform:none}
-}
-
-/* ==========================================================================
-   Problem
-   ========================================================================== */
-.split{display:grid;gap:clamp(36px,5vw,56px);align-items:center}
-@media (min-width:1024px){.split{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:80px}}
-.map{padding:14px;border-radius:32px;background:var(--canvas);border:1px solid var(--line);box-shadow:var(--shadow)}
-.map svg{width:100%;height:auto}
-
-/* ==========================================================================
-   How it works
-   ========================================================================== */
-.steps{display:grid;gap:20px}
-.step{display:flex;flex-direction:column;padding:clamp(24px,3vw,32px)}
-.num{font-weight:500;font-size:clamp(2.5rem,3vw,3rem);line-height:1;letter-spacing:-.04em;color:var(--coral);font-variant-numeric:tabular-nums}
-.step h3{margin-top:22px}
-.step p{margin:12px 0 28px;color:var(--muted)}
-.step p a,.cta .lead a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
-.mini{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:84px;margin-top:auto;padding:16px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
-.mini-bars{display:flex;align-items:flex-end;gap:10px;width:100%;height:52px}
-.mini-bars span{flex:1;border-radius:8px 8px 4px 4px;background:var(--frame);border:1px solid var(--line-strong)}
-.mini-bars .claimed{background:transparent;border:1.5px dashed var(--faint)}
-.mini-cap{display:flex;justify-content:space-between;gap:8px;width:100%;margin-top:-2px;font:500 .72rem/1.2 var(--mono);color:var(--muted)}
-.screening{display:inline-flex;align-items:center;gap:10px;padding:9px 14px;border-radius:999px;background:var(--paper);border:1px solid var(--line-strong);font:500 .75rem/1 var(--mono);color:var(--muted)}
-@media (min-width:1024px){.steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}}
-
-/* ==========================================================================
-   Features (2 rows x 3 columns on desktop)
-   ========================================================================== */
-.feat-grid{display:grid;gap:20px}
-.feat{display:flex;flex-direction:column;height:100%;padding:clamp(24px,3vw,32px)}
-.feat-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;min-height:48px}
-.ico{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
-.ico svg{width:24px;height:24px;fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.feat h3{margin-top:22px}
-.feat p{margin-top:10px;color:var(--muted);font-size:.9688rem}
-@media (min-width:640px){.feat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (min-width:1024px){.feat-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}}
-
-/* ==========================================================================
-   Buy box
-   ========================================================================== */
-.stats{display:grid;gap:16px;margin-top:clamp(28px,4vw,40px)}
-.stat{display:flex;flex-direction:column;justify-content:center;padding:clamp(24px,3vw,32px);text-align:center}
-.stat strong{display:block;font-weight:500;font-size:clamp(1.625rem,1.3rem + 1vw,2.125rem);line-height:1.12;letter-spacing:-.03em;color:var(--coral);text-wrap:balance}
-.stat span{display:block;margin-top:10px;color:var(--muted)}
-@media (min-width:1024px){.stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}}
-
-/* ==========================================================================
-   Asset packs
-   ========================================================================== */
-.pack-cards{display:grid;gap:16px;counter-reset:pack}
-.pack-card{padding:26px;counter-increment:pack}
-.pack-card::before{content:counter(pack);display:grid;place-items:center;width:32px;height:32px;margin-bottom:18px;border-radius:50%;background:var(--coral-tint);color:var(--coral-ink);font:500 .8125rem/1 var(--mono)}
-.pack-card p{margin-top:10px;color:var(--muted);font-size:.9688rem}
-.packs{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(28px,4vw,44px)}
-.pack{display:inline-flex;align-items:center;flex-wrap:wrap;gap:10px;min-height:48px;padding:10px 14px 10px 18px;border-radius:14px;background:var(--paper);border:1px solid var(--line-strong);font-weight:500}
-.pack-on{background:var(--ink);border-color:var(--ink);color:#fff}
-.pack-line{margin-top:20px;color:var(--muted)}
-@media (min-width:640px){.pack-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (min-width:1024px){.pack-cards{grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}}
-
-/* ==========================================================================
-   Human in the loop (night band)
-   ========================================================================== */
-.night-sec{padding-block:clamp(16px,3vw,32px)}
-.night-wrap{margin-inline:clamp(8px,2vw,24px)}
-.night{position:relative;isolation:isolate;overflow:hidden;border-radius:clamp(28px,4.5vw,56px);background:var(--night);color:var(--night-ink);padding-block:clamp(64px,9vw,120px)}
-.night::before{content:"";position:absolute;z-index:-1;inset:0 0 auto 0;height:70%;background:radial-gradient(55% 70% at 50% 0%,rgba(228,87,46,.18),rgba(228,87,46,0) 70%);pointer-events:none}
-.night .eyebrow{color:var(--coral)}
-.night .display{color:var(--night-ink)}
-.night-grid{display:grid;gap:16px}
-.night-card{padding:clamp(24px,3vw,32px);border-radius:24px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);box-shadow:0 18px 40px -22px rgba(0,0,0,.7)}
-.night-card h3{color:var(--night-ink)}
-.night-card p{margin-top:10px;color:var(--night-muted)}
-@media (min-width:768px){.night-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}}
-
-/* ==========================================================================
-   Demo and screens
-   ========================================================================== */
-.video{position:relative;isolation:isolate;overflow:hidden;display:grid;place-items:center;width:100%;min-width:0;aspect-ratio:16/9;min-height:268px;padding:28px 24px;text-align:center;background:var(--frame);border:1px solid var(--line-strong);border-radius:clamp(28px,4.5vw,48px);box-shadow:var(--shadow)}
-.video::before{content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(45% 55% at 50% 45%,rgba(228,87,46,.16),rgba(228,87,46,0) 70%);pointer-events:none}
-.video-in{display:grid;justify-items:center}
-.play{display:grid;place-items:center;width:clamp(64px,8vw,88px);aspect-ratio:1;border-radius:50%;background:var(--coral-fill);box-shadow:0 8px 22px -6px rgba(228,87,46,.65)}
-.play svg{width:34%;height:34%;margin-left:6%;fill:#fff}
-.video-cap{margin-top:22px;max-width:44ch;font-size:clamp(.9688rem,.88rem + .4vw,1.125rem);line-height:1.5;color:var(--ink)}
-.shots{display:grid;gap:16px;margin:clamp(20px,3vw,32px) 0 0;padding:0}
-.shot{position:relative;height:100%;display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:230px;padding:18px 20px 20px;overflow:hidden;background:var(--frame);border:1px solid var(--line-strong);border-radius:28px}
-.shot-top{display:flex;align-items:center;gap:6px}
-.shot-top i{display:block;width:9px;height:9px;border-radius:50%;background:#D9D1C4}
-.shot-lines{display:grid;gap:9px;margin-top:20px}
-.shot-lines .sk{background:#E3DCCF;height:8px}
-.shot-n{display:block;margin-bottom:8px;font:500 .72rem/1 var(--mono);letter-spacing:.14em;color:var(--muted)}
-.shot p{font-size:.9688rem;line-height:1.45;color:var(--ink)}
-@media (min-width:640px){.shots{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (min-width:1280px){.shots{grid-template-columns:repeat(4,minmax(0,1fr))}}
-
-/* ==========================================================================
-   Roadmap: vertical on mobile, horizontal from 1120px
-   ========================================================================== */
-.timeline{position:relative;display:grid;gap:16px;padding-left:32px}
-.timeline::before{content:"";position:absolute;left:9px;top:12px;bottom:12px;width:1px;background:var(--line-strong);pointer-events:none}
-.tl{position:relative}
-.tl::before{content:"";position:absolute;left:-30px;top:24px;width:15px;height:15px;border-radius:50%;background:var(--paper);border:2px solid var(--faint)}
-.tl:first-child::before{background:var(--ok);border-color:var(--ok);box-shadow:0 0 0 5px rgba(0,151,103,.14)}
-.tl-card{display:flex;flex-direction:column;gap:12px;height:100%;padding:22px}
-.tl-card .tag{white-space:normal;border-radius:14px;letter-spacing:.05em;line-height:1.3}
-.tl-stage{font:500 .72rem/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--coral-ink)}
-.tl-text{font-size:.9688rem;line-height:1.5;color:var(--ink)}
-.tl-card .tag{margin-top:auto}
-.tl-card .tl-text{margin-bottom:6px}
-@media (min-width:1120px){
-  .tl-card{padding:20px 18px}
-  .timeline{grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;padding:40px 0 0}
-  .timeline::before{left:0;right:0;top:7px;bottom:auto;width:auto;height:1px}
-  .tl::before{left:20px;top:-40px}
-}
-
-/* ==========================================================================
-   FAQ
-   ========================================================================== */
-.faq{max-width:820px;margin-inline:auto;border-top:1px solid var(--line-strong)}
-.faq-item{border-bottom:1px solid var(--line-strong)}
-.faq-q{display:flex;align-items:center;justify-content:space-between;gap:20px;width:100%;min-height:64px;padding:16px 0;background:none;border:0;text-align:left;font-weight:500;font-size:clamp(1.0625rem,1rem + .35vw,1.25rem);line-height:1.35;letter-spacing:-.01em;cursor:pointer}
-.faq-ico{position:relative;flex:none;width:36px;height:36px;border-radius:50%;background:var(--paper);border:1px solid var(--line-strong)}
-.faq-ico::before,.faq-ico::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:1.6px;margin:-.8px 0 0 -6px;border-radius:2px;background:var(--ink);transition:transform .3s var(--ease)}
-.faq-ico::after{transform:rotate(90deg)}
-.faq-item.open .faq-ico::after{transform:rotate(0)}
-.faq-panel{display:grid;grid-template-rows:1fr;transition:grid-template-rows .35s var(--ease)}
-.faq-panel > div{overflow:hidden;min-height:0;transition:visibility 0s}
-.faq-panel p{padding:0 56px 22px 0;color:var(--muted);max-width:62ch}
-.js .faq-item:not(.open) .faq-panel{grid-template-rows:0fr}
-.js .faq-item:not(.open) .faq-panel > div{visibility:hidden;transition-delay:.35s}
-
-/* ==========================================================================
-   Final CTA and footer
-   ========================================================================== */
-.cta{position:relative;isolation:isolate;overflow:hidden;text-align:center;padding:clamp(48px,8vw,104px) clamp(20px,5vw,64px);background:var(--coral-tint);border:1px solid #F6D9CC;border-radius:clamp(32px,5vw,56px);box-shadow:var(--shadow)}
-.cta::before{content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(60% 75% at 50% 0%,rgba(228,87,46,.2),rgba(228,87,46,0) 72%);pointer-events:none}
-.cta h2 em{color:var(--coral-ink)}
-.cta .lead{margin:24px auto 0;color:#5B5348}
-.cta .cta-row{margin-top:36px}
-.foot{padding:32px 0 48px;border-top:1px solid var(--line);text-align:center}
-.foot p{max-width:none;font:400 .8125rem/1.7 var(--mono);letter-spacing:.02em;color:var(--muted)}
-
-/* ==========================================================================
-   Motion (calm; everything here is off under prefers-reduced-motion)
-   ========================================================================== */
-@keyframes wordIn{from{opacity:0;filter:blur(10px);transform:translateY(.22em)}to{opacity:1;filter:blur(0);transform:none}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,151,103,.42)}70%{box-shadow:0 0 0 16px rgba(0,151,103,0)}100%{box-shadow:0 0 0 0 rgba(0,151,103,0)}}
-@keyframes dot{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
-
-@media (prefers-reduced-motion:no-preference){
-  html{scroll-behavior:smooth}
-  .w{animation:wordIn .9s var(--ease2) backwards;animation-delay:calc(120ms + var(--i,0) * 60ms)}
-  .load{animation:fadeUp .8s var(--ease) backwards;animation-delay:calc(var(--d,0) * 1ms)}
-  .js .rise:not(.in){opacity:0}
-  .rise.in{animation:rise .5s var(--ease) backwards;animation-delay:calc(var(--i,0) * 80ms)}
-  .pulse{animation:pulse 1.8s var(--ease2) 2s 1}
-  .dots i{animation:dot 1.2s ease-in-out infinite}
-  .dots i:nth-child(2){animation-delay:.15s}
-  .dots i:nth-child(3){animation-delay:.3s}
-}
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  *,*::before,*::after{animation:none !important;transition:none !important}
-}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
 </style>
+<script>document.documentElement.className+=' js'</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-
-<!-- ============================ 0. Top nav ============================ -->
-<header class="nav" id="nav">
-  <div class="wrap nav-bar">
-    <a class="brand" href="#top" aria-label="Acquiro, back to top"><span class="brand-name">Acquiro</span></a>
-    <nav class="menu" id="menu" aria-label="Primary">
-      <ul>
-        <li><a href="#how-it-works">How it works</a></li>
-        <li><a href="realtors.html">For realtors</a></li>
-        <li><a href="#features">Features</a></li>
-        <li><a href="#asset-packs">Asset packs</a></li>
-        <li><a href="#trust">Trust</a></li>
-        <li><a href="#roadmap">Roadmap</a></li>
-      </ul>
-    </nav>
-    <div class="nav-actions">
-      <a class="btn btn-primary btn-sm" href="#demo">See the demo</a>
-      <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Menu"><span></span><span></span></button>
-    </div>
-  </div>
+<header>
+<div class="top">
+<a class="brand" href="index.html" aria-label="Acquiro, home">Acquiro</a>
+<nav class="nav" aria-label="Main">
+<a href="realtors.html">For realtors</a>
+<a class="cta" href="submit.html">Send a deal</a>
+</nav>
+</div>
 </header>
 
 <main id="main">
 
-<!-- ============================ 1. Hero ============================ -->
-<section class="hero" id="top" aria-labelledby="hero-h">
-  <div class="wrap">
-    <p class="eyebrow load" style="--d:0">Austin, Texas</p>
-    <h1 class="display" id="hero-h"><span class="w" style="--i:0">The</span> <span class="w" style="--i:1">acquisitions</span> <span class="w" style="--i:2">team</span> <em><span class="w" style="--i:3">you</span> <span class="w" style="--i:4">never</span> <span class="w" style="--i:5">had</span> <span class="w" style="--i:6">to</span> <span class="w" style="--i:7">hire.</span></em></h1>
-    <p class="lead load" style="--d:650">Acquiro is a team of AI agents that scouts, screens and underwrites every deal for developers, investors, funds and flippers, and answers every agent with real numbers.</p>
-    <div class="cta-row load" style="--d:800">
-      <a class="btn btn-primary" href="#demo">See the demo</a>
-      <a class="btn btn-secondary" href="#how-it-works">How it works</a>
-      <a class="btn btn-secondary" href="realtors.html">For realtors</a>
-    </div>
-
-    <!-- Placeholder product frame: replace with a real screen capture when one exists. -->
-    <div class="stage rise" role="img" aria-label="Illustration placeholder. A deal email on the left turns into a standard deal record on the right. Each fact in the record is tagged agent sent or we found, and the deal carries a green Surface flag.">
-      <div class="stage-in">
-        <div class="pane">
-          <p class="pane-label">Deal email</p>
-          <div class="mail-head">
-            <span class="mail-dot"></span>
-            <div class="sk-lines"><span class="sk" style="width:46%"></span><span class="sk" style="width:70%;opacity:.65"></span></div>
-          </div>
-          <div class="sk-lines">
-            <span class="sk" style="width:100%"></span>
-            <span class="sk" style="width:94%"></span>
-            <span class="sk" style="width:98%"></span>
-            <span class="sk" style="width:62%"></span>
-            <span class="sk" style="width:88%"></span>
-            <span class="sk" style="width:40%"></span>
-          </div>
-          <ul class="fmt"><li>Plain text</li><li>PDF flyer</li><li>MLS sheet</li></ul>
-        </div>
-        <div class="flow"><span><svg viewBox="0 0 24 24" fill="none" stroke="#1A1714" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
-        <div class="pane">
-          <div class="pane-top"><p class="pane-label">Deal record</p><span class="chip-surface pulse"><i></i>Surface</span></div>
-          <ul class="rows">
-            <li><div><span class="k">Address</span><span class="sk" style="width:72%"></span></div><span class="src src-sent">agent sent</span></li>
-            <li><div><span class="k">Lot size</span><span class="sk" style="width:44%"></span></div><span class="src src-found">we found</span></li>
-            <li><div><span class="k">Zoning</span><span class="sk" style="width:34%"></span></div><span class="src src-found">we found</span></li>
-            <li><div><span class="k">After-repair value</span><span class="sk" style="width:52%"></span></div><span class="src src-sent">agent sent</span></li>
-            <li><div><span class="k">Sold comps</span><span class="sk" style="width:62%"></span></div><span class="src src-found">we found</span></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
+<section class="hero">
+<div class="wrap">
+<h1 class="h1">
+<span class="blk">The acquisitions team</span>
+<span class="blk acc">you never had to hire.</span>
+</h1>
+<div class="herorow">
+<div class="herocopy">
+<p class="sub">Messy realtor deal email in. Completed due diligence and real feedback out.</p>
+<div class="btns">
+<a class="btn btn-solid" href="submit.html">Send a deal</a>
+<a class="btn btn-line" href="#desk">See the desk</a>
+</div>
+</div>
+<p class="proof"><span class="n">405</span><span>deals screened this week.</span></p>
+</div>
+<div class="shots">
+<div class="phone" role="img" aria-label="Phone showing the desk card and the text thread for 609 W Elizabeth St, 78704. The card says Review with 2 flags: the lot supports 3,813 sf, under 5,000, and the downturn case is negative. Ask is $800,000, sent by the agent. Max price for your buy box is $854,022. The thread: the agent texts the address and asking 800k, the desk answers that it is running the numbers, then sends the max price of $854,000.">
+<div class="screen"><div class="scr">
+<div class="mcard">
+<div class="mhead"><span class="mname">Acquiro desk</span><span class="verdict">Review</span></div>
+<div class="maddr">609 W Elizabeth St, 78704</div>
+<div class="flags"><span class="flag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>Lot supports 3,813 sf, under 5,000</span><span class="flag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>Downturn case negative</span></div>
+<div class="rows">
+<div class="row"><span class="rl">Ask <span class="tag sent">agent sent</span></span><span class="rv">$800,000</span></div>
+<div class="row"><span class="rl">Max price for your buy box <span class="tag found">we found</span></span><span class="rv">$854,022</span></div>
+<div class="row2"><div><span class="rl">Profit per lot</span><span class="rv">$693k</span></div><div><span class="rl">Margin</span><span class="rv">30%</span></div></div>
+<div class="row"><span class="rl">Comps median <span class="tag found">we found</span></span><span style="display:flex;align-items:baseline;gap:6px"><span class="rv">$795/sf</span><span class="small">low confidence</span></span></div>
+</div>
+<div class="acts"><span class="mbtn">Hold</span><span class="mbtn">Note</span><span class="mbtn go">Dossier</span><span class="mbtn no">Decline</span></div>
+</div>
+<div class="thread">
+<div class="thread-h"><span>Text thread</span><span>609 W Elizabeth</span></div>
+<div class="msg"><span class="who">Agent</span><p class="bub">609 W Elizabeth St, 78704, asking 800k</p></div>
+<div class="msg me"><span class="who">Desk</span><p class="bub">Got it, 609 W Elizabeth. Running the numbers now, back to you within the hour. Who am I talking to, and best email for the write-up? -Prashant</p></div>
+<div class="msg me"><span class="who">Desk</span><p class="bub w">609 W Elizabeth St: Only 2 closed new builds within half a mile, so I pulled 20 across 78704, median $795/sf. Lot is 7,476 sf, supports about 3,800 sf across 2 units. We need 5,000+. The max I'd pay on this lot is $854,000. -Prashant</p></div>
+</div>
+</div></div>
+</div>
+<div class="dframe" role="img" aria-label="Browser window showing the Acquiro desk page for 609 W Elizabeth St, 78704. Review, ask $800,000, 2 flags. Facts found: lot 7,476 sf, zoning SF-3-NP, flood none, canopy 14%, geocode high. Underwrite for 2 homes against 3: sales $3.04M, all-in $2.35M, profit per lot $693k, margin 30%, max price for your buy box $854,022. Three closed new-build comps, median $795 a foot, low confidence. The reply to the agent and the buttons Hold, Note, Dossier, Lender packet, Permit intake and Decline.">
+<div class="dbar"><div class="dots"><span></span><span></span><span></span></div><div class="url"><span>getacquiro.app/desk</span></div></div>
+<div class="dbody">
+<div class="dtop">
+<div><div class="daddr">609 W Elizabeth St, 78704</div><p class="dask"><b>Ask $800,000</b><span class="tag sent">agent sent</span></p></div>
+<span class="dverdict">Review</span>
+</div>
+<div class="dflags"><span class="flag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>Lot supports 3,813 sf, under 5,000</span><span class="flag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/></svg>Downturn case negative</span></div>
+<div class="dfound"><span class="lab">We found</span><span class="fact">Lot 7,476 sf</span><span class="fact">Zoning SF-3-NP</span><span class="fact">Flood none (FEMA X)</span><span class="fact">Canopy 14%</span><span class="fact">Geocode high</span></div>
+<div class="panel">
+<div class="phead ln"><span class="cap">Underwrite</span><span class="small">2 homes against 3</span></div>
+<div class="pbody">
+<p style="font-size:13px;font-weight:600">2 homes</p>
+<div class="stats">
+<div><p class="small">Sales</p><p class="stat">$3.04M</p></div>
+<div><p class="small">All-in</p><p class="stat">$2.35M</p></div>
+<div><p class="small">Profit per lot</p><p class="stat">$693k</p></div>
+<div><p class="small">Margin</p><p class="stat">30%</p></div>
+</div>
+<div class="maxbox"><span class="l">Max price for your buy box</span><span class="v">$854,022</span><span class="n">binds: profit floor</span></div>
+<div class="kv"><b>3 homes</b><span>Needs comps</span></div>
+<div class="kv"><b>Downturn case</b><span>-$7k per lot</span></div>
+</div>
+</div>
+<div class="panel">
+<div class="phead"><span class="cap">Comps</span><span class="tag found">we found</span></div>
+<div class="tbl"><table>
+<thead><tr><th scope="col" class="l">Closed new build</th><th scope="col" class="r">Per sf</th></tr></thead>
+<tbody><tr><td class="l">2015 Holland Ave</td><td class="r">$797/sf</td></tr><tr><td class="l">1502 Juliet St</td><td class="r">$797/sf</td></tr><tr><td class="l">1707 Kerr St</td><td class="r">$784/sf</td></tr></tbody>
+<tfoot><tr><td colspan="2">20 ZIP-wide, low confidence, 2 within half a mile</td></tr></tfoot>
+</table></div>
+</div>
+<div>
+<p class="replyh">Reply to the agent</p>
+<ul>
+<li>Only 2 closed new builds within half a mile, so I pulled 20 across 78704, median $795/sf.</li>
+<li>Lot is 7,476 sf, supports about 3,800 sf across 2 units. We need 5,000+.</li>
+<li>The max I'd pay on this lot is $854,000.</li>
+</ul>
+</div>
+<div class="dacts"><span class="mbtn">Hold</span><span class="mbtn">Note</span><span class="mbtn go">Dossier</span><span class="mbtn">Lender packet</span><span class="mbtn">Permit intake</span><span class="mbtn no">Decline</span></div>
+</div>
+</div>
+</div>
+</div>
 </section>
 
-<!-- ============================ 2. The problem ============================ -->
-<section class="sec band" id="problem" aria-labelledby="problem-h">
-  <div class="wrap split">
-    <div class="rise">
-      <p class="eyebrow">The problem</p>
-      <h2 class="display" id="problem-h">Good lots get lost in the <em>inbox.</em></h2>
-      <p class="lead" style="margin-top:28px">Deal emails arrive all day from wholesalers, InvestorLift blasts and brokers. Each one claims an after-repair value. Checking it by hand takes time, so agents often never hear back. Agents who never hear back stop sending deals.</p>
-      <!-- SOURCE: owner's statement, 10/15 4:40 PM: realtors who find us the deals usually represent us on the listing after we develop, and have made $50k to $100k per deal in commission. -->
-      <p class="lead" style="margin-top:16px">Bring us the lot and you usually get the listing on what we build. Agents have made $50k to $100k per deal with us.</p>
-    </div>
-    <!-- Decorative line drawing: one lot on an Austin-style street grid. No text, no data. -->
-    <div class="map rise" style="--i:1" aria-hidden="true">
-      <svg viewBox="0 0 520 400" focusable="false">
-        <g stroke="#E2DBD0" stroke-width="1.5" stroke-dasharray="6 8" fill="none"><path d="M0 135H520M0 265H520M175 0V400M345 0V400"/></g>
-        <g fill="#fff" stroke="#E2DBD0" stroke-width="1.5">
-          <rect x="24" y="24" width="135" height="95" rx="10"/><rect x="191" y="24" width="138" height="95" rx="10"/><rect x="361" y="24" width="135" height="95" rx="10"/>
-          <rect x="24" y="151" width="135" height="98" rx="10"/><rect x="191" y="151" width="138" height="98" rx="10"/><rect x="361" y="151" width="135" height="98" rx="10"/>
-          <rect x="24" y="281" width="135" height="95" rx="10"/><rect x="191" y="281" width="138" height="95" rx="10"/><rect x="361" y="281" width="135" height="95" rx="10"/>
-        </g>
-        <g stroke="#ECE7E0" stroke-width="1.5" fill="none">
-          <path d="M69 24V119M114 24V119M237 24V119M283 24V119M406 24V119M451 24V119"/>
-          <path d="M69 151V249M114 151V249M237 151V249M283 151V249M406 151V249M451 151V249"/>
-          <path d="M69 281V376M114 281V376M237 281V376M283 281V376M406 281V376M451 281V376"/>
-        </g>
-        <rect x="237" y="151" width="46" height="98" fill="#FCEFE9" stroke="#1A1714" stroke-width="1.5" stroke-dasharray="5 4"/>
-        <rect x="246" y="186" width="28" height="42" rx="3" fill="none" stroke="#1A1714" stroke-width="1.5"/>
-      </svg>
-    </div>
-  </div>
+<section class="band">
+<div class="wrap">
+<p class="big">Acquiro is the AI acquisitions team that does the work you can't get to.</p>
+<p class="small2">It reads every deal, pulls the comps, runs the numbers and answers the agent.</p>
+</div>
 </section>
 
-<!-- ============================ 3. How it works ============================ -->
-<section class="sec" id="how-it-works" aria-labelledby="how-h">
-  <div class="wrap">
-    <div class="sec-head rise">
-      <p class="eyebrow">How it works</p>
-      <h2 class="display" id="how-h">From deal email to decision, <em>in three steps.</em></h2>
-    </div>
-    <ol class="steps">
-      <li class="card step rise" style="--i:0">
-        <span class="num">01</span>
-        <h3>Send the deal.</h3>
-        <p>Send the address and the asking price. We do the rest. Email <a href="mailto:prashant+deals@avivo.homes">prashant+deals@avivo.homes</a>, forward the InvestorLift blast or broker email there, or fill in the <a href="submit.html">deal form</a>. Or text the deal to <a href="sms:+15128661988">(512) 866-1988</a>. The desk reads the text, the flyer or the MLS sheet and fills in one standard deal record. Every fact is tagged &ldquo;agent sent&rdquo; or &ldquo;we found.&rdquo;</p>
-        <div class="mini" aria-hidden="true"><span class="src src-sent">agent sent</span><span class="src src-found">we found</span></div>
-      </li>
-      <li class="card step rise" style="--i:1">
-        <span class="num">02</span>
-        <h3>It checks the comps.</h3>
-        <p>The desk pulls independent closed new-build sales from MLS sold data, within 0.25 to 0.5 mile of the lot, and sets their price per square foot beside the number the wholesaler claimed. Their after-repair value is shown, but never used in the math.</p>
-        <div class="mini" aria-hidden="true">
-          <div class="mini-bars"><span style="height:56%"></span><span style="height:78%"></span><span style="height:66%"></span><span class="claimed" style="height:72%"></span></div>
-          <div class="mini-cap"><span>Closed comps</span><span>Claimed</span></div>
-        </div>
-      </li>
-      <li class="card step rise" style="--i:2">
-        <span class="num">03</span>
-        <h3>You get a verdict.</h3>
-        <p>It works out the profit per lot for a 2-house and a 3-house plan. At $600k or more profit per lot and a 20% margin on cost, the deal is flagged <strong>Surface</strong> for you. If not, a 3-bullet reply with the real numbers and the price that works waits in your Gmail drafts.</p>
-        <div class="mini" aria-hidden="true"><span class="screening">Screening<span class="dots"><i></i><i></i><i></i></span></span><span class="chip-surface"><i></i>Surface</span></div>
-      </li>
-    </ol>
-    <p class="note rise">Nothing goes out until you click send.</p>
-  </div>
+<section class="sec">
+<div class="wrap">
+<h2 class="h2">Doesn't summarize. Underwrites.</h2>
+<div class="grid">
+<article class="card">
+<div class="pills"><span class="pill">Text</span><span class="pill">Email</span><span class="pill">Flyer</span><span class="pill">MLS sheet</span><span class="pill">InvestorLift blast</span></div>
+<h3 class="h3">Takes any deal</h3>
+<p class="dim">Text, email, flyer, MLS sheet or InvestorLift blast. An address and an asking price is enough.</p>
+</article>
+<article class="card">
+<div class="ca">
+<div class="r1"><span>Asking price $800,000</span><span class="tag t24 pg">agent sent</span></div>
+<div class="r2"><span>Lot size 7,476 sf</span><span class="tag t24 found">we found</span></div>
+</div>
+<h3 class="h3">Finds the facts itself</h3>
+<p class="dim">Lot, zoning, flood, trees and closed new-build comps within half a mile. Every fact is tagged agent sent or we found.</p>
+</article>
+<article class="card">
+<div class="pills"><span class="pill on">Review</span><span class="pill off">Decline</span></div>
+<h3 class="h3">Answers with the number</h3>
+<p class="dim">You teach it your buy box: minimum profit per lot, margin on cost, return on equity, cash-on-cash, lot size, ZIPs. Clear it and the deal is a Review. Miss it and it is a Decline, with the reply sent.</p>
+</article>
+</div>
+</div>
 </section>
 
-<!-- ============================ 4. Features ============================ -->
-<section class="sec" id="features" aria-labelledby="features-h" style="padding-top:0">
-  <div class="wrap">
-    <div class="sec-head rise">
-      <p class="eyebrow">What it does</p>
-      <h2 class="display" id="features-h">The due diligence, <em>done before you open it.</em></h2>
-    </div>
-    <ul class="feat-grid">
-      <li class="card feat rise" style="--i:0">
-        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 8 8 6 8-6"/></svg></span></div>
-        <h3>Reads any deal email</h3>
-        <p>Plain text, PDF flyers, MLS sheets and InvestorLift blasts become one standard deal record.</p>
-      </li>
-      <li class="card feat rise" style="--i:1">
-        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="12" cy="12" r="2.5"/><path d="M7 12h2.5M14.5 12H17"/></svg></span></div>
-        <h3>Facts you can trace</h3>
-        <p>Every field shows where it came from: &ldquo;agent sent&rdquo; or &ldquo;we found.&rdquo; Lot size and zoning are looked up on their own, not copied from the flyer.</p>
-      </li>
-      <li class="card feat rise" style="--i:2">
-        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5"/></svg></span></div>
-        <h3>Independent sold comps</h3>
-        <p>Closed new-build sales from MLS sold data, within 0.25 to 0.5 mile of the lot and over the last 12 months, with the count, median, low and high. Under 3 comps, it says &ldquo;insufficient comps.&rdquo; It never passes a deal on thin data.</p>
-      </li>
-      <li class="card feat rise" style="--i:0">
-        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 4v16M4 12h8"/></svg></span></div>
-        <h3>Judged per lot</h3>
-        <p>2 houses or 3, whichever makes more. Profit is measured on the lot, not on the house or on a percentage.</p>
-      </li>
-      <li class="card feat rise" style="--i:1">
-        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 21V4M6 5h11l-2 4 2 4H6"/></svg></span></div>
-        <h3>Surface or draft</h3>
-        <p>A Surface flag when a lot clears $600k profit and a 20% margin on cost. Otherwise a 3-bullet Gmail reply with the price that works.</p>
-      </li>
-      <li class="card feat rise" style="--i:2">
-        <div class="feat-top"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20h16M6 20V9l6-4 6 4v11M10 20v-5h4v5"/></svg></span><span class="tag tag-coming">Coming</span></div>
-        <h3>Austin permit pull</h3>
-        <p>Reads City of Austin public permit records to list teardown sites and active builders. Lists only.</p>
-      </li>
-    </ul>
-  </div>
+<section class="sec rule">
+<div class="wrap">
+<h2 class="h2" style="max-width:900px">A chatbot answers. Acquiro delivers.</h2>
+<div class="cmp">
+<div class="a"><p class="lab">A chatbot</p><p class="say d">Tells you how to pull comps.</p></div>
+<div class="b"><p class="lab">Acquiro</p><p class="say d">Pulls them, runs 2 homes vs 3, emails the agent the max price.</p></div>
+</div>
+<div class="tabbox">
+<div class="tablist" role="tablist" aria-label="What Acquiro does with a deal">
+<button type="button" class="tab" role="tab" id="tab-comps" aria-controls="panel-comps" aria-selected="true">Comps</button>
+<button type="button" class="tab" role="tab" id="tab-lot" aria-controls="panel-lot" aria-selected="false" tabindex="-1">Lot check</button>
+<button type="button" class="tab" role="tab" id="tab-reply" aria-controls="panel-reply" aria-selected="false" tabindex="-1">The reply</button>
+<button type="button" class="tab" role="tab" id="tab-dossier" aria-controls="panel-dossier" aria-selected="false" tabindex="-1">The dossier</button>
+</div>
+<div class="tp" id="panel-comps" role="tabpanel" aria-labelledby="tab-comps">
+<div class="lead"><span class="tag t24 found">we found</span><p class="big d">$795/sf</p></div>
+<p class="say">Only 2 closed new builds within half a mile, so it pulled 20 across 78704. The median is $795/sf, marked low confidence.</p>
+</div>
+<div class="tp" id="panel-lot" role="tabpanel" aria-labelledby="tab-lot">
+<div class="lead"><span class="tag t24 found">we found</span><p class="big d">7,476 sf</p></div>
+<p class="say">The lot supports about 3,800 sf across 2 units. The buy box needs 5,000+, so the desk card flags it.</p>
+</div>
+<div class="tp" id="panel-reply" role="tabpanel" aria-labelledby="tab-reply">
+<div class="lead"><span class="tag t24 pg">sent to the agent</span><p class="big d">$854,000</p></div>
+<p class="say">The max I'd pay on this lot is $854,000. The agent gets that number in the thread, signed Prashant.</p>
+</div>
+<div class="tp" id="panel-dossier" role="tabpanel" aria-labelledby="tab-dossier">
+<div class="lead"><span class="tag t24 found">we found</span><p class="big d sm">The write-up</p></div>
+<p class="say">The Dossier button opens the comps, the 2 homes against 3 math, the downturn case and where every fact came from.</p>
+</div>
+</div>
+</div>
 </section>
 
-<!-- ============================ 5. Buy box ============================ -->
-<section class="sec sec-tight" id="buy-box" aria-labelledby="buybox-h">
-  <div class="wrap">
-    <h2 class="eyebrow rise" id="buybox-h" style="text-align:center;margin:0">The buy box</h2>
-    <ul class="stats">
-      <li class="card stat rise" style="--i:0"><strong>5,000+ sq ft</strong><span>of new construction per lot</span></li>
-      <li class="card stat rise" style="--i:1"><strong>$650 to $700+ per sq ft</strong><span>new-construction comps</span></li>
-      <li class="card stat rise" style="--i:2"><strong>$600k per lot</strong><span>profit floor, plus a 20% margin on cost</span></li>
-    </ul>
-    <p class="note rise">City of Austin lots and teardowns in four ZIPs: 78703, 78704, 78746 and 78757. 78731 is a watch ZIP. These are the screening rules the desk applies. They are not results.</p>
-  </div>
+<section class="sec rule" id="how">
+<div class="wrap">
+<h2 class="h2">How it works</h2>
+<ol class="steps">
+<li><span class="num">1</span><h3 class="h3">Send the deal</h3><p class="dim">Text it or email it. An address and an asking price is enough.</p></li>
+<li><span class="num">2</span><h3 class="h3">It runs the numbers</h3><p class="dim">It pulls comps within half a mile, runs 2 homes against 3 and runs the downturn case.</p></li>
+<li><span class="num">3</span><h3 class="h3">You get Review or Decline</h3><p class="dim">Clear your buy box and the deal is a Review. Miss it and it is a Decline, with the reply sent.</p></li>
+</ol>
+</div>
 </section>
 
-<!-- ============================ 6. Asset packs ============================ -->
-<section class="sec band" id="asset-packs" aria-labelledby="packs-h">
-  <div class="wrap">
-    <div class="sec-head rise">
-      <p class="eyebrow">One engine, swappable packs</p>
-      <h2 class="display" id="packs-h">Built for lots. <em>Ready for the next asset class.</em></h2>
-      <p class="lead">The engine is the same for every deal: email in, standard record, facts checked, value worked out, scored, then a flag or a draft. Only the asset pack changes. A pack holds four things.</p>
-    </div>
-    <ol class="pack-cards">
-      <li class="card pack-card rise" style="--i:0"><h3>Buy box rules.</h3><p>The gates a deal must pass: where, how big, how strong the comps.</p></li>
-      <li class="card pack-card rise" style="--i:1"><h3>Value method.</h3><p>How a deal is valued. For lots: sold new-build comps, price per square foot.</p></li>
-      <li class="card pack-card rise" style="--i:2"><h3>Comp sources.</h3><p>Where the comps come from. For lots: an MLS sold export now, a live feed later.</p></li>
-      <li class="card pack-card rise" style="--i:3"><h3>Scoring threshold.</h3><p>The line a deal must clear. For lots: $600k profit per lot and a 20% margin on cost.</p></li>
-    </ol>
-    <ul class="packs rise">
-      <li class="pack pack-on">Lots <span class="tag tag-built">Built</span></li>
-      <li class="pack">Light industrial <span class="tag tag-coming">Coming</span></li>
-      <li class="pack">Strip retail <span class="tag tag-coming">Coming</span></li>
-      <li class="pack">Multifamily <span class="tag tag-coming">Coming</span></li>
-      <li class="pack">Storage <span class="tag tag-coming">Coming</span></li>
-    </ul>
-    <p class="pack-line rise">Future packs swap in income and rent comps or rent rolls. The engine stays the same.</p>
-  </div>
+<section class="sec rule" id="desk">
+<div class="wrap split" style="gap:48px 64px">
+<h2 class="h2">Autonomous, not unsupervised.</h2>
+<div style="flex:1 1 440px;min-width:0">
+<ul class="rowlist">
+<li>Declines reply on their own.</li>
+<li>Anything you might buy waits for you.</li>
+<li>Offers and sends sit behind a button on the desk.</li>
+<li>Every fact shows where it came from.</li>
+</ul>
+<div class="ondesk" role="img" aria-label="Buttons on the desk: Hold, Note, Dossier, Decline">
+<span class="cap">On the desk</span>
+<span class="mbtn">Hold</span><span class="mbtn">Note</span><span class="mbtn go">Dossier</span><span class="mbtn no">Decline</span>
+</div>
+</div>
+</div>
 </section>
 
-<!-- ============================ 7. Human in the loop ============================ -->
-<section class="night-sec" id="trust" aria-labelledby="trust-h">
-  <div class="night-wrap">
-    <div class="night">
-      <div class="wrap">
-        <div class="sec-head rise">
-          <p class="eyebrow">You stay in charge</p>
-          <h2 class="display" id="trust-h">It does the homework. <em>You make the call.</em></h2>
-        </div>
-        <ul class="night-grid">
-          <li class="night-card rise" style="--i:0"><h3>Nothing sends without a click.</h3><p>Replies are drafts in your Gmail. The desk has no send button.</p></li>
-          <li class="night-card rise" style="--i:1"><h3>Pricing is your call.</h3><p>The desk shows the math and the price that works. You decide.</p></li>
-          <li class="night-card rise" style="--i:2"><h3>Missing facts become questions.</h3><p>If the email leaves something out, the draft asks the agent for it.</p></li>
-          <li class="night-card rise" style="--i:3"><h3>No guessing.</h3><p>A weak address match comes back &ldquo;not found.&rdquo; The wholesaler&rsquo;s after-repair value is shown, never trusted.</p></li>
-        </ul>
-      </div>
-    </div>
-  </div>
+<section class="sec" style="padding-top:clamp(16px,3vw,40px)">
+<div class="wrap">
+<div class="strip">
+<div class="l">
+<p class="eyebrow">For realtors</p>
+<h2>Bring us the lot and you usually get the listing on what we build.</h2>
+</div>
+<div class="r">
+<p>Three sides.</p>
+<p>$50k to $100k per deal.</p>
+<p>We close in as few as 15 days.</p>
+<a class="btn btn-solid btn-md" href="realtors.html">For realtors</a>
+</div>
+</div>
+</div>
 </section>
 
-<!-- ============================ 8. Demo and screens ============================ -->
-<section class="sec" id="demo" aria-labelledby="demo-h">
-  <div class="wrap">
-    <div class="sec-head rise">
-      <p class="eyebrow">See it run</p>
-      <h2 class="display" id="demo-h">One real deal email, <em>start to finish.</em></h2>
-      <p class="lead">Screens and a demo video are coming. The frames below show what each one will be.</p>
-    </div>
-
-    <!-- Swap this frame for a <video> (with poster) when the recording exists. -->
-    <div class="video rise" role="img" aria-label="Video placeholder. Demo video coming: forward a lot blast, get comps and a verdict.">
-      <div class="video-in">
-        <span class="play"><svg viewBox="0 0 24 24" focusable="false"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg></span>
-        <p class="video-cap">Demo video coming: forward a lot blast, get comps and a verdict.</p>
-      </div>
-    </div>
-
-    <!-- Swap each frame for a real screenshot; keep the caption and alt text. -->
-    <ol class="shots">
-      <li class="rise" style="--i:0"><div class="shot" role="img" aria-label="Screenshot placeholder 1. The deal record, with agent sent and we found tags.">
-        <div><div class="shot-top"><i></i><i></i><i></i></div><div class="shot-lines"><span class="sk" style="width:80%"></span><span class="sk" style="width:58%"></span><span class="sk" style="width:70%"></span></div></div>
-        <div><span class="shot-n">01</span><p>The deal record, with &ldquo;agent sent&rdquo; and &ldquo;we found&rdquo; tags.</p></div>
-      </div></li>
-      <li class="rise" style="--i:1"><div class="shot" role="img" aria-label="Screenshot placeholder 2. Our comps beside the wholesaler's claimed value.">
-        <div><div class="shot-top"><i></i><i></i><i></i></div><div class="shot-lines"><span class="sk" style="width:90%"></span><span class="sk" style="width:90%"></span><span class="sk" style="width:90%"></span></div></div>
-        <div><span class="shot-n">02</span><p>Our comps beside the wholesaler&rsquo;s claimed value.</p></div>
-      </div></li>
-      <li class="rise" style="--i:2"><div class="shot" role="img" aria-label="Screenshot placeholder 3. The per-lot math for 2 and 3 houses.">
-        <div><div class="shot-top"><i></i><i></i><i></i></div><div class="shot-lines"><span class="sk" style="width:46%"></span><span class="sk" style="width:62%"></span><span class="sk" style="width:38%"></span></div></div>
-        <div><span class="shot-n">03</span><p>The per-lot math for 2 and 3 houses.</p></div>
-      </div></li>
-      <li class="rise" style="--i:3"><div class="shot" role="img" aria-label="Screenshot placeholder 4. The Surface flag, or the 3-bullet draft in Gmail.">
-        <div><div class="shot-top"><i></i><i></i><i></i></div><div class="shot-lines"><span class="sk" style="width:34%"></span><span class="sk" style="width:76%"></span><span class="sk" style="width:60%"></span></div></div>
-        <div><span class="shot-n">04</span><p>The Surface flag, or the 3-bullet draft in Gmail.</p></div>
-      </div></li>
-    </ol>
-  </div>
+<section class="sec rule">
+<div class="wrap split" style="gap:32px 64px">
+<h2 class="h2">What's next</h2>
+<ul class="rowlist next">
+<li><span>What-if re-screen</span><span class="pill">Coming</span></li>
+<li><span>Austin permit pull</span><span class="pill">Coming</span></li>
+<li><span>More asset packs</span><span class="pill">Coming</span></li>
+</ul>
+</div>
 </section>
 
-<!-- ============================ 9. Roadmap ============================ -->
-<section class="sec band" id="roadmap" aria-labelledby="roadmap-h">
-  <div class="wrap">
-    <div class="sec-head rise">
-      <p class="eyebrow">Roadmap</p>
-      <h2 class="display" id="roadmap-h">What is next, <em>in order.</em></h2>
-    </div>
-    <ol class="timeline">
-      <li class="tl rise" style="--i:0"><div class="card tl-card"><p class="tl-stage">Now</p><p class="tl-text">Lot pack: email in, deal record, MLS comps from an agent export, per-lot screen, Surface flag or Gmail draft</p><span class="tag tag-built">Built</span></div></li>
-      <li class="tl rise" style="--i:1"><div class="card tl-card"><p class="tl-stage">Next</p><p class="tl-text">Deal board: every screened deal on one page, Surface deals on top</p><span class="tag tag-coming">Coming</span></div></li>
-      <li class="tl rise" style="--i:2"><div class="card tl-card"><p class="tl-stage">Next</p><p class="tl-text">Austin permit pull: teardown sites and active builders, lists only</p><span class="tag tag-coming">Coming</span></div></li>
-      <li class="tl rise" style="--i:3"><div class="card tl-card"><p class="tl-stage">Later</p><p class="tl-text">Live MLS sold feed through a broker-sponsored Unlock MLS connection</p><span class="tag tag-coming">Coming</span></div></li>
-      <li class="tl rise" style="--i:4"><div class="card tl-card"><p class="tl-stage">Later</p><p class="tl-text">More asset packs: light industrial, strip retail, multifamily, storage</p><span class="tag tag-coming">Coming</span></div></li>
-    </ol>
-    <p class="note rise">Today the comps come from an agent&rsquo;s MLS export, not a live feed. We say so on screen.</p>
-  </div>
+<section class="sec rule" id="faq">
+<div class="wrap">
+<h2 class="h2">Questions</h2>
+<div class="faq">
+<details class="q" open><summary><h3>Where do the comps come from?</h3></summary><p>Closed new-build sales within half a mile of the lot. When too few closed nearby, it widens to the ZIP and marks the result low confidence.</p></details>
+<details class="q" open><summary><h3>Does it ever send?</h3></summary><p>Yes, a Decline sends its reply on its own, in your voice, with the max you would pay. A Review waits for you, and offers sit behind a button on the desk.</p></details>
+<details class="q" open><summary><h3>What do you buy?</h3></summary><p>Whatever clears the buy box you teach it. That means minimum profit per lot, margin on cost, return on equity, cash-on-cash, lot size and ZIPs.</p></details>
+<details class="q" open><summary><h3>Who is behind it?</h3></summary><p>I was a realtor and I hated the silence, so I built the thing that answers. Replies go out under my name, signed Prashant.</p></details>
+<details class="q" open><summary><h3>What does it cost?</h3></summary><p>Send one deal first. It costs nothing to see what comes back. Team pricing is coming.</p></details>
+<details class="q" open><summary><h3>Can it work for my market?</h3></summary><p>Austin is what runs today. Other markets and asset types are coming as new buy boxes on the same engine.</p></details>
+</div>
+</div>
 </section>
 
-<!-- ============================ 10. FAQ ============================ -->
-<section class="sec" id="faq" aria-labelledby="faq-h">
-  <div class="wrap">
-    <h2 class="eyebrow rise" id="faq-h" style="text-align:center;margin-bottom:clamp(28px,4vw,44px)">FAQ</h2>
-    <div class="faq rise">
-      <div class="faq-item open">
-        <h3 class="faq-h"><button class="faq-q" type="button" id="q1" aria-expanded="true" aria-controls="a1"><span>Does it send emails on its own?</span><span class="faq-ico" aria-hidden="true"></span></button></h3>
-        <div class="faq-panel" id="a1" role="region" aria-labelledby="q1"><div><p>No. It writes drafts. You read them and click send.</p></div></div>
-      </div>
-      <div class="faq-item">
-        <h3 class="faq-h"><button class="faq-q" type="button" id="q2" aria-expanded="false" aria-controls="a2"><span>Where do the comps come from?</span><span class="faq-ico" aria-hidden="true"></span></button></h3>
-        <div class="faq-panel" id="a2" role="region" aria-labelledby="q2"><div><p>Right now, an MLS sold export from an agent. We use closed new-build sales within 0.25 to 0.5 mile of the lot. A broker-sponsored live MLS feed comes later.</p></div></div>
-      </div>
-      <div class="faq-item">
-        <h3 class="faq-h"><button class="faq-q" type="button" id="q3" aria-expanded="false" aria-controls="a3"><span>Why per lot?</span><span class="faq-ico" aria-hidden="true"></span></button></h3>
-        <div class="faq-panel" id="a3" role="region" aria-labelledby="q3"><div><p>We build 2 or 3 houses on a lot. The lot is what we buy, so the lot is what we judge.</p></div></div>
-      </div>
-      <div class="faq-item">
-        <h3 class="faq-h"><button class="faq-q" type="button" id="q4" aria-expanded="false" aria-controls="a4"><span>Does it work outside Austin or beyond lots?</span><span class="faq-ico" aria-hidden="true"></span></button></h3>
-        <div class="faq-panel" id="a4" role="region" aria-labelledby="q4"><div><p>Not yet. New areas and asset classes are new asset packs on the same engine.</p></div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================ 11. Final CTA ============================ -->
-<section class="sec" id="contact" aria-labelledby="cta-h" style="padding-top:0">
-  <div class="wrap">
-    <div class="cta rise">
-      <h2 class="display" id="cta-h">Send us a deal. <em>Get real numbers back.</em></h2>
-      <p class="lead">Send the address and the asking price. We do the rest. Realtors: email your next lot or teardown to <a href="mailto:prashant+deals@avivo.homes">prashant+deals@avivo.homes</a>, or text the deal to <a href="sms:+15128661988">(512) 866-1988</a>, and see what the desk says.</p>
-      <p class="lead" style="margin-top:12px">You bring the lot, you list what we build. Agents have made $50k to $100k a deal with us.</p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="#demo">See the demo</a>
-        <a class="btn btn-secondary" href="submit.html">Send a deal</a>
-      </div>
-    </div>
-  </div>
+<section class="sec rule">
+<div class="wrap cta-row">
+<h2 class="h2 close">Send one deal. <span class="acc">See what comes back.</span></h2>
+<a class="btn btn-solid" href="submit.html">Send a deal</a>
+</div>
 </section>
 
 </main>
 
 <footer class="foot">
-  <div class="wrap">
-    <p>Acquiro · Austin, Texas</p>
-  </div>
+<div class="in">
+<a class="brand" href="index.html">Acquiro</a>
+<nav aria-label="Footer">
+<a href="realtors.html">For realtors</a>
+<a href="submit.html">Send a deal</a>
+<a href="sms:+15128661988">Text (512) 866-1988</a>
+<a href="mailto:prashant+deals@avivo.homes">prashant+deals@avivo.homes</a>
+</nav>
+</div>
 </footer>
 
 <script>
 (function () {
   'use strict';
-  var d = document;
-  function all(sel, ctx) { return Array.prototype.slice.call((ctx || d).querySelectorAll(sel)); }
-  function showAll() { all('.rise').forEach(function (el) { el.classList.add('in'); }); }
-
-  try {
-    /* Nav: mobile menu toggle */
-    var nav = d.getElementById('nav'), btn = d.getElementById('menu-btn'), menu = d.getElementById('menu');
-    function setMenu(open) {
-      nav.classList.toggle('open', open);
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-    btn.addEventListener('click', function (e) { e.stopPropagation(); setMenu(!nav.classList.contains('open')); });
-    all('a', menu).forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
-    d.addEventListener('click', function (e) { if (!nav.contains(e.target)) setMenu(false); });
-    d.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && nav.classList.contains('open')) { setMenu(false); btn.focus(); }
+  var tabs = [].slice.call(document.querySelectorAll('[role=tab]'));
+  function pick(i, focus) {
+    tabs.forEach(function (t, j) {
+      var on = i === j;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
     });
-
-    /* FAQ accordion */
-    all('.faq-q').forEach(function (q) {
-      q.addEventListener('click', function () {
-        var item = q.closest('.faq-item'), open = !item.classList.contains('open');
-        item.classList.toggle('open', open);
-        q.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-    });
-
-    /* Rise on scroll (CSS keeps everything visible under prefers-reduced-motion) */
-    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce || !('IntersectionObserver' in window)) {
-      showAll();
-    } else {
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) {
-          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
-        });
-      }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
-      all('.rise').forEach(function (el) { io.observe(el); });
-    }
-  } catch (err) {
-    showAll(); /* never leave content hidden if something above fails */
+    if (focus) { tabs[i].focus(); }
   }
-})();
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { pick(i, false); });
+    t.addEventListener('keydown', function (e) {
+      var n = tabs.length;
+      if (e.key === 'ArrowRight') { e.preventDefault(); pick((i + 1) % n, true); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); pick((i + n - 1) % n, true); }
+      else if (e.key === 'Home') { e.preventDefault(); pick(0, true); }
+      else if (e.key === 'End') { e.preventDefault(); pick(n - 1, true); }
+    });
+  });
+  if (tabs.length) { pick(0, false); }
+  if (window.matchMedia && window.matchMedia('(max-width: 700px)').matches) {
+    [].forEach.call(document.querySelectorAll('details.q'), function (d) { d.open = false; });
+  }
+}());
 </script>
 </body>
 </html>

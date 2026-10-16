@@ -3,401 +3,427 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
 <meta name="referrer" content="no-referrer">
-<!-- The CSP makes "no backend" enforceable: the page cannot fetch, post or load scripts from anywhere. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <title>Send a deal | Acquiro</title>
-<meta name="description" content="Send Acquiro a City of Austin lot or teardown. The form writes the deal out as an email you send from your own mail app. Nothing is stored on this page.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23E4572E'/%3E%3Cpath d='M9 23 16 9l7 14M12.2 18.2h7.6' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@500&family=Instrument+Serif:ital@0;1&display=swap">
+<meta name="description" content="Send one deal. An address with its ZIP and an asking price is all it takes. The form opens your own mail app with the deal filled in.">
+<meta name="theme-color" content="#F6F3EC">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Send a deal | Acquiro">
+<meta property="og:description" content="Send one deal. An address with its ZIP and an asking price is all it takes. The form opens your own mail app with the deal filled in.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231F5C3A'/%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M16 6 25 26h-4.5l-1.6-4h-5.8l-1.6 4H7zm0 7-1.7 5h3.4z'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Schibsted+Grotesk:wght@500;600;700&amp;display=swap">
 <style>
-/* ---------- Tokens (palette from the Acquiro landing style guide) ---------- */
-:root {
-  color-scheme: light dark;
-  --canvas: #FBF9F6;
-  --card: #FFFFFF;
-  --ink: #1A1714;
-  --muted: #6B6358;            /* body secondary; also used for captions (the #8B8378 caption grey fails AA for small text) */
-  --line: #ECE7E0;
-  --line-strong: #E2DBD0;
-  --control-border: #8B8378;   /* 3.5:1+ against canvas and card, WCAG 1.4.11 */
-  --control-bg: #FFFFFF;
-  --coral: #E4572E;
-  --coral-tint: #FCEFE9;
-  --coral-text: #B53F1C;       /* small coral text */
-  --on-coral: #FFFFFF;
-  --error: #B5483B;
-  --ok: #007A53;
-  --glow: rgba(228, 87, 46, .14);
-  --nav-bg: rgba(251, 249, 246, .82);
-  --shadow-card: 0 2px 6px rgba(26, 23, 20, .05), 0 18px 40px -20px rgba(26, 23, 20, .22);
-  --shadow-btn: 0 4px 12px -2px rgba(228, 87, 46, .6);
-  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%231A1714' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  --sans: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --serif: "Instrument Serif", "Newsreader", Georgia, "Times New Roman", serif;
-  --mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --ease: cubic-bezier(.22, 1, .36, 1);
-  --tap: 48px;                 /* control height; the floor is 44px */
+:root{
+  --bg:#F6F3EC;          /* page */
+  --ink:#15130F;         /* text */
+  --accent:#1F5C3A;      /* the one deep green */
+  --tint:#E3EDE6;        /* accent tint */
+  --card:#FBFAF6;        /* mockup surface */
+  --paper:#FFFFFF;
+  --line:#D9D3C4;        /* mockup borders */
+  --line-soft:#E6E1D3;
+  --head:#F7F4EC;
+  --muted:#5A554B;       /* mockup captions, 6:1 on card */
+  --chip:#EFEBE0;
+  --chip-line:#D8D2C2;
+  --bubble:#ECE8DD;
+  --stroke:#BDB7A8;      /* decorative chip and button strokes */
+  --b14:rgba(21,19,15,.14);
+  --b18:rgba(21,19,15,.18);
+  --b22:rgba(21,19,15,.22);
+  --b35:rgba(21,19,15,.35);
+  --b40:rgba(21,19,15,.4);
+  --b45:rgba(21,19,15,.45);
+  --focus:#2F7D52;
+  --err:#9B1C1C;
+  --gutter:clamp(16px,4vw,40px);
+  --d:'Schibsted Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --t:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --canvas: #16120E;
-    --card: #1F1A15;
-    --ink: #F5EFE7;
-    --muted: #B9AD9D;
-    --line: #2E2822;
-    --line-strong: #3A332B;
-    --control-border: #8A7F70;
-    --control-bg: #16120E;
-    --coral-tint: #2A1A13;
-    --coral-text: #F2724B;
-    --error: #F08A7C;
-    --ok: #4FD1A1;
-    --glow: rgba(228, 87, 46, .18);
-    --nav-bg: rgba(22, 18, 14, .82);
-    --shadow-card: 0 2px 6px rgba(0, 0, 0, .4), 0 18px 40px -20px rgba(0, 0, 0, .65);
-    --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23F5EFE7' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  }
-}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.55 var(--t);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,p,ul,ol,dl,dd,figure{margin:0}
+a{color:inherit}
+[hidden]{display:none!important}
+.d{font-family:var(--d)}
+.blk{display:block}
+.acc{color:var(--accent)}
+.dim{opacity:.8}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip{position:absolute;left:16px;top:-120px;z-index:100;display:inline-flex;align-items:center;min-height:44px;padding:0 20px;background:var(--ink);color:#fff;border-radius:999px;text-decoration:none;font-weight:500}
+.skip:focus{top:12px}
 
-/* ---------- Base ---------- */
-*, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-body {
-  margin: 0;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: var(--canvas) radial-gradient(70% 460px at 50% 0, var(--glow), transparent 70%) no-repeat;
-  color: var(--ink);
-  font: 400 1rem/1.6 var(--sans);
-  -webkit-font-smoothing: antialiased;
-}
-main { flex: 1 0 auto; }
-h1, h2, p, ol, dl, dd { margin: 0; }
-a { color: inherit; }
-.wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 16px; }
-.skip {
-  position: absolute; left: 16px; top: -64px; z-index: 30;
-  background: var(--card); color: var(--ink); border: 2px solid var(--coral);
-  border-radius: 999px; padding: 12px 20px; min-height: 44px; text-decoration: none; font-weight: 500;
-}
-.skip:focus { top: 12px; }
-:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
+/* chrome */
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--gutter)}
+.top{max-width:1280px;margin:0 auto;padding:16px var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:inline-flex;align-items:center;min-height:44px;font:700 26px/1 var(--d);letter-spacing:-.03em;text-decoration:none}
+.nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;font-weight:500;text-decoration:none}
+.nav a[aria-current=page]{font-weight:600;text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:2px}
+.nav a.cta{justify-content:center;padding:0 22px;border-radius:10px;background:var(--accent);color:#fff;font:600 16px/1.2 var(--d);text-decoration:none}
+.foot{border-top:1px solid var(--b14)}
+.foot .in{max-width:1280px;margin:0 auto;padding:32px var(--gutter) 48px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 32px}
+.foot .brand{font-size:22px}
+.foot nav{display:flex;flex-wrap:wrap;align-items:center;gap:4px 20px;font-size:16px}
+.foot nav a{display:inline-flex;align-items:center;min-height:44px}
 
-/* ---------- Nav ---------- */
-.nav {
-  position: sticky; top: 0; z-index: 20;
-  background: var(--nav-bg);
-  -webkit-backdrop-filter: saturate(1.4) blur(12px);
-  backdrop-filter: saturate(1.4) blur(12px);
-  border-bottom: 1px solid var(--line);
-}
-.nav .wrap { display: flex; align-items: center; justify-content: space-between; min-height: 64px; gap: 12px; }
-.brand { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; text-decoration: none; }
-.brand .word { font-weight: 600; font-size: 1.375rem; letter-spacing: -.03em; }
-.nav-link {
-  display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 999px;
-  color: var(--muted); text-decoration: none; font-size: .9375rem; font-weight: 500;
-  transition: color .3s var(--ease), background-color .3s var(--ease);
-}
-.nav-link:hover { color: var(--ink); background: var(--line); }
+/* sections and type */
+.sec{padding:clamp(56px,7vw,96px) 0}
+.rule{border-top:1px solid var(--b14)}
+.hero{padding:clamp(24px,4vw,56px) 0 clamp(56px,7vw,96px)}
+.h1{font:700 clamp(42px,8.4vw,88px)/.98 var(--d);letter-spacing:-.04em}
+.h2{font:700 clamp(34px,5vw,56px)/1.04 var(--d);letter-spacing:-.03em}
+.h2.close{font-size:clamp(40px,6.4vw,72px);line-height:1;letter-spacing:-.035em;max-width:900px}
+.h3{font:600 26px/1.15 var(--d);letter-spacing:-.02em}
+.sub{font-size:clamp(20px,2.3vw,28px);line-height:1.35}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 30px;border:1px solid transparent;border-radius:12px;font:600 18px/1.2 var(--d);text-decoration:none;cursor:pointer;transition:opacity .15s}
+.btn:hover{opacity:.86}
+.btn-solid{background:var(--accent);color:#fff}
+.btn-line{background:transparent;color:inherit;border-color:var(--b40)}
+.btn-md{min-height:52px;padding:0 26px;font-size:17px}
+.btn-sm{min-height:48px;padding:0 22px;font-size:16px;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(var(--min,320px),100%),1fr));gap:var(--gap,24px);margin-top:clamp(32px,4vw,48px)}
+.card{border:1px solid var(--b18);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{display:inline-flex;align-items:center;min-height:28px;padding:0 12px;border:1px solid var(--b35);border-radius:999px;font-size:14px}
+.pill.on{padding:0 14px;border-color:transparent;background:var(--accent);color:#fff;font-weight:600}
+.pill.off{padding:0 14px;border-color:currentColor;font-weight:600}
+.num{font:700 56px/1 var(--d);letter-spacing:-.04em;color:var(--accent)}
+.rowlist{list-style:none;padding:0;margin:0}
+.rowlist li{padding:20px 0;border-top:1px solid var(--b18);font:600 clamp(20px,2.2vw,26px)/1.3 var(--d);letter-spacing:-.01em}
+.rowlist li:last-child{border-bottom:1px solid var(--b18)}
+.split{display:flex;flex-wrap:wrap;gap:32px 64px;align-items:flex-start}
+.split>h2{flex:1 1 320px}
+.split>.rowlist,.split>dl{flex:1 1 440px;min-width:0}
+.cta-row{display:flex;flex-direction:column;align-items:flex-start;gap:32px}
 
-/* ---------- Layout ---------- */
-.layout { display: grid; gap: 32px; padding-top: 40px; padding-bottom: 56px; }
-.eyebrow { font: 500 .75rem/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--coral-text); }
-h1 {
-  margin-top: 14px;
-  font-weight: 500; letter-spacing: -.03em; line-height: 1.02;
-  font-size: clamp(2.5rem, 1.7rem + 3.6vw, 3.75rem);
-  text-wrap: balance;
-}
-h1 em, h2 em { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 1.08em; color: var(--coral); letter-spacing: -.01em; }
-.lead { margin-top: 18px; max-width: 34rem; color: var(--muted); font-size: 1.0625rem; text-wrap: pretty; }
-.chip {
-  display: inline-flex; align-items: center; min-height: 32px; margin-top: 20px; padding: 0 12px;
-  border-radius: 12px; background: var(--coral-tint); color: var(--coral-text);
-  font: 500 .75rem/1 var(--mono); letter-spacing: .06em; text-transform: uppercase;
-}
-.steps { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 16px; max-width: 34rem; counter-reset: step; }
-.steps li { position: relative; padding-left: 44px; color: var(--muted); counter-increment: step; text-wrap: pretty; }
-.steps li::before {
-  content: "0" counter(step);
-  position: absolute; left: 0; top: .2em;
-  font: 500 .8125rem/1.4 var(--mono); letter-spacing: .08em; color: var(--coral-text);
-}
-.steps strong { color: var(--ink); font-weight: 600; }
+/* chips and flags */
+.tag{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:500;line-height:1;white-space:nowrap}
+.tag.t24{min-height:24px;padding:0 10px}
+.tag.sent{border:1px solid var(--stroke);color:var(--muted)}
+.tag.pg{border:1px solid var(--b35);color:inherit}
+.tag.found{background:var(--tint);color:var(--accent)}
+.flag{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:4px 10px;border-radius:999px;background:var(--chip);border:1px solid var(--chip-line);color:var(--ink);font-size:13px;font-weight:500;line-height:1.2}
+.flag svg{flex:none}
+.fact{display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border-radius:999px;background:var(--tint);color:var(--accent);font-size:13px;font-weight:500;white-space:nowrap}
 
-@media (min-width: 1024px) {
-  .layout { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; padding-top: 72px; padding-bottom: 88px; align-items: start; }
-  .intro { position: sticky; top: 104px; }
-}
+/* mockups (drawn in markup, no images) */
+.shots{display:flex;flex-direction:row-reverse;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:50px;margin-top:clamp(40px,6vw,72px)}
+.phone{flex:0 1 390px;width:100%;max-width:390px;align-self:center;background:#15130F;border:1px solid #3A362E;border-radius:44px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.screen{background:var(--card);color:var(--ink);border-radius:34px;overflow:hidden;font:400 14px/1.4 var(--t)}
+.scr{display:flex;flex-direction:column;gap:12px;padding:16px}
+.mcard{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--paper)}
+.mhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mname{font:600 13px var(--d);color:var(--muted);letter-spacing:.02em}
+.verdict{display:inline-flex;align-items:center;min-height:26px;padding:0 12px;border-radius:999px;background:var(--accent);color:#fff;font-size:13px;font-weight:600}
+.maddr{font:700 22px/1.1 var(--d);letter-spacing:-.02em}
+.flags{display:flex;flex-wrap:wrap;gap:6px}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line-soft)}
+.rl{display:flex;align-items:center;flex-wrap:wrap;gap:6px;color:var(--muted);font-size:13px}
+.rv{font:600 17px var(--d)}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px 0;border-top:1px solid var(--line-soft)}
+.row2>div{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.row2 .rl{font-size:13px}
+.small{color:var(--muted);font-size:12px}
+.acts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.mbtn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 4px;border:1px solid var(--stroke);border-radius:10px;background:var(--paper);color:var(--ink);font-size:13px;font-weight:600}
+.mbtn.go{border-color:var(--accent);background:var(--accent);color:#fff}
+.mbtn.no{border-color:var(--ink)}
+.thread-h{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.thread{display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.msg.me{align-items:flex-end}
+.who{font-size:12px;color:var(--muted)}
+.bub{max-width:88%;padding:9px 12px;border-radius:16px 16px 16px 4px;background:var(--bubble);font-size:14px}
+.msg.me .bub{background:var(--accent);color:#fff;border-radius:16px 16px 4px 16px}
+.bub.w{max-width:92%}
+.dframe{flex:1 1 520px;max-width:760px;min-width:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.06);font:400 14px/1.45 var(--t)}
+.dbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--chip);border-bottom:1px solid var(--line)}
+.dots{display:flex;gap:6px}
+.dots span{width:10px;height:10px;border-radius:50%;background:#CFC9BA}
+.url{flex:1;min-width:0;display:flex;justify-content:center}
+.url span{max-width:100%;padding:3px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dbody{display:flex;flex-direction:column;gap:20px;padding:24px}
+.dtop{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px}
+.dtop>div{min-width:0}
+.daddr{font:700 28px/1.1 var(--d);letter-spacing:-.025em}
+.dask{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px}
+.dask b{font:600 18px var(--d)}
+.dverdict{display:inline-flex;align-items:center;min-height:34px;padding:0 18px;border-radius:999px;background:var(--accent);color:#fff;font-size:15px;font-weight:600}
+.dflags{display:flex;flex-wrap:wrap;gap:8px}
+.dfound{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.dfound .lab,.cap{margin-right:4px;color:var(--muted);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.panel{border:1px solid var(--line);border-radius:12px;background:var(--paper);overflow:hidden}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;background:var(--head)}
+.phead.ln{border-bottom:1px solid var(--line-soft)}
+.phead .cap{margin:0;font-weight:600}
+.pbody{display:flex;flex-direction:column;gap:14px;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(120px,100%),1fr));gap:12px}
+.stats .small{font-size:12px}
+.stat{font:700 20px var(--d)}
+.maxbox{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;padding:12px 14px;border-radius:10px;background:var(--tint)}
+.maxbox .l{font-size:13px;font-weight:500}
+.maxbox .v{font:700 26px var(--d);letter-spacing:-.02em;color:var(--accent)}
+.maxbox .n{flex-basis:100%;font-size:12.5px;color:#4A463D}
+.kv{display:flex;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.kv b{font-weight:600}
+.tbl{overflow-x:auto}
+.tbl table{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{padding:8px 16px;font-size:12px;font-weight:500;color:var(--muted)}
+.tbl td{padding:10px 16px}
+.tbl tr{border-top:1px solid var(--line-soft)}
+.tbl thead tr{border-top:0}
+.tbl .r{text-align:right}
+.tbl .l{text-align:left}
+.tbl td.r{font-weight:600}
+.tbl tfoot td{background:var(--head);font-size:13px;color:var(--muted)}
+.replyh{color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.dframe ul{margin:8px 0 0;padding-left:20px;font-size:14px}
+.dframe li+li{margin-top:4px}
+.dacts{display:flex;flex-wrap:wrap;gap:8px}
+.dacts .mbtn{padding:0 18px;font-size:14px}
 
-/* ---------- Cards ---------- */
-.card {
-  background: var(--card); border: 1px solid var(--line); border-radius: 24px;
-  box-shadow: var(--shadow-card); padding: 20px;
-}
-@media (min-width: 640px) { .card { padding: 36px; } .wrap { padding: 0 24px; } }
-.stack { display: grid; gap: 24px; min-width: 0; }
+/* tabs and panels */
+.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:24px;margin-top:clamp(32px,4vw,48px)}
+.cmp>div{display:flex;flex-direction:column;gap:14px;padding:28px;border-radius:16px}
+.cmp .a{border:1px solid var(--b18)}
+.cmp .a .lab{opacity:.7}
+.cmp .a .say{opacity:.8}
+.cmp .b{background:var(--tint)}
+.cmp .lab{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.cmp .b .lab{color:var(--accent)}
+.cmp .say{font:600 clamp(24px,2.6vw,32px)/1.2 var(--d);letter-spacing:-.02em}
+.tabbox{margin-top:24px;padding:clamp(20px,3vw,32px);border:1px solid var(--b18);border-radius:16px}
+.tablist{display:none;flex-wrap:wrap;gap:8px}
+.js .tablist{display:flex}
+.tab{min-height:44px;padding:0 20px;border:1px solid var(--b35);border-radius:999px;background:transparent;color:inherit;font:600 16px/1.2 var(--d);cursor:pointer}
+.tab[aria-selected=true]{background:var(--ink);color:var(--bg)}
+.tp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:24px;align-items:end;margin-top:28px}
+.tp .lead{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.tp .big{font:700 clamp(48px,6vw,72px)/1 var(--d);letter-spacing:-.04em}
+.tp .big.sm{font-size:clamp(40px,5vw,60px)}
+.tp p.say{font-size:20px;line-height:1.45;max-width:560px}
+.tp+.tp{border-top:1px solid var(--b14);padding-top:28px}
+.js .tp+.tp{border-top:0;padding-top:0}
 
-/* ---------- Form ---------- */
-fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
-fieldset + fieldset { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--line); }
-legend { padding: 0; margin-bottom: 16px; font: 500 .75rem/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--coral-text); }
-.req-note { margin-bottom: 20px; font-size: .9375rem; color: var(--muted); }
-.req, .req-note span { color: var(--coral-text); font-weight: 600; }
-.grid { display: grid; gap: 20px 16px; grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 640px) {
-  .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (min-width: 480px) {
-  .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-.span-all { grid-column: 1 / -1; }
-.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-label { font-weight: 500; font-size: .9375rem; line-height: 1.4; }
-.hint { font-size: .875rem; line-height: 1.45; color: var(--muted); text-wrap: pretty; }
-.err { font-size: .875rem; line-height: 1.45; color: var(--error); font-weight: 500; }
-.err[hidden], .hint[hidden], .form-error[hidden], .card[hidden] { display: none; }
-input, select, textarea {
-  width: 100%; min-height: var(--tap); padding: 0 14px;
-  font: inherit; font-size: 1rem; color: var(--ink);
-  background: var(--control-bg); border: 1px solid var(--control-border); border-radius: 14px;
-  scroll-margin-top: 96px;
-  transition: border-color .3s var(--ease), box-shadow .3s var(--ease);
-}
-textarea { padding: 12px 14px; min-height: 8rem; line-height: 1.5; resize: vertical; }
-input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
-select {
-  -webkit-appearance: none; appearance: none;
-  padding-right: 40px; cursor: pointer;
-  background-image: var(--chevron); background-repeat: no-repeat; background-position: right 14px center; background-size: 12px 8px;
-}
-input:hover, select:hover, textarea:hover { border-color: var(--ink); }
-input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; border-color: var(--coral); }
-[aria-invalid="true"] { border-color: var(--error); box-shadow: 0 0 0 1px var(--error); }
-.more { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); }
-.more summary {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: var(--tap); cursor: pointer;
-  font: 500 .75rem/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--coral-text); list-style: none;
-}
-.more summary::-webkit-details-marker { display: none; }
-.more summary::after { content: ""; width: 12px; height: 8px; background: var(--chevron) no-repeat center / 12px 8px; transition: transform .3s var(--ease); }
-.more[open] summary::after { transform: rotate(180deg); }
-.more-note { margin: 4px 0 20px; }
-.size-meter { font-size: .875rem; color: var(--muted); }
-.size-meter.over { color: var(--error); font-weight: 500; }
+/* the home sections */
+.band{background:var(--ink);color:var(--bg);padding:clamp(56px,7vw,96px) 0}
+.band .big{max-width:1000px;font:600 clamp(28px,4.4vw,56px)/1.1 var(--d);letter-spacing:-.03em;text-wrap:balance}
+.band .small2{max-width:720px;margin-top:28px;font-size:clamp(18px,2vw,24px);line-height:1.5;opacity:.82}
+.herorow{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:32px;margin-top:clamp(28px,4vw,48px)}
+.herocopy{flex:1 1 420px;max-width:660px}
+.herocopy .btns{margin-top:28px}
+.proof{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:20px}
+.proof .n{font:700 clamp(56px,7vw,88px)/1 var(--d);letter-spacing:-.04em;color:var(--accent)}
+.ca{display:flex;flex-direction:column;gap:8px}
+.ca .r1{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--b14);font-size:15px}
+.ca .r2{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:15px}
+.steps{list-style:none;padding:0;margin:clamp(32px,4vw,48px) 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:32px}
+.steps li{display:flex;flex-direction:column;gap:12px;padding-top:20px;border-top:2px solid currentColor}
+.ondesk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:28px;padding:16px;border:1px solid var(--b18);border-radius:14px}
+.ondesk .cap{margin-right:6px;color:inherit;opacity:.7;font-weight:600;letter-spacing:.08em}
+.ondesk .mbtn{padding:0 18px;font-size:15px;background:transparent;color:inherit;border-color:var(--b40)}
+.ondesk .mbtn.go{background:var(--accent);border-color:var(--accent);color:#fff}
+.ondesk .mbtn.no{border-color:currentColor}
+.strip{background:var(--tint);border-radius:24px;padding:clamp(28px,5vw,56px);display:flex;flex-wrap:wrap;gap:32px 48px;align-items:center;justify-content:space-between}
+.strip .l{flex:1 1 420px;max-width:680px}
+.strip .l h2{margin-top:12px;font:700 clamp(28px,3.6vw,44px)/1.1 var(--d);letter-spacing:-.03em}
+.strip .r{flex:0 1 340px;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.strip .r p{font:600 24px/1.2 var(--d)}
+.strip .r .btn{margin-top:10px}
+.next li{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.next .pill{font-size:13px;font-weight:500}
+.faq{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));gap:0 64px;margin-top:clamp(32px,4vw,48px)}
+.faq.one{grid-template-columns:minmax(0,820px)}
+details.q{padding:12px 0 20px;border-top:1px solid var(--b22)}
+details.q summary{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-height:44px;padding-top:8px;list-style:none;cursor:pointer}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary::after{content:"";flex:none;width:10px;height:10px;margin-top:12px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
+details.q[open] summary::after{transform:rotate(-135deg);margin-top:16px}
+details.q h3{font:600 22px/1.25 var(--d);letter-spacing:-.01em}
+details.q p{margin-top:10px;opacity:.82}
 
-.actions { margin-top: 32px; display: grid; gap: 14px; }
-.form-error { padding: 12px 16px; border-radius: 14px; background: var(--coral-tint); color: var(--coral-text); font-weight: 500; border: 1px solid var(--coral-text); }
-.note { color: var(--muted); font-size: .9375rem; }
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
 
-/* ---------- Buttons ---------- */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
-  min-height: 52px; padding: 0 28px; border-radius: 999px; border: 1px solid transparent;
-  font: 600 1.0625rem/1 var(--sans); text-decoration: none; cursor: pointer; text-align: center;
-  transition: transform .3s var(--ease), box-shadow .3s var(--ease), background-color .3s var(--ease);
-}
-.btn:hover { transform: translateY(-1px); }
-.btn-primary {
-  background: var(--coral); color: var(--on-coral); box-shadow: var(--shadow-btn);
-  font-size: 1.2rem;           /* 19.2px semibold = WCAG "large text"; white on coral is 3.68:1 (needs 3:1) */
-  width: 100%;
-}
-.btn-primary:hover { box-shadow: 0 8px 18px -4px rgba(228, 87, 46, .6); }
-.btn-secondary { background: var(--card); color: var(--ink); border-color: var(--line-strong); }
-.btn-secondary:hover { border-color: var(--control-border); }
-@media (min-width: 640px) { .btn-primary { width: auto; min-width: 260px; } }
-
-/* ---------- Review panel ---------- */
-.review { scroll-margin-top: 80px; }
-.review h2 { margin-top: 10px; font-size: clamp(1.625rem, 1.3rem + 1.4vw, 2.125rem); font-weight: 500; letter-spacing: -.03em; line-height: 1.1; }
-.review p.copy { margin-top: 12px; color: var(--muted); text-wrap: pretty; }
-.meta { margin-top: 20px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 16px; font-size: .9375rem; }
-.meta dt { font: 500 .75rem/1.9 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--coral-text); }
-.meta dd { overflow-wrap: anywhere; font-weight: 500; }
-.review label { display: block; margin-top: 20px; margin-bottom: 6px; }
-.review textarea { font-family: var(--mono); font-size: .875rem; line-height: 1.6; min-height: 15rem; padding: 14px; }
-.row { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 12px; }
-.status { margin-top: 12px; min-height: 1.5em; font-size: .9375rem; color: var(--ok); font-weight: 500; }
-.status.bad { color: var(--error); }
-.noscript { margin: 16px 0 0; padding: 14px 16px; border-radius: 14px; background: var(--coral-tint); color: var(--coral-text); font-weight: 500; }
-
-/* ---------- Footer ---------- */
-.foot { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: .9375rem; text-align: center; text-wrap: balance; }
-
-/* ---------- Motion (calm; off for reduced-motion) ---------- */
-@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-@keyframes settle { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: none; } }
-h1 { animation: settle .8s var(--ease) both; }
-.review:not([hidden]) { animation: rise .45s var(--ease) both; }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation: none !important; transition: none !important; }
-  .btn:hover { transform: none; }
-}
+.hero.s{padding:clamp(24px,4vw,56px) 0 clamp(32px,4vw,56px)}
+.formsec{padding:0 0 clamp(56px,7vw,96px)}
+.cols{display:flex;flex-wrap:wrap;align-items:flex-start;gap:40px 64px}
+.left{flex:999 1 520px;min-width:0;display:flex;flex-direction:column;gap:40px}
+.left form{display:flex;flex-direction:column;gap:40px}
+fieldset{border:0;margin:0;padding:0;min-width:0;display:flex;flex-direction:column;gap:20px}
+legend{padding:0;margin-bottom:20px;font:600 13px/1.2 var(--d);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+legend.opt{color:inherit;opacity:.7}
+.field{display:flex;flex-direction:column;gap:8px}
+.field label{font:600 18px/1.3 var(--d)}
+input,textarea{width:100%;min-height:56px;padding:0 16px;border:1px solid var(--b45);border-radius:12px;background:transparent;color:inherit;font:inherit;font-size:18px}
+textarea{min-height:128px;padding:14px 16px;line-height:1.5;resize:vertical}
+input::placeholder{color:#6B665C;opacity:1}
+[aria-invalid=true]{border:2px solid var(--err)}
+.err{color:var(--err);font-size:16px}
+.two2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:20px}
+.actions{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.actions .btn{border:0}
+.actions p{max-width:520px;font-size:16px;opacity:.8}
+.actions p.form-error{color:var(--err);opacity:1;font-weight:600}
+.size-meter{font-size:15px;color:var(--muted)}
+.size-meter.over{color:var(--err)}
+.aside{flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:24px}
+.msgcard{display:flex;flex-direction:column;gap:12px;padding:20px;border:1px solid var(--line);border-radius:20px;background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.06);font-size:15px;line-height:1.4}
+.msgcard .thread-h .tag{letter-spacing:0;text-transform:none}
+.msgcard .msg{gap:4px}
+.msgcard .bub{max-width:none;padding:10px 14px;border-radius:18px 18px 18px 4px;color:#4A463D}
+.msgcard .after{padding-top:12px;border-top:1px solid var(--line-soft)}
+.textcard{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:20px;border:1px solid var(--b18);border-radius:20px}
+.textcard h2{font:600 22px/1.2 var(--d);letter-spacing:-.01em}
+.textcard p{font-size:16px;opacity:.85}
+.review{display:flex;flex-direction:column;gap:12px;padding:24px;border:1px solid var(--b22);border-radius:20px}
+.review h2{font:700 28px/1.1 var(--d);letter-spacing:-.02em}
+.review p.copy{font-size:16px;opacity:.85}
+.review dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:16px}
+.review dt{font-weight:600}
+.review dd{margin:0;overflow-wrap:anywhere}
+.review textarea{min-height:200px;font-size:16px;line-height:1.5}
+.review label{font:600 16px var(--d)}
+.review .row{display:flex;flex-wrap:wrap;gap:10px}
+.review .btn{min-height:48px;padding:0 22px;font-size:16px;border-radius:10px}
+.status{font-size:16px;min-height:1.5em}
+.status.bad{color:var(--err)}
+.noscript{padding:14px 16px;border:1px solid var(--b35);border-radius:12px;font-size:16px}
 </style>
 </head>
 <body>
 <a class="skip" href="#form">Skip to the form</a>
-
-<header class="nav">
-  <div class="wrap">
-    <a class="brand" href="index.html" aria-label="Acquiro, overview"><span class="word">Acquiro</span></a>
-    <a class="nav-link" href="index.html">Back to overview</a>
-  </div>
+<header>
+<div class="top">
+<a class="brand" href="index.html" aria-label="Acquiro, home">Acquiro</a>
+<nav class="nav" aria-label="Main">
+<a href="realtors.html">For realtors</a>
+<a class="cta" href="submit.html" aria-current="page">Send a deal</a>
+</nav>
+</div>
 </header>
 
 <main id="main">
-  <div class="wrap layout">
 
-    <section class="intro" aria-labelledby="page-title">
-      <p class="eyebrow">Send a deal</p>
-      <h1 id="page-title">Two things and <em>we do the rest.</em></h1>
-      <p class="lead">Send the address and the asking price. The desk finds the lot size, zoning, flood, trees and comps itself, and you hear back with real numbers. This page writes the deal out as an email for you to send from your own mail app.</p>
-      <p class="lead" style="margin-top:12px">Prefer a text? Text the deal to <a href="sms:+15128661988">(512) 866-1988</a>.</p>
-      <span class="chip">City of Austin lots and teardowns</span>
-      <ol class="steps">
-        <li><strong>Type two things.</strong> The street address with its ZIP, and the asking price.</li>
-        <li><strong>Your email app opens.</strong> The deal is already written out, one line per field.</li>
-        <li><strong>You press send.</strong> Nothing goes out until you do.</li>
-      </ol>
-    </section>
+<section class="hero s">
+<div class="wrap">
+<p class="eyebrow">Send a deal</p>
+<h1 class="h1" style="margin-top:16px">
+<span class="blk">Send one deal.</span>
+<span class="blk acc">Two things are required.</span>
+</h1>
+<p class="sub" style="max-width:640px;margin-top:clamp(20px,3vw,32px)">An address with its ZIP and an asking price. Everything else is optional.</p>
+</div>
+</section>
 
-    <div class="stack">
-      <section class="card" aria-labelledby="form-title">
-        <h2 id="form-title" class="eyebrow" style="font-weight:500">The deal</h2>
-        <p class="req-note" style="margin-top:12px"><span aria-hidden="true">*</span> Required</p>
-        <noscript><p class="noscript">This form needs JavaScript to write your email. Without it, email prashant+deals@avivo.homes or text (512) 866-1988 with the address, ZIP and asking price.</p></noscript>
+<section class="formsec">
+<div class="wrap cols">
 
-        <form id="form" method="post" novalidate>
-          <fieldset>
-            <legend>The two things</legend>
-            <div class="grid two">
-              <div class="field">
-                <label for="address">Property address and ZIP <span class="req" aria-hidden="true">*</span></label>
-                <input id="address" name="address" type="text" required aria-required="true" maxlength="140" autocomplete="off" autocapitalize="words" enterkeyhint="next" placeholder="1204 Example St, 78704" aria-describedby="h-address e-address">
-                <p class="hint" id="h-address">Street number and name, then the 5-digit ZIP.</p>
-                <p class="err" id="e-address" hidden></p>
-              </div>
-              <div class="field">
-                <label for="ask">Asking price <span class="req" aria-hidden="true">*</span></label>
-                <input id="ask" name="ask" type="text" inputmode="decimal" required aria-required="true" maxlength="16" autocomplete="off" enterkeyhint="next" placeholder="650,000" aria-describedby="h-ask e-ask">
-                <p class="hint" id="h-ask">Whole dollars. 650000 or 650k both work.</p>
-                <p class="err" id="e-ask" hidden></p>
-              </div>
-            </div>
-          </fieldset>
+<div class="left">
+<noscript><p class="noscript">This form needs JavaScript to write your email. Without it, email <a href="mailto:prashant+deals@avivo.homes">prashant+deals@avivo.homes</a> or text (512) 866-1988 with the address, ZIP and asking price.</p></noscript>
 
-          <fieldset>
-            <legend>How to reach you</legend>
-            <div class="field">
-              <label for="contact">Email or phone</label>
-              <input id="contact" name="contact" type="text" maxlength="120" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" aria-describedby="h-contact e-contact">
-              <p class="hint" id="h-contact">Optional. We answer the email you send from. Add a phone or another address here if you want it used.</p>
-              <p class="err" id="e-contact" hidden></p>
-            </div>
-          </fieldset>
+<form id="form" method="post" novalidate>
+<fieldset>
+<legend>Required</legend>
+<div class="field">
+<label for="address">Address and ZIP</label>
+<input id="address" name="address" type="text" required aria-required="true" maxlength="140" autocomplete="off" autocapitalize="words" enterkeyhint="next" placeholder="609 W Elizabeth St, 78704" aria-describedby="e-address">
+<p class="err" id="e-address" hidden></p>
+</div>
+<div class="field">
+<label for="ask">Asking price</label>
+<input id="ask" name="ask" type="text" inputmode="decimal" required aria-required="true" maxlength="16" autocomplete="off" enterkeyhint="next" placeholder="$800,000" aria-describedby="e-ask">
+<p class="err" id="e-ask" hidden></p>
+</div>
+</fieldset>
 
-          <details class="more" id="more">
-            <summary>If you have it</summary>
-            <p class="hint more-note">All optional. Skip every one of these and we still run the deal.</p>
-            <div class="grid two">
-              <div class="field">
-                <label for="listed">Listed or pocket</label>
-                <select id="listed" name="listed">
-                  <option value="" selected>Not sure</option>
-                  <option value="listed">Listed on the MLS</option>
-                  <option value="pocket">Pocket listing</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="structure">Existing structure</label>
-                <select id="structure" name="structure">
-                  <option value="" selected>Not sure</option>
-                  <option value="vacant">Vacant lot</option>
-                  <option value="demo">House on it, demo needed</option>
-                  <option value="keep">House on it, no demo</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="survey">Survey or plans on hand</label>
-                <select id="survey" name="survey">
-                  <option value="" selected>None or not sure</option>
-                  <option value="survey">Survey</option>
-                  <option value="plans">Plans</option>
-                  <option value="both">Survey and plans</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="timeline">Seller timeline</label>
-                <input id="timeline" name="timeline" type="text" maxlength="80" autocomplete="off" enterkeyhint="next" placeholder="Wants to close in 30 days" aria-describedby="e-timeline">
-                <p class="err" id="e-timeline" hidden></p>
-              </div>
-              <div class="field">
-                <label for="arv">Your ARV (after-repair value)</label>
-                <input id="arv" name="arv" type="text" inputmode="decimal" maxlength="16" autocomplete="off" enterkeyhint="next" placeholder="1,250,000" aria-describedby="h-arv e-arv">
-                <p class="hint" id="h-arv">We keep it as your claim and screen on our own comps.</p>
-                <p class="err" id="e-arv" hidden></p>
-              </div>
-              <div class="field">
-                <label for="agent_name">Your name</label>
-                <input id="agent_name" name="agent_name" type="text" maxlength="80" autocomplete="name" enterkeyhint="next" aria-describedby="e-agent_name">
-                <p class="err" id="e-agent_name" hidden></p>
-              </div>
-              <div class="field span-all">
-                <label for="listing_url">Link to flyer or listing</label>
-                <input id="listing_url" name="listing_url" type="url" inputmode="url" maxlength="300" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="next" placeholder="https://" aria-describedby="e-listing_url">
-                <p class="err" id="e-listing_url" hidden></p>
-              </div>
-              <div class="field span-all">
-                <label for="notes">Anything else</label>
-                <textarea id="notes" name="notes" maxlength="600" rows="4" aria-describedby="h-notes size-meter e-notes"></textarea>
-                <p class="hint" id="h-notes">Access, what you have heard, anything the seller said.</p>
-                <p class="size-meter" id="size-meter" hidden></p>
-                <p class="err" id="e-notes" hidden></p>
-              </div>
-            </div>
-          </details>
+<fieldset>
+<legend class="opt">Optional</legend>
+<div class="two2">
+<div class="field">
+<label for="agent_name">Your name</label>
+<input id="agent_name" name="agent_name" type="text" maxlength="80" autocomplete="name" enterkeyhint="next" aria-describedby="e-agent_name">
+<p class="err" id="e-agent_name" hidden></p>
+</div>
+<div class="field">
+<label for="contact">Best email for the write-up</label>
+<input id="contact" name="contact" type="text" maxlength="120" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" aria-describedby="e-contact">
+<p class="err" id="e-contact" hidden></p>
+</div>
+</div>
+<div class="field">
+<label for="listing_url">Link to the listing or flyer</label>
+<input id="listing_url" name="listing_url" type="text" inputmode="url" maxlength="300" autocomplete="off" autocapitalize="none" spellcheck="false" enterkeyhint="next" aria-describedby="e-listing_url">
+<p class="err" id="e-listing_url" hidden></p>
+</div>
+<div class="field">
+<label for="notes">Notes</label>
+<textarea id="notes" name="notes" maxlength="600" rows="4" aria-describedby="size-meter e-notes"></textarea>
+<p class="err" id="e-notes" hidden></p>
+</div>
+<p class="size-meter" id="size-meter" hidden></p>
+</fieldset>
 
-          <div class="actions">
-            <p class="form-error" id="form-error" role="alert" hidden></p>
-            <button type="submit" id="send" class="btn btn-primary">Send to Acquiro</button>
-            <p class="note">This opens your email app. Nothing is stored on this page.</p>
-          </div>
-        </form>
-      </section>
+<div class="actions">
+<p class="form-error" id="form-error" role="alert" hidden></p>
+<button type="submit" id="send" class="btn btn-solid">Open in my mail app</button>
+<p id="need">Add the address with its ZIP and the asking price to continue.</p>
+<p>This opens your own mail app with the deal filled in. Nothing is sent until you press send there.</p>
+</div>
+</form>
 
-      <section class="card review" id="review" aria-labelledby="review-title" tabindex="-1" hidden>
-        <p class="eyebrow">Your email</p>
-        <h2 id="review-title">Ready to <em>send</em></h2>
-        <p class="copy">Your email app should be opening with this message. Check it, then press send there. If nothing opened, copy the text below and email it to the address shown, or text it to (512) 866-1988.</p>
-        <dl class="meta">
-          <dt>To</dt><dd id="r-to">prashant+deals@avivo.homes</dd>
-          <dt>Subject</dt><dd id="r-subject"></dd>
-        </dl>
-        <label for="composed">Message</label>
-        <textarea id="composed" name="composed" readonly rows="12" spellcheck="false"></textarea>
-        <div class="row">
-          <button type="button" id="copy-btn" class="btn btn-secondary">Copy</button>
-          <a id="mailto-link" class="btn btn-secondary" href="mailto:prashant+deals@avivo.homes">Open email app again</a>
-        </div>
-        <p class="status" id="copy-status" role="status" aria-live="polite"></p>
-      </section>
-    </div>
+<section class="review" id="review" aria-labelledby="review-title" tabindex="-1" hidden>
+<h2 id="review-title">Ready to send</h2>
+<p class="copy">Your mail app should be opening with this message. Check it, then press send there. If nothing opened, copy the text below and email it to the address shown, or text it to (512) 866-1988.</p>
+<dl>
+<dt>To</dt><dd id="r-to">prashant+deals@avivo.homes</dd>
+<dt>Subject</dt><dd id="r-subject"></dd>
+</dl>
+<label for="composed">Message</label>
+<textarea id="composed" name="composed" readonly rows="12" spellcheck="false"></textarea>
+<div class="row">
+<button type="button" id="copy-btn" class="btn btn-line">Copy</button>
+<a id="mailto-link" class="btn btn-line" href="mailto:prashant+deals@avivo.homes">Open my mail app again</a>
+</div>
+<p class="status" id="copy-status" role="status" aria-live="polite"></p>
+</section>
+</div>
 
-  </div>
+<aside class="aside">
+<section class="msgcard" aria-label="Your message">
+<p class="thread-h"><span>Your message</span><span class="tag sent">agent sent</span></p>
+<div class="msg"><span class="who">Example</span><p class="bub">609 W Elizabeth St, 78704, asking 800k</p></div>
+<p class="after">The desk replies in the thread. You get a written number within a day, even when the answer is Decline.</p>
+</section>
+<section class="textcard" aria-label="Prefer to text">
+<h2>Prefer to text?</h2>
+<p>Send the same two things to <span style="white-space:nowrap">(512) 866-1988</span>.</p>
+<a class="btn btn-line btn-sm" href="sms:+15128661988">Text (512) 866-1988</a>
+</section>
+</aside>
+
+</div>
+</section>
+
 </main>
 
 <footer class="foot">
-  <div class="wrap"><p>Nothing sends from our side without a click. You'll hear back with real numbers.</p></div>
+<div class="in">
+<a class="brand" href="index.html">Acquiro</a>
+<nav aria-label="Footer">
+<a href="index.html">Home</a>
+<a href="realtors.html">For realtors</a>
+<a href="sms:+15128661988">Text (512) 866-1988</a>
+<a href="mailto:prashant+deals@avivo.homes">prashant+deals@avivo.homes</a>
+</nav>
+</div>
 </footer>
-
 <script>
 (function () {
   'use strict';
@@ -408,8 +434,7 @@ h1 { animation: settle .8s var(--ease) both; }
   var WARN_ENCODED = 1400;         // show the size note from here
   var NL = '\r\n';                 // RFC 6068 line break inside mailto bodies
   var MIN_PRICE = 10000, MAX_PRICE = 100000000;
-  var CONTROLS = ['address', 'ask', 'contact', 'arv', 'agent_name', 'listing_url', 'timeline', 'notes'];
-  var IN_MORE = ['arv', 'agent_name', 'listing_url', 'timeline', 'notes'];     // inside the collapsed "If you have it"
+  var CONTROLS = ['address', 'ask', 'contact', 'agent_name', 'listing_url', 'notes'];
 
   var form = document.getElementById('form');
   var attempted = false;
@@ -425,10 +450,6 @@ h1 { animation: settle .8s var(--ease) both; }
     if (m[2] === 'k') { n *= 1e3; }
     if (m[2] === 'm') { n *= 1e6; }
     return Math.round(n);
-  }
-  function parseNum(raw) {
-    var s = raw.replace(/[,\s]/g, '');
-    return /^\d+(?:\.\d+)?$/.test(s) ? parseFloat(s) : NaN;
   }
 
   // Reads the form. Returns the value for each label (in FIELD_ORDER) and the list of errors in page order.
@@ -454,7 +475,7 @@ h1 { animation: settle .8s var(--ease) both; }
 
     money('ask', 'Ask', true, 'the asking price');
     out['Lot size'] = '';            // the desk finds the lot, the zoning and the house itself
-    money('arv', 'Claimed ARV', false, 'your ARV');
+    out['Claimed ARV'] = '';
     out['Existing sf'] = '';
 
     var link = val('listing_url');
@@ -470,35 +491,22 @@ h1 { animation: settle .8s var(--ease) both; }
 
     out['Agent name'] = val('agent_name');
 
-    // How to reach you: one box, an email or a phone. An email goes on the email line, anything else on the phone line.
+    // The best email for the write-up: one box. An email goes on the email line, a phone number on the phone line.
     var contact = val('contact'), email = '', phone = '';
     if (contact) {
       if (contact.indexOf('@') >= 0) {
         if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(contact)) { email = contact; }
-        else { fail('contact', 'Enter a valid email address or a phone number, or leave it blank.'); }
+        else { fail('contact', 'Enter a valid email address, or leave it blank.'); }
       } else {
         var digits = contact.replace(/\D/g, '');
         if (digits.length >= 10 && digits.length <= 15) { phone = contact; }
-        else { fail('contact', 'Enter a valid email address or a 10-digit phone number, or leave it blank.'); }
+        else { fail('contact', 'Enter a valid email address, or leave it blank.'); }
       }
     }
     out['Agent email'] = email;
     out['Agent phone'] = phone;
 
-    // The "If you have it" answers have no label of their own in the contract, so they lead the Notes line.
-    var notes = [];
-    var listed = val('listed'), structure = val('structure'), survey = val('survey'), timeline = val('timeline');
-    if (listed === 'listed') { notes.push('Listed on the MLS.'); } else if (listed === 'pocket') { notes.push('Pocket listing.'); }
-    if (structure === 'vacant') { notes.push('Vacant lot.'); }
-    else if (structure === 'demo') { notes.push('Existing house, demo needed.'); }
-    else if (structure === 'keep') { notes.push('Existing house, no demo.'); }
-    if (survey === 'survey') { notes.push('Survey on hand.'); }
-    else if (survey === 'plans') { notes.push('Plans on hand.'); }
-    else if (survey === 'both') { notes.push('Survey and plans on hand.'); }
-    if (timeline) { notes.push('Seller timeline: ' + timeline + (/[.!?]$/.test(timeline) ? '' : '.')); }
-    var free = val('notes');
-    if (free) { notes.push(free); }
-    out['Notes'] = notes.join(' ');
+    out['Notes'] = val('notes');
 
     return { values: out, errors: errors };
   }
@@ -524,9 +532,8 @@ h1 { animation: settle .8s var(--ease) both; }
       else { el.removeAttribute('aria-invalid'); box.textContent = ''; box.hidden = true; }
     });
     var summary = $('form-error'), n = Object.keys(byId).length;
-    if (n) { summary.textContent = n === 1 ? 'Please fix the field marked below.' : 'Please fix the ' + n + ' fields marked below.'; summary.hidden = false; }
+    if (n) { summary.textContent = n === 1 ? 'Please fix the field marked above.' : 'Please fix the ' + n + ' fields marked above.'; summary.hidden = false; }
     else { summary.textContent = ''; summary.hidden = true; }
-    if (errors.some(function (e) { return IN_MORE.indexOf(e.id) >= 0; })) { $('more').open = true; }
     if (moveFocus && errors.length) { $(errors[0].id).focus(); }
   }
 
@@ -548,11 +555,18 @@ h1 { animation: settle .8s var(--ease) both; }
     return result;
   }
 
+  // The helper line under the button shows until the two required things are in.
+  function needLine(result) {
+    var short = result.errors.some(function (e) { return e.id === 'address' || e.id === 'ask'; });
+    $('need').hidden = !short;
+  }
+
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
     attempted = true;
     var result = evaluate();
     renderErrors(result.errors, true);
+    needLine(result);
     if (result.errors.length) { return; }
 
     var href = buildMailto(result.values), body = buildBody(result.values);
@@ -571,6 +585,7 @@ h1 { animation: settle .8s var(--ease) both; }
 
   function refresh() {
     var result = evaluate();
+    needLine(result);
     if (attempted) { renderErrors(result.errors, false); }
   }
   form.addEventListener('input', refresh);

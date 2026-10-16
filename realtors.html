@@ -3,347 +3,389 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!--
-  For Realtors page (owner, 10/15 6:18 PM, in chat). Same tokens and CSS approach as index.html: one file, inline CSS,
-  no framework, no script, no tracking. tests/test_realtors_page.py pins the copy, the links and the :root tokens.
-  OPEN ITEMS BEFORE THIS GOES PUBLIC (the page is in scripts/publish_site.py, so a publish ships it as it stands):
-  (1) "How fast do you close?" still shows the placeholder [owner to set]. Replace the span with the owner's answer.
-  (2) The FAQ link to buyer.html is the right href, but buyer.html is UNPUBLISHED (it is not in SITE_FILES), so the link
-      is a dead link until buyer.html goes up. Publish buyer.html first, or take the link out.
-  (3) The nav link to this page on index.html is the owner's to add.
-  Brand rule: the chrome (nav, footer, title, hero) says Acquiro and nothing else. Avivo is named only in the FAQ, where
-  the question is who buys.
--->
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <title>For Realtors | Acquiro</title>
-<meta name="description" content="Send Acquiro an address and an asking price. Text or email. You can earn three sides of a commission, and we do the rest.">
-<meta name="theme-color" content="#FBF9F6">
+<meta name="description" content="Send an address and an asking price by text or email. You get a written number back within a day, even when the answer is Decline.">
+<meta name="theme-color" content="#F6F3EC">
 <meta name="color-scheme" content="light">
 <meta property="og:type" content="website">
 <meta property="og:title" content="For Realtors | Acquiro">
-<meta property="og:description" content="Send us an address and an asking price. Text or email. We do the rest.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23E4572E'/%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M16 6 25 26h-4.5l-1.6-4h-5.8l-1.6 4H7zm0 7-1.7 5h3.4z'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
+<meta property="og:description" content="Send us an address and an asking price. Text or email. You get a written number within a day.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231F5C3A'/%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M16 6 25 26h-4.5l-1.6-4h-5.8l-1.6 4H7zm0 7-1.7 5h3.4z'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Schibsted+Grotesk:wght@500;600;700&amp;display=swap">
 <style>
-/* ==========================================================================
-   Acquiro: For Realtors
-   Same tokens and CSS approach as landing/index.html. Mobile first: every rule below is the phone layout, and the
-   min-width queries only widen it. The :root block is a verbatim copy of index.html's; the test fails if the two drift.
-   ========================================================================== */
-
 :root{
-  /* palette */
-  --canvas:#FBF9F6;       /* page */
-  --surface:#F4F1EA;      /* soft section band */
-  --frame:#ECE7DE;        /* placeholder frames */
-  --paper:#FFFFFF;        /* cards */
-  --ink:#1A1714;
-  --muted:#6B6358;        /* body secondary and all small captions (AA) */
-  --faint:#8B8378;        /* decorative strokes only, never text */
-  --line:#ECE7E0;
-  --line-strong:#E2DBD0;
-  --coral:#E4572E;        /* glow, large numerals, focus ring */
-  --coral-fill:#CC4A22;   /* button fill: same hue, deepened so white text clears 4.5:1 */
-  --coral-tint:#FCEFE9;
-  --coral-ink:#B53F1C;    /* small coral text */
-  --night:#16120E;
-  --night-ink:#F5EFE7;
-  --night-muted:#B9AD9D;
-  --ok:#009767;
-  --ok-tint:#E3F5EE;
-  --ok-ink:#00704A;
-  /* type */
-  --sans:'Geist','Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
-  --serif:'Instrument Serif','Newsreader',Georgia,'Times New Roman',serif;
-  --mono:'Geist Mono','JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-  /* motion */
-  --ease:cubic-bezier(.22,1,.36,1);   /* ease-out-expo-ish */
-  --ease2:cubic-bezier(.16,1,.3,1);   /* ease-out-quint-ish */
-  /* shape */
-  --shadow:0 2px 6px rgba(26,23,20,.05),0 18px 40px -20px rgba(26,23,20,.22);
-  --gutter:20px;
-  --nav-h:64px;
+  --bg:#F6F3EC;          /* page */
+  --ink:#15130F;         /* text */
+  --accent:#1F5C3A;      /* the one deep green */
+  --tint:#E3EDE6;        /* accent tint */
+  --card:#FBFAF6;        /* mockup surface */
+  --paper:#FFFFFF;
+  --line:#D9D3C4;        /* mockup borders */
+  --line-soft:#E6E1D3;
+  --head:#F7F4EC;
+  --muted:#5A554B;       /* mockup captions, 6:1 on card */
+  --chip:#EFEBE0;
+  --chip-line:#D8D2C2;
+  --bubble:#ECE8DD;
+  --stroke:#BDB7A8;      /* decorative chip and button strokes */
+  --b14:rgba(21,19,15,.14);
+  --b18:rgba(21,19,15,.18);
+  --b22:rgba(21,19,15,.22);
+  --b35:rgba(21,19,15,.35);
+  --b40:rgba(21,19,15,.4);
+  --b45:rgba(21,19,15,.45);
+  --focus:#2F7D52;
+  --err:#9B1C1C;
+  --gutter:clamp(16px,4vw,40px);
+  --d:'Schibsted Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --t:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
-@media (min-width:640px){:root{--gutter:32px}}
-@media (min-width:1024px){:root{--gutter:40px}}
-
-*,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{margin:0;background:var(--canvas);color:var(--ink);font:400 1rem/1.65 var(--sans);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.55 var(--t);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,p,ul,ol,dl,dd,figure{margin:0}
 a{color:inherit}
-p{margin:0;text-wrap:pretty}
-ul,ol{margin:0;padding:0;list-style:none}
-h1,h2,h3{margin:0}
-:focus-visible{outline:3px solid var(--coral);outline-offset:3px}
-::selection{background:var(--coral-tint);color:var(--ink)}
-
-.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
-.skip{position:absolute;left:16px;top:-120px;z-index:100;background:var(--ink);color:#fff;padding:12px 20px;min-height:44px;border-radius:999px;text-decoration:none;font-weight:500}
+[hidden]{display:none!important}
+.d{font-family:var(--d)}
+.blk{display:block}
+.acc{color:var(--accent)}
+.dim{opacity:.8}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.skip{position:absolute;left:16px;top:-120px;z-index:100;display:inline-flex;align-items:center;min-height:44px;padding:0 20px;background:var(--ink);color:#fff;border-radius:999px;text-decoration:none;font-weight:500}
 .skip:focus{top:12px}
 
-/* ---------- layout ---------- */
-.wrap{width:100%;max-width:calc(1200px + 2 * var(--gutter));margin-inline:auto;padding-inline:var(--gutter)}
-.sec{position:relative;padding-block:clamp(56px,8vw,104px);overflow-x:clip}
-section[id]{scroll-margin-top:calc(var(--nav-h) - 1px)}
-.band{background:linear-gradient(180deg,var(--canvas) 0%,var(--surface) 22%,var(--surface) 72%,var(--canvas) 100%)}
-.sec-head{max-width:780px;margin-bottom:clamp(28px,4vw,48px)}
+/* chrome */
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--gutter)}
+.top{max-width:1280px;margin:0 auto;padding:16px var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:inline-flex;align-items:center;min-height:44px;font:700 26px/1 var(--d);letter-spacing:-.03em;text-decoration:none}
+.nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;font-weight:500;text-decoration:none}
+.nav a[aria-current=page]{font-weight:600;text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:2px}
+.nav a.cta{justify-content:center;padding:0 22px;border-radius:10px;background:var(--accent);color:#fff;font:600 16px/1.2 var(--d);text-decoration:none}
+.foot{border-top:1px solid var(--b14)}
+.foot .in{max-width:1280px;margin:0 auto;padding:32px var(--gutter) 48px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 32px}
+.foot .brand{font-size:22px}
+.foot nav{display:flex;flex-wrap:wrap;align-items:center;gap:4px 20px;font-size:16px}
+.foot nav a{display:inline-flex;align-items:center;min-height:44px}
 
-/* ---------- type ---------- */
-.eyebrow{margin:0 0 20px;font:500 .75rem/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--coral-ink)}
-.display{font-family:var(--sans);font-weight:500;letter-spacing:-.03em;line-height:1.02;text-wrap:balance}
-h1.display{font-size:clamp(2.5rem,1.2rem + 5.2vw,4.5rem)}
-h2.display{font-size:clamp(2.125rem,1.35rem + 3vw,3.5rem)}
-.display em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.015em;font-size:1.08em}
-h3{font-weight:500;font-size:1.25rem;line-height:1.25;letter-spacing:-.015em}
-.lead{font-size:clamp(1.0625rem,1rem + .3vw,1.1875rem);line-height:1.65;color:var(--muted);max-width:60ch}
-.sec-head .lead{margin-top:24px}
-.note{margin-top:clamp(20px,3vw,28px);color:var(--muted);font-size:.9375rem;max-width:70ch}
-.note + .note{margin-top:12px}
-.pull{margin-top:clamp(20px,3vw,28px);font-weight:500;font-size:clamp(1.125rem,1rem + .5vw,1.375rem);line-height:1.4;letter-spacing:-.015em;max-width:44ch}
+/* sections and type */
+.sec{padding:clamp(56px,7vw,96px) 0}
+.rule{border-top:1px solid var(--b14)}
+.hero{padding:clamp(24px,4vw,56px) 0 clamp(56px,7vw,96px)}
+.h1{font:700 clamp(42px,8.4vw,88px)/.98 var(--d);letter-spacing:-.04em}
+.h2{font:700 clamp(34px,5vw,56px)/1.04 var(--d);letter-spacing:-.03em}
+.h2.close{font-size:clamp(40px,6.4vw,72px);line-height:1;letter-spacing:-.035em;max-width:900px}
+.h3{font:600 26px/1.15 var(--d);letter-spacing:-.02em}
+.sub{font-size:clamp(20px,2.3vw,28px);line-height:1.35}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 30px;border:1px solid transparent;border-radius:12px;font:600 18px/1.2 var(--d);text-decoration:none;cursor:pointer;transition:opacity .15s}
+.btn:hover{opacity:.86}
+.btn-solid{background:var(--accent);color:#fff}
+.btn-line{background:transparent;color:inherit;border-color:var(--b40)}
+.btn-md{min-height:52px;padding:0 26px;font-size:17px}
+.btn-sm{min-height:48px;padding:0 22px;font-size:16px;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(var(--min,320px),100%),1fr));gap:var(--gap,24px);margin-top:clamp(32px,4vw,48px)}
+.card{border:1px solid var(--b18);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{display:inline-flex;align-items:center;min-height:28px;padding:0 12px;border:1px solid var(--b35);border-radius:999px;font-size:14px}
+.pill.on{padding:0 14px;border-color:transparent;background:var(--accent);color:#fff;font-weight:600}
+.pill.off{padding:0 14px;border-color:currentColor;font-weight:600}
+.num{font:700 56px/1 var(--d);letter-spacing:-.04em;color:var(--accent)}
+.rowlist{list-style:none;padding:0;margin:0}
+.rowlist li{padding:20px 0;border-top:1px solid var(--b18);font:600 clamp(20px,2.2vw,26px)/1.3 var(--d);letter-spacing:-.01em}
+.rowlist li:last-child{border-bottom:1px solid var(--b18)}
+.split{display:flex;flex-wrap:wrap;gap:32px 64px;align-items:flex-start}
+.split>h2{flex:1 1 320px}
+.split>.rowlist,.split>dl{flex:1 1 440px;min-width:0}
+.cta-row{display:flex;flex-direction:column;align-items:flex-start;gap:32px}
 
-/* ---------- buttons and cards ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 26px;border-radius:999px;border:1px solid transparent;font-weight:500;font-size:1rem;line-height:1;text-decoration:none;white-space:nowrap;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s var(--ease),background-color .3s var(--ease),border-color .3s var(--ease)}
-.btn:hover{transform:translateY(-1px)}
-.btn-primary{background:var(--coral-fill);color:#fff;box-shadow:0 4px 12px -2px rgba(228,87,46,.6)}
-.btn-primary:hover{box-shadow:0 8px 18px -4px rgba(228,87,46,.6)}
-.btn-secondary{background:rgba(255,255,255,.72);border-color:var(--line-strong);color:var(--ink)}
-.btn-secondary:hover{background:#fff;border-color:#D6CDBF}
-.btn-sm{min-height:44px;padding:0 18px;font-size:.9375rem}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+/* chips and flags */
+.tag{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:999px;font-size:12px;font-weight:500;line-height:1;white-space:nowrap}
+.tag.t24{min-height:24px;padding:0 10px}
+.tag.sent{border:1px solid var(--stroke);color:var(--muted)}
+.tag.pg{border:1px solid var(--b35);color:inherit}
+.tag.found{background:var(--tint);color:var(--accent)}
+.flag{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:4px 10px;border-radius:999px;background:var(--chip);border:1px solid var(--chip-line);color:var(--ink);font-size:13px;font-weight:500;line-height:1.2}
+.flag svg{flex:none}
+.fact{display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border-radius:999px;background:var(--tint);color:var(--accent);font-size:13px;font-weight:500;white-space:nowrap}
 
-/* ==========================================================================
-   Nav (no menu: one way home and one action)
-   ========================================================================== */
-.nav{position:sticky;top:0;z-index:50;background:rgba(251,249,246,.94);border-bottom:1px solid var(--line)}
-@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
-  .nav{background:rgba(251,249,246,.74);-webkit-backdrop-filter:saturate(1.4) blur(16px);backdrop-filter:saturate(1.4) blur(16px)}
-}
-.nav-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:var(--nav-h)}
-.brand{display:inline-flex;align-items:center;min-height:44px;text-decoration:none}
-.brand-name{font-weight:600;font-size:1.1875rem;letter-spacing:-.03em}
+/* mockups (drawn in markup, no images) */
+.shots{display:flex;flex-direction:row-reverse;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:50px;margin-top:clamp(40px,6vw,72px)}
+.phone{flex:0 1 390px;width:100%;max-width:390px;align-self:center;background:#15130F;border:1px solid #3A362E;border-radius:44px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.screen{background:var(--card);color:var(--ink);border-radius:34px;overflow:hidden;font:400 14px/1.4 var(--t)}
+.scr{display:flex;flex-direction:column;gap:12px;padding:16px}
+.mcard{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--paper)}
+.mhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mname{font:600 13px var(--d);color:var(--muted);letter-spacing:.02em}
+.verdict{display:inline-flex;align-items:center;min-height:26px;padding:0 12px;border-radius:999px;background:var(--accent);color:#fff;font-size:13px;font-weight:600}
+.maddr{font:700 22px/1.1 var(--d);letter-spacing:-.02em}
+.flags{display:flex;flex-wrap:wrap;gap:6px}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line-soft)}
+.rl{display:flex;align-items:center;flex-wrap:wrap;gap:6px;color:var(--muted);font-size:13px}
+.rv{font:600 17px var(--d)}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px 0;border-top:1px solid var(--line-soft)}
+.row2>div{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.row2 .rl{font-size:13px}
+.small{color:var(--muted);font-size:12px}
+.acts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.mbtn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 4px;border:1px solid var(--stroke);border-radius:10px;background:var(--paper);color:var(--ink);font-size:13px;font-weight:600}
+.mbtn.go{border-color:var(--accent);background:var(--accent);color:#fff}
+.mbtn.no{border-color:var(--ink)}
+.thread-h{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.thread{display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.msg.me{align-items:flex-end}
+.who{font-size:12px;color:var(--muted)}
+.bub{max-width:88%;padding:9px 12px;border-radius:16px 16px 16px 4px;background:var(--bubble);font-size:14px}
+.msg.me .bub{background:var(--accent);color:#fff;border-radius:16px 16px 4px 16px}
+.bub.w{max-width:92%}
+.dframe{flex:1 1 520px;max-width:760px;min-width:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.06);font:400 14px/1.45 var(--t)}
+.dbar{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--chip);border-bottom:1px solid var(--line)}
+.dots{display:flex;gap:6px}
+.dots span{width:10px;height:10px;border-radius:50%;background:#CFC9BA}
+.url{flex:1;min-width:0;display:flex;justify-content:center}
+.url span{max-width:100%;padding:3px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dbody{display:flex;flex-direction:column;gap:20px;padding:24px}
+.dtop{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px}
+.dtop>div{min-width:0}
+.daddr{font:700 28px/1.1 var(--d);letter-spacing:-.025em}
+.dask{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px}
+.dask b{font:600 18px var(--d)}
+.dverdict{display:inline-flex;align-items:center;min-height:34px;padding:0 18px;border-radius:999px;background:var(--accent);color:#fff;font-size:15px;font-weight:600}
+.dflags{display:flex;flex-wrap:wrap;gap:8px}
+.dfound{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.dfound .lab,.cap{margin-right:4px;color:var(--muted);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.panel{border:1px solid var(--line);border-radius:12px;background:var(--paper);overflow:hidden}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;background:var(--head)}
+.phead.ln{border-bottom:1px solid var(--line-soft)}
+.phead .cap{margin:0;font-weight:600}
+.pbody{display:flex;flex-direction:column;gap:14px;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(120px,100%),1fr));gap:12px}
+.stats .small{font-size:12px}
+.stat{font:700 20px var(--d)}
+.maxbox{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;padding:12px 14px;border-radius:10px;background:var(--tint)}
+.maxbox .l{font-size:13px;font-weight:500}
+.maxbox .v{font:700 26px var(--d);letter-spacing:-.02em;color:var(--accent)}
+.maxbox .n{flex-basis:100%;font-size:12.5px;color:#4A463D}
+.kv{display:flex;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.kv b{font-weight:600}
+.tbl{overflow-x:auto}
+.tbl table{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{padding:8px 16px;font-size:12px;font-weight:500;color:var(--muted)}
+.tbl td{padding:10px 16px}
+.tbl tr{border-top:1px solid var(--line-soft)}
+.tbl thead tr{border-top:0}
+.tbl .r{text-align:right}
+.tbl .l{text-align:left}
+.tbl td.r{font-weight:600}
+.tbl tfoot td{background:var(--head);font-size:13px;color:var(--muted)}
+.replyh{color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.dframe ul{margin:8px 0 0;padding-left:20px;font-size:14px}
+.dframe li+li{margin-top:4px}
+.dacts{display:flex;flex-wrap:wrap;gap:8px}
+.dacts .mbtn{padding:0 18px;font-size:14px}
 
-/* ==========================================================================
-   1. Hero and the two big tap targets (also used in "Send one now")
-   ========================================================================== */
-.hero{position:relative;isolation:isolate;overflow-x:clip;text-align:center;padding-block:clamp(48px,9vw,112px) clamp(48px,7vw,88px)}
-.hero::before{content:"";position:absolute;z-index:-1;inset:0 0 auto 0;height:min(640px,100%);background:radial-gradient(60% 80% at 50% 0%,rgba(228,87,46,.14),rgba(228,87,46,0) 70%);pointer-events:none}
-.hero h1{max-width:12ch;margin-inline:auto}
-.hero h1 em{display:block;color:var(--coral)}
-.hero .lead{margin:24px auto 0;max-width:40ch}
+/* tabs and panels */
+.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:24px;margin-top:clamp(32px,4vw,48px)}
+.cmp>div{display:flex;flex-direction:column;gap:14px;padding:28px;border-radius:16px}
+.cmp .a{border:1px solid var(--b18)}
+.cmp .a .lab{opacity:.7}
+.cmp .a .say{opacity:.8}
+.cmp .b{background:var(--tint)}
+.cmp .lab{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.cmp .b .lab{color:var(--accent)}
+.cmp .say{font:600 clamp(24px,2.6vw,32px)/1.2 var(--d);letter-spacing:-.02em}
+.tabbox{margin-top:24px;padding:clamp(20px,3vw,32px);border:1px solid var(--b18);border-radius:16px}
+.tablist{display:none;flex-wrap:wrap;gap:8px}
+.js .tablist{display:flex}
+.tab{min-height:44px;padding:0 20px;border:1px solid var(--b35);border-radius:999px;background:transparent;color:inherit;font:600 16px/1.2 var(--d);cursor:pointer}
+.tab[aria-selected=true]{background:var(--ink);color:var(--bg)}
+.tp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:24px;align-items:end;margin-top:28px}
+.tp .lead{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.tp .big{font:700 clamp(48px,6vw,72px)/1 var(--d);letter-spacing:-.04em}
+.tp .big.sm{font-size:clamp(40px,5vw,60px)}
+.tp p.say{font-size:20px;line-height:1.45;max-width:560px}
+.tp+.tp{border-top:1px solid var(--b14);padding-top:28px}
+.js .tp+.tp{border-top:0;padding-top:0}
 
-.sends{display:grid;gap:12px;max-width:760px;margin:clamp(28px,5vw,40px) auto 0}
-.tap{display:flex;flex-direction:column;justify-content:center;min-height:96px;padding:20px 22px;text-align:center;text-decoration:none;transition:transform .3s var(--ease),border-color .3s var(--ease),box-shadow .3s var(--ease)}
-.tap:hover{transform:translateY(-2px);border-color:var(--coral)}
-.tap .k{font:500 .75rem/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--coral-ink)}
-.tap .v{margin-top:8px;font-weight:500;font-size:clamp(1.5rem,1.2rem + 1.2vw,1.875rem);line-height:1.15;letter-spacing:-.025em;overflow-wrap:anywhere}
-.tap .v.long{font-size:clamp(1.0625rem,.8rem + 1.5vw,1.375rem);letter-spacing:-.015em}
-.tap .d{margin-top:8px;color:var(--muted);font-size:.9375rem}
-@media (min-width:720px){.sends{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}}
+/* the home sections */
+.band{background:var(--ink);color:var(--bg);padding:clamp(56px,7vw,96px) 0}
+.band .big{max-width:1000px;font:600 clamp(28px,4.4vw,56px)/1.1 var(--d);letter-spacing:-.03em;text-wrap:balance}
+.band .small2{max-width:720px;margin-top:28px;font-size:clamp(18px,2vw,24px);line-height:1.5;opacity:.82}
+.herorow{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:32px;margin-top:clamp(28px,4vw,48px)}
+.herocopy{flex:1 1 420px;max-width:660px}
+.herocopy .btns{margin-top:28px}
+.proof{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:20px}
+.proof .n{font:700 clamp(56px,7vw,88px)/1 var(--d);letter-spacing:-.04em;color:var(--accent)}
+.ca{display:flex;flex-direction:column;gap:8px}
+.ca .r1{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--b14);font-size:15px}
+.ca .r2{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:15px}
+.steps{list-style:none;padding:0;margin:clamp(32px,4vw,48px) 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:32px}
+.steps li{display:flex;flex-direction:column;gap:12px;padding-top:20px;border-top:2px solid currentColor}
+.ondesk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:28px;padding:16px;border:1px solid var(--b18);border-radius:14px}
+.ondesk .cap{margin-right:6px;color:inherit;opacity:.7;font-weight:600;letter-spacing:.08em}
+.ondesk .mbtn{padding:0 18px;font-size:15px;background:transparent;color:inherit;border-color:var(--b40)}
+.ondesk .mbtn.go{background:var(--accent);border-color:var(--accent);color:#fff}
+.ondesk .mbtn.no{border-color:currentColor}
+.strip{background:var(--tint);border-radius:24px;padding:clamp(28px,5vw,56px);display:flex;flex-wrap:wrap;gap:32px 48px;align-items:center;justify-content:space-between}
+.strip .l{flex:1 1 420px;max-width:680px}
+.strip .l h2{margin-top:12px;font:700 clamp(28px,3.6vw,44px)/1.1 var(--d);letter-spacing:-.03em}
+.strip .r{flex:0 1 340px;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.strip .r p{font:600 24px/1.2 var(--d)}
+.strip .r .btn{margin-top:10px}
+.next li{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.next .pill{font-size:13px;font-weight:500}
+.faq{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));gap:0 64px;margin-top:clamp(32px,4vw,48px)}
+.faq.one{grid-template-columns:minmax(0,820px)}
+details.q{padding:12px 0 20px;border-top:1px solid var(--b22)}
+details.q summary{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-height:44px;padding-top:8px;list-style:none;cursor:pointer}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary::after{content:"";flex:none;width:10px;height:10px;margin-top:12px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
+details.q[open] summary::after{transform:rotate(-135deg);margin-top:16px}
+details.q h3{font:600 22px/1.25 var(--d);letter-spacing:-.01em}
+details.q p{margin-top:10px;opacity:.82}
 
-/* ==========================================================================
-   2. How you earn   4. What you get back   (cards)
-   ========================================================================== */
-.cards{display:grid;gap:16px}
-.tile{padding:clamp(24px,3vw,32px)}
-.tag{display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:var(--coral-tint);color:var(--coral-ink);font:500 .72rem/1.25 var(--mono);letter-spacing:.08em;text-transform:uppercase}
-.tile h3{margin-top:18px}
-.tile p{margin-top:12px;color:var(--muted)}
-@media (min-width:768px){.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.cards.three{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
 
-.callout{margin-top:clamp(20px,3vw,32px);padding:20px 24px;border-radius:20px;background:var(--coral-tint);border:1px solid #F6D9CC;color:var(--ink);font-size:1.0625rem}
-
-/* ==========================================================================
-   3. What we buy
-   ========================================================================== */
-.stats{display:grid;gap:16px}
-.stat{display:flex;flex-direction:column;justify-content:center;padding:clamp(24px,3vw,32px);text-align:center}
-.stat strong{display:block;font-weight:500;font-size:clamp(1.5rem,1.2rem + 1vw,2rem);line-height:1.15;letter-spacing:-.03em;color:var(--coral);text-wrap:balance}
-.stat span{display:block;margin-top:10px;color:var(--muted)}
-.stat .zips span{display:inline-block;margin:0 .22em;color:inherit}
-@media (min-width:1024px){.stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}}
-
-/* ==========================================================================
-   5. Send one now
-   ========================================================================== */
-.fields{display:grid;gap:12px;counter-reset:field}
-.fields li{counter-increment:field;display:flex;align-items:center;gap:16px;padding:18px 22px}
-.fields li::before{content:counter(field);display:grid;place-items:center;flex:none;width:36px;height:36px;border-radius:50%;background:var(--coral-tint);color:var(--coral-ink);font:500 .9375rem/1 var(--mono)}
-@media (min-width:640px){.fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}}
-.send-more{margin-top:clamp(28px,4vw,40px);display:grid;gap:14px;justify-items:start}
-.send-more .btn{white-space:normal;text-align:center;padding-block:14px;line-height:1.2}
-.extras-h{margin-top:clamp(36px,5vw,56px)}
-.extras{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
-.extras li{padding:11px 18px;border-radius:999px;background:var(--paper);border:1px solid var(--line-strong);font-weight:500;font-size:.9688rem;line-height:1.3}
-
-/* ==========================================================================
-   6. FAQ (always open: four short answers, no script)
-   ========================================================================== */
-.faq{max-width:820px;border-top:1px solid var(--line-strong)}
-.faq-item{padding:22px 0;border-bottom:1px solid var(--line-strong)}
-.faq-item h3{font-size:clamp(1.0625rem,1rem + .35vw,1.25rem)}
-.faq-item p{margin-top:10px;color:var(--muted);max-width:62ch}
-.faq-item p a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
-.todo{padding:2px 8px;border-radius:8px;background:var(--coral-tint);color:var(--coral-ink);font:500 .9375rem/1.4 var(--mono)}
-
-.foot{padding:32px 0 48px;border-top:1px solid var(--line);text-align:center}
-.foot p{max-width:none;font:400 .8125rem/1.7 var(--mono);letter-spacing:.02em;color:var(--muted)}
-
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  *,*::before,*::after{animation:none !important;transition:none !important}
-}
+.thr{display:flex;flex-direction:column;gap:12px;padding:20px;border:1px solid var(--line);border-radius:20px;background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.06);font-size:15px;line-height:1.4}
+.thr .thread-h{margin:0}
+.thr .bub{max-width:90%;padding:10px 14px;border-radius:18px 18px 18px 4px}
+.thr .msg{gap:4px}
+.thr .msg.me .bub{border-radius:18px 18px 4px 18px}
+.thr .bub.full{max-width:100%}
+.two{display:flex;flex-wrap:wrap;gap:48px 64px;align-items:center}
+.two>div:first-child{flex:1 1 420px;min-width:0}
+.two>.thr{flex:1 1 420px;min-width:0;max-width:520px}
+.two>.thr.wide{max-width:560px}
+.two p.dim{max-width:520px;margin-top:20px;opacity:.82}
+.two .h2,.eyebrow+.h2{margin-top:12px}
+.callout{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px 24px;margin-top:24px;padding:clamp(24px,4vw,40px);border-radius:20px;background:var(--tint)}
+.callout .big{font:700 clamp(40px,5.6vw,72px)/1 var(--d);letter-spacing:-.04em;color:var(--accent)}
+.callout .per{font:600 clamp(20px,2.4vw,28px) var(--d)}
+.buy>div{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:8px 24px;padding:22px 0;border-top:1px solid var(--b18)}
+.buy>div:last-child{border-bottom:1px solid var(--b18)}
+.buy dt{font:600 22px var(--d);letter-spacing:-.01em}
+.buy dd{margin:0}
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-
-<header class="nav" id="nav">
-  <div class="wrap nav-bar">
-    <a class="brand" href="index.html" aria-label="Acquiro, home"><span class="brand-name">Acquiro</span></a>
-    <a class="btn btn-primary btn-sm" href="#send">Send one now</a>
-  </div>
+<header>
+<div class="top">
+<a class="brand" href="index.html" aria-label="Acquiro, home">Acquiro</a>
+<nav class="nav" aria-label="Main">
+<a href="realtors.html" aria-current="page">For realtors</a>
+<a class="cta" href="submit.html">Send a deal</a>
+</nav>
+</div>
 </header>
 
 <main id="main">
 
-<!-- ============================ 1. Hero ============================ -->
-<section class="hero" id="top" aria-labelledby="hero-h">
-  <div class="wrap">
-    <p class="eyebrow">For realtors</p>
-    <h1 class="display" id="hero-h">Two things. <em>Three sides.</em></h1>
-    <p class="lead">Send us an address and an asking price. Text or email. We do the rest.</p>
-    <div class="sends">
-      <a class="card tap" href="mailto:prashant+deals@avivo.homes"><span class="k">Email</span><span class="v long">prashant+deals@avivo.homes</span><span class="d">Forward the listing, or just type it.</span></a>
-      <a class="card tap" href="sms:+15128661988"><span class="k">Text</span><span class="v">(512) 866-1988</span><span class="d">Two lines is enough.</span></a>
-    </div>
-  </div>
+<section class="hero">
+<div class="wrap">
+<p class="eyebrow">For realtors</p>
+<h1 class="h1" style="margin-top:16px">
+<span class="blk">Two things.</span>
+<span class="blk acc">Three sides.</span>
+</h1>
+<p class="sub" style="max-width:720px;margin-top:clamp(24px,3vw,36px)">Send an address and an asking price by text or email. You get a written number back within a day, even when the answer is Decline.</p>
+<div class="btns" style="margin-top:28px">
+<a class="btn btn-solid" href="submit.html">Send a deal</a>
+<a class="btn btn-line" href="sms:+15128661988">Text (512) 866-1988</a>
+</div>
+</div>
 </section>
 
-<!-- ============================ 2. How you earn three sides ============================ -->
-<section class="sec band" id="earn" aria-labelledby="earn-h">
-  <div class="wrap">
-    <div class="sec-head">
-      <p class="eyebrow">What you earn</p>
-      <h2 class="display" id="earn-h">How you earn <em>three sides.</em></h2>
-    </div>
-    <ul class="cards">
-      <li class="card tile"><span class="tag">Side one</span><h3>You represent the seller</h3><p>You bring us an off market lot or teardown. You most likely represent the seller on that sale.</p></li>
-      <li class="card tile"><span class="tag">Side two</span><h3>You represent us as the buyer</h3><p>On the purchase, you can represent us as the buyer. Same deal, second side.</p></li>
-      <li class="card tile"><span class="tag">Side three</span><h3>You list what we build</h3><p>When we finish building, you usually list the finished homes and represent us again as the seller. One listing per home. Agents have made $50k to $100k per deal with us so far.</p></li>
-    </ul>
-    <!-- SOURCE: the owner, in chat. 10/15 4:40 PM: "we usually let realtors who find us the deals represent us on the listing after we develop, so realtors have made $50k to $100k per deal in commission working with us." 10/15 6:18 PM: "You earn two to three sides of a commission by just sending us an address and asking price." Both are the owner's statements, not checked against a closed-deal record.
-         OWNER 10/15 6:40 PM: "three sides work: they represent the seller on the off-market deal, they could represent us as a buyer, and when we finish building they represent us as the seller again." -->
-    <p class="callout"><strong>Agents have made $50k to $100k per deal with us so far.</strong></p>
-  </div>
+<section class="sec rule">
+<div class="wrap two">
+<div>
+<p class="eyebrow">The two things</p>
+<h2 class="h2">An address and an asking price.</h2>
+<p class="dim">Text them to (512) 866-1988 or email them. A flyer or an MLS sheet works too.</p>
+</div>
+<div class="thr" role="img" aria-label="Text thread with (512) 866-1988. You text 609 W Elizabeth St, 78704, asking 800k. The desk answers that it is running the numbers and asks for your name and best email for the write-up.">
+<div class="thread-h"><span>Text thread</span><span>(512) 866-1988</span></div>
+<div class="msg"><span class="who">You</span><p class="bub">609 W Elizabeth St, 78704, asking 800k</p></div>
+<div class="msg me"><span class="who">Desk</span><p class="bub">Got it, 609 W Elizabeth. Running the numbers now, back to you within the hour. Who am I talking to, and best email for the write-up? -Prashant</p></div>
+</div>
+</div>
 </section>
 
-<!-- ============================ 3. What we buy ============================ -->
-<section class="sec" id="buy" aria-labelledby="buy-h">
-  <div class="wrap">
-    <div class="sec-head">
-      <p class="eyebrow">What we buy</p>
-      <h2 class="display" id="buy-h">Lots and teardowns <em>in four ZIPs.</em></h2>
-      <!-- SOURCE: the lot pack, owner-approved buy box of 10/15: four buy ZIPs, 78731 on watch (screened, never named as a ZIP we buy in), 5,000 sq ft across 2 or 3 units, $650 a foot floor on new-build comps. The owner asked for the 78731 watch note on this page (10/15 6:18 PM). -->
-      <p class="lead">We buy lots and teardowns in Austin. The plan has to carry 5,000 sq ft or more of new construction across 2 or 3 homes.</p>
-    </div>
-    <ul class="stats">
-      <li class="card stat"><strong class="zips"><span>78703</span> <span>78704</span> <span>78746</span> <span>78757</span></strong><span>the ZIPs we buy in</span></li>
-      <li class="card stat"><strong>5,000+ sq ft</strong><span>of new construction, across 2 or 3 homes</span></li>
-      <li class="card stat"><strong>$650+ a foot</strong><span>where new builds sell</span></li>
-    </ul>
-    <p class="pull">We are the buyer. We pay for the lot. You do not need to find us a buyer.</p>
-    <p class="note">78731 is a watch ZIP. This is how we screen. It is not a promise to buy any lot.</p>
-  </div>
+<section class="sec rule">
+<div class="wrap">
+<p class="eyebrow">The three sides</p>
+<h2 class="h2" style="margin-top:12px;max-width:900px">Bring us the lot and you usually get the listing on what we build.</h2>
+<div class="grid" style="--min:300px">
+<article class="card" style="gap:14px"><span class="num">1</span><h3 class="h3">The seller side</h3><p class="dim">On the lot you bring us.</p></article>
+<article class="card" style="gap:14px"><span class="num">2</span><h3 class="h3">The buyer side</h3><p class="dim">On the purchase, when we buy it.</p></article>
+<article class="card" style="gap:14px"><span class="num">3</span><h3 class="h3">The listing</h3><p class="dim">On what we build, usually yours.</p></article>
+</div>
+<div class="callout"><p class="big">$50k to $100k</p><p class="per">per deal.</p></div>
+</div>
 </section>
 
-<!-- ============================ 4. What you get back ============================ -->
-<section class="sec band" id="answer" aria-labelledby="answer-h">
-  <div class="wrap">
-    <div class="sec-head">
-      <p class="eyebrow">What you get back</p>
-      <h2 class="display" id="answer-h">A written answer <em>within a day.</em></h2>
-      <p class="lead">You get a real number. You get it even when the answer is no.</p>
-    </div>
-    <ul class="cards three">
-      <li class="card tile"><span class="tag">Comps</span><h3>Our comps</h3><p>Closed new builds inside half a mile of the lot.</p></li>
-      <li class="card tile"><span class="tag">The lot</span><h3>What the lot supports</h3><p>How much we can build, and whether it is two homes or three.</p></li>
-      <li class="card tile"><span class="tag">The price</span><h3>The most we would pay</h3><p>One number, in writing. We give it when we pass too.</p></li>
-    </ul>
-    <p class="note">Take it back to your seller. It is a number you can use.</p>
-  </div>
+<section class="sec rule">
+<div class="wrap split">
+<h2 class="h2">What we buy</h2>
+<dl class="buy" style="flex:1 1 480px;min-width:0">
+<div><dt>ZIPs</dt><dd>78703, 78704, 78746 and 78757. 78731 is on watch.</dd></div>
+<div><dt>Size</dt><dd>Lots that support 5,000+ sf of new construction across 2 or 3 homes.</dd></div>
+<div><dt>Value</dt><dd>New builds sell for $650 a foot and up.</dd></div>
+<div><dt>Close</dt><dd>As few as 15 days.</dd></div>
+</dl>
+</div>
 </section>
 
-<!-- ============================ 5. Send one now ============================ -->
-<section class="sec" id="send" aria-labelledby="send-h">
-  <div class="wrap">
-    <div class="sec-head">
-      <p class="eyebrow">Send one now</p>
-      <h2 class="display" id="send-h">Two fields. <em>That is it.</em></h2>
-    </div>
-    <ol class="fields">
-      <li class="card"><h3>The address</h3></li>
-      <li class="card"><h3>The asking price</h3></li>
-    </ol>
-    <div class="sends">
-      <a class="card tap" href="mailto:prashant+deals@avivo.homes"><span class="k">Email</span><span class="v long">prashant+deals@avivo.homes</span><span class="d">Forward the listing, or just type it.</span></a>
-      <a class="card tap" href="sms:+15128661988"><span class="k">Text</span><span class="v">(512) 866-1988</span><span class="d">Two lines is enough.</span></a>
-    </div>
-    <!-- SOURCE: the deal form page. It opens the sender's own email app and stores nothing on the page. -->
-    <div class="send-more">
-      <a class="btn btn-secondary" href="submit.html">Use the deal form instead</a>
-      <p class="note" style="margin-top:0">It opens your own email app. Nothing is stored on the page.</p>
-    </div>
-    <h3 class="extras-h">If you have it</h3>
-    <ul class="extras">
-      <li>Listed, or a pocket listing</li>
-      <li>What is on the lot now</li>
-      <li>Survey or plans</li>
-      <li>Your timeline</li>
-      <li>Your ARV</li>
-    </ul>
-    <p class="note">Skip any of it. The address and the price are enough.</p>
-  </div>
+<section class="sec rule">
+<div class="wrap two">
+<div>
+<p class="eyebrow">What you get back</p>
+<h2 class="h2">A written number within a day.</h2>
+<p class="dim">Even when the answer is Decline.</p>
+</div>
+<div class="thr wide" role="img" aria-label="What the agent receives for 609 W Elizabeth St: a text from the desk with the comps median of $795 a foot, the lot size, what it supports, and the max price of $854,000, signed Prashant.">
+<div class="thread-h"><span>What the agent receives</span><span>609 W Elizabeth St</span></div>
+<div class="msg me"><span class="who">Desk</span><p class="bub full">609 W Elizabeth St: Only 2 closed new builds within half a mile, so I pulled 20 across 78704, median $795/sf. Lot is 7,476 sf, supports about 3,800 sf across 2 units. We need 5,000+. The max I'd pay on this lot is $854,000. -Prashant</p></div>
+</div>
+</div>
 </section>
 
-<!-- ============================ 6. FAQ ============================ -->
-<section class="sec band" id="faq" aria-labelledby="faq-h">
-  <div class="wrap">
-    <div class="sec-head">
-      <p class="eyebrow">Questions</p>
-      <h2 class="display" id="faq-h">Short <em>answers.</em></h2>
-    </div>
-    <div class="faq">
-      <div class="faq-item">
-        <h3>Do you pay referral fees?</h3>
-        <p>The listing is the fee. You get paid on the sides above. If you want a referral agreement, ask. Prashant handles those.</p>
-      </div>
-      <div class="faq-item">
-        <h3>Do you buy outside those ZIPs?</h3>
-        <p>We screen everything you send. We buy where new builds clear $650 a foot. An address outside those ZIPs can still work. You get the same written answer.</p>
-      </div>
-      <div class="faq-item">
-        <h3>How fast do you close?</h3>
-        <!-- PLACEHOLDER: the owner has not given a closing time. Nothing is invented here. Replace the whole span. -->
-        <p>As soon as 15 days.</p>
-        <!-- SOURCE: the owner, in chat. 10/15 6:40 PM: "we can close as soon as 15 days." -->
-      </div>
-      <div class="faq-item">
-        <h3>Who is behind Acquiro?</h3>
-        <!-- SOURCE: the owner's brief names the link text and the href. buyer.html is UNPUBLISHED (not in SITE_FILES in scripts/publish_site.py), so this href is a dead link until it goes up. The two facts here (Avivo Homes buys the lot and builds the homes; Prashant Vanka owns it) are the ones buyer.html already carries from the Company Brain. -->
-        <p>Avivo Homes. It buys the lot and builds the homes. Prashant Vanka owns it. Read about <a href="buyer.html">the buyer behind the desk</a>.</p>
-      </div>
-    </div>
-  </div>
+<section class="sec rule" id="faq">
+<div class="wrap">
+<h2 class="h2">Questions</h2>
+<div class="faq one">
+<details class="q" open><summary><h3>How fast do you close?</h3></summary><p>As few as 15 days.</p></details>
+<details class="q" open><summary><h3>Who is behind Acquiro?</h3></summary><p>Avivo Homes. It buys the lot and builds the homes. Prashant Vanka owns it.</p></details>
+</div>
+</div>
+</section>
+
+<section class="sec rule">
+<div class="wrap cta-row">
+<h2 class="h2 close">Bring us the lot. <span class="acc">Send one address.</span></h2>
+<div class="btns">
+<a class="btn btn-solid" href="submit.html">Send a deal</a>
+<a class="btn btn-line" href="sms:+15128661988">Text (512) 866-1988</a>
+</div>
+</div>
 </section>
 
 </main>
 
 <footer class="foot">
-  <div class="wrap">
-    <p>Acquiro &middot; Austin, Texas</p>
-  </div>
+<div class="in">
+<a class="brand" href="index.html">Acquiro</a>
+<nav aria-label="Footer">
+<a href="index.html">Home</a>
+<a href="submit.html">Send a deal</a>
+<a href="sms:+15128661988">Text (512) 866-1988</a>
+<a href="mailto:prashant+deals@avivo.homes">prashant+deals@avivo.homes</a>
+</nav>
+</div>
 </footer>
 </body>
 </html>
