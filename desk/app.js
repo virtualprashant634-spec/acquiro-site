@@ -470,6 +470,75 @@ function hurdlesOf(screen) {
 }
 // the number the seller-facing max price is: the lowest across every configured test (max_price_for_600k is the same number under its old name)
 function maxPrice(screen) { var v = num(screen.max_price_for_buy_box); return v != null ? v : num(screen.max_price_for_600k); }
+
+// Owner rule 2026-10-16 6:10 PM CDT: never quote or offer a price above the asking price. The worker proposes an offer draft at min(max, ask)
+// (src/acquiro/decisions.py propose_price, packs/offer.yaml price.cap_at_ask); these helpers do the same on the page. The owner's own views keep the real max.
+function knownAsk(d) { var a = num(obj(d).ask_price); return a != null && a > 0 ? a : null; }       // the asking price when there is one above zero, else null
+// The price an offer starts at. bound: 'ask' (our max is at or above the ask, so the ask caps it), 'buy_box' (our max, under the ask or with no ask on file),
+// null (the screen priced nothing: the owner types the price). A price set by the max is that max rounded DOWN to $1,000 (never above it).
+function proposePrice(screen, askPrice) {
+  var top = maxPrice(obj(screen)), ask = num(askPrice);
+  ask = ask != null && ask > 0 ? ask : null;
+  if (top == null || !(top > 0)) return { price: null, bound: null, ask: ask, max: null };
+  if (ask != null && top >= ask) return { price: Math.round(ask), bound: 'ask', ask: ask, max: top };
+  var floor = Math.floor(top / 1000) * 1000;
+  return { price: floor > 0 ? floor : null, bound: 'buy_box', ask: ask, max: top };
+}
+// the line under the offer price box: which number the box starts at, and when the owner has typed another, what the desk would have started at
+function priceCaption(prop, typed) {
+  if (typed == null || prop.price == null) return '';
+  if (typed !== prop.price) return 'Your number. The desk would start at ' + usd(prop.price) + ' (' + (prop.bound === 'ask' ? 'at the ask' : 'at our max') + ').';
+  if (prop.bound === 'ask') return 'At the ask. Our max for your buy box is ' + usdK(prop.max) + ', which is higher, so their ' + usd(prop.ask) + ' ask is the cap.';
+  return prop.ask != null ? 'At our max for your buy box, which is under their ' + usd(prop.ask) + ' ask.' : 'At our max for your buy box. There is no ask on file to cap it.';
+}
+// one line for a price typed above the ask; never blocks
+function aboveAskWarning(typed, ask) { return ask != null && typed != null && typed > ask ? 'Above their ' + usd(ask) + ' ask' : ''; }
+// How an offer draft's price was set, in the owner's words, from facts.offer.bound ('ask', 'buy_box' or 'owner'). The page always sends the price it showed, so a
+// draft made from the sheet reads 'owner'; say when that number is the ask. null when there is nothing to say.
+function offerPriceWords(offer, d) {
+  var b = String(offer.bound || ''), p = num(offer.price), ask = knownAsk(d);
+  if (b === 'ask') return 'at the ask';
+  if (b === 'buy_box') return 'at our max for your buy box';
+  if (b !== 'owner') return null;                                  // a draft from before the field existed says nothing about how it was priced
+  return 'a price you picked' + (p == null || ask == null ? '' : p === Math.round(ask) ? ', at the ask' : p > ask ? ', above the ask' : '');
+}
+// The owner-only warning for an offer draft priced over the ask: the worker's own line (facts.offer.warning, the same words its action result carries), else the
+// action result's above_ask flag, else the numbers themselves.
+function offerWarning(d) {
+  var offer = obj(obj(d.facts).offer), a = latest(d.id, 'offer'), r = a && a.status === 'done' ? obj(a.result) : {};
+  var line = String(offer.warning || '').trim();
+  if (line) return line;
+  var ask = knownAsk(d), p = num(offer.price) != null ? num(offer.price) : num(r.price);
+  var above = offer.above_ask === true || r.above_ask === true || (ask != null && p != null && p > ask);
+  return above ? (ask != null ? 'Above their ' + usd(ask) + ' ask' : 'Above their ask') : null;
+}
+// The stored reply bullets as the owner may hand-text them. A bullet that quotes "the max I'd pay is $X" with X at or above the deal's ask (stored before the
+// ask cap, src/acquiro/verdict.py guard_bullets) is re-worded: a Review says the numbers work at the ask, anything else says it does not fit. {list, reworded}.
+var QUOTED_MAX = /max I['\u2019]d pay is \$(\d(?:[\d,]*\d)?)/gi;      // 'Max' too: a compressed text rebuilt from its key numbers starts the clause with a capital
+function quotesMaxOverAsk(text, ask) {
+  if (ask == null) return false;
+  var re = new RegExp(QUOTED_MAX.source, QUOTED_MAX.flags), m;       // a fresh copy: a global regex keeps its place between calls
+  while ((m = re.exec(String(text)))) if (Number(m[1].replace(/,/g, '')) >= ask) return true;
+  return false;
+}
+// what stands in for the number: a Review says the numbers work at the ask; anything else says it does not fit (the gates' reason is the worker's to give)
+function askCapLine(d) { return verdictOf(d) === 'review' ? 'At the ' + usdK(knownAsk(d)) + ' ask the numbers work for us. I\'d like to talk.' : 'This one doesn\'t fit for us.'; }
+function replyBullets(d) {
+  var list = arr(d.reply_bullets).map(String).filter(function (b) { return b.trim(); }), ask = knownAsk(d), n = 0, line = askCapLine(d);
+  list = list.map(function (b) { if (!quotesMaxOverAsk(b, ask)) return b; n++; return line; });
+  return { list: list, reworded: n };
+}
+// A stored text for hand-texting (facts.sms_in ack / feedback text, built from the bullets): the sentence that quotes the max is swapped for the same line. {text, reworded}.
+function guardText(text, d) {
+  var s = String(text == null ? '' : text), ask = knownAsk(d), n = 0, line = askCapLine(d);
+  if (!quotesMaxOverAsk(s, ask)) return { text: s, reworded: 0 };
+  var out = (s.match(/[^.!?]*[.!?]+\s*|[^.!?]+$/g) || [s]).map(function (c) {
+    if (!quotesMaxOverAsk(c, ask)) return c;
+    n++; return line + /\s*$/.exec(c)[0];
+  }).join('');
+  return { text: out, reworded: n };
+}
+var REWORDED_NOTE = 'stored bullet re-worded (ask cap)';
 // which test set that max price, in words
 function bindingWords(screen) {
   var b = screen.max_price_binding_test, hz = hurdlesOf(screen);
@@ -701,9 +770,9 @@ function moneyBlock(d) {
 }
 
 function outcomeBlock(d) {
-  var v = verdictOf(d), bullets = arr(d.reply_bullets).map(String).filter(function (b) { return b.trim(); });
+  var v = verdictOf(d), rb = replyBullets(d), bullets = rb.list;
   var kids = [], draft = String(d.reply_draft_id || '').trim(), inquire = safeUrl(d.inquire_url);
-  var quote = bullets.length ? h('blockquote', null, h('ul', null, bullets.map(function (b) { return h('li', null, b); }))) : null;
+  var quote = bullets.length ? h('blockquote', null, h('ul', null, bullets.map(function (b) { return h('li', null, b); })), rb.reworded ? h('p', { class: 'fine' }, REWORDED_NOTE) : null) : null;
   if (replied(d)) {
     kids.push(d.status === 'bounced' ? chip('bad', 'Replied · bounced') : chip('ok', d.sent_at ? 'Replied · sent ' + fmtCT(d.sent_at) : 'Replied'), quote);
   } else if (v === 'review') {
@@ -726,9 +795,10 @@ function draftLink(id) {
 // sender gave us, the numbers texted and emailed back. A text Close would not send yet (A2P 10DLC) is stored on the deal to send by hand.
 var SKIP_WORDS = { opt_out: 'they opted out', personal_number: 'a personal number' };
 function textTalk(d) {
-  var sms = obj(obj(d.facts).sms_in), ack = obj(sms.ack), fb = obj(sms.feedback), fs = obj(fb.sms), fe = obj(fb.email);
+  var sms = obj(obj(d.facts).sms_in), ack = Object.assign({}, obj(sms.ack)), fb = obj(sms.feedback), fs = Object.assign({}, obj(fb.sms)), fe = obj(fb.email), reworded = 0;
+  [ack, fs].forEach(function (a) { if (a.text == null) return; var g = guardText(a.text, d); a.text = g.text; reworded += g.reworded; });       // these are copies: the page shows and copies the guarded text, the stored row is not changed
   return {
-    has: !!Object.keys(sms).length, sms: sms, ack: ack, fs: fs, fe: fe,
+    has: !!Object.keys(sms).length, sms: sms, ack: ack, fs: fs, fe: fe, reworded: reworded,
     blocked: ack.status === 'blocked_10dlc' || fs.status === 'blocked_10dlc',
     noLead: ack.status === 'no_lead' || fs.status === 'no_lead',             // waiting for a Close lead: tried again every pass
     close: obj(sms.close), person: obj(sms.person),
@@ -793,6 +863,7 @@ function textBlock(d) {
       t.close.created === true ? h('span', { class: 'fine' }, 'lead created by the desk') : null));
   }
   stored.forEach(function (text) { lines.push(h('blockquote', { class: 'smstext' }, text)); });
+  if (stored.length && t.reworded) lines.push(h('p', { class: 'fine' }, REWORDED_NOTE));
   return lines.length ? h('div', { class: 'smstalk' }, lines) : null;
 }
 function linkRow(d) {
@@ -979,15 +1050,26 @@ function soonSheet(kind, d, label) {
 }
 
 function offerSheet(d) {
-  var s = obj(d.screen), prev = obj(obj(d.facts).offer), max = maxPrice(s), ask = num(d.ask_price);
+  var s = obj(d.screen), prev = obj(obj(d.facts).offer), max = maxPrice(s), ask = num(d.ask_price), prop = proposePrice(s, d.ask_price), cap = knownAsk(d);
   var offerCfg = obj(S.settings.offer), terms = obj(offerCfg.terms), unset = offerCfg.unset || '[set in packs/offer.yaml]';
   var termKeys = arr(offerCfg.order).filter(function (k) { return terms[k]; });
   if (!termKeys.length) termKeys = Object.keys(terms);
   var maxR = max != null && max > 0 ? Math.round(max / 1000) * 1000 : null;       // the same nearest-$1,000 the Review note and the replies quote
-  var price = h('input', { class: 'price', id: 'offer-price', type: 'text', inputmode: 'numeric', autocomplete: 'off', 'aria-label': 'Offer price', value: (num(prev.price) || maxR) ? NF.format(num(prev.price) || maxR) : '' });
+  // starts at min(max, ask); a price from an earlier draft on this deal stands unless it is over the ask
+  var before = num(prev.price), start = before != null && before > 0 && !(cap != null && before > cap) ? before : prop.price;
+  var price = h('input', { class: 'price', id: 'offer-price', type: 'text', inputmode: 'numeric', autocomplete: 'off', 'aria-label': 'Offer price', value: start ? NF.format(start) : '' });
+  var note = h('p', { class: 'fine', id: 'offer-price-note', 'aria-live': 'polite' });
   var warn = h('p', { class: 'warn1', hidden: true }, 'This is above the max price for your buy box.');
+  var askWarn = h('p', { class: 'warn1', id: 'offer-above-ask', role: 'status', hidden: true });
   function parsed() { var v = num(String(price.value).replace(/[^0-9.]/g, '')); return v; }
-  price.addEventListener('input', function () { var v = parsed(); warn.hidden = !(v != null && maxR != null && v > maxR); });
+  function say(el, text) { clear(el).appendChild(document.createTextNode(text)); el.hidden = !text; }
+  function refresh() {
+    var v = parsed();
+    warn.hidden = !(v != null && maxR != null && v > maxR);
+    say(askWarn, aboveAskWarning(v, cap));                      // over the ask is allowed: it warns and does not block
+    say(note, priceCaption(prop, v));
+  }
+  price.addEventListener('input', refresh);
   var fields = {}, termEls = [];
   termKeys.forEach(function (key) {
     var t = obj(terms[key]), opts = arr(t.options), isSet = t.owner_to_set === false, el;
@@ -1010,7 +1092,7 @@ function offerSheet(d) {
       h('div', { class: 'stack' },
         maxR != null ? h('p', null, h('span', { class: 'lbl' }, 'Max price for your buy box'), h('br'), h('b', null, usd(maxR)), h('span', { class: 'muted' }, ' · ' + bindingCaption(s).replace('seller-facing · ', ''))) : h('p', { class: 'muted' }, 'No max price from the screen.'),
         ask != null ? h('p', { class: 'muted' }, 'Their ask: ' + usd(ask)) : null),
-      h('label', null, 'Your offer price', price), warn,
+      h('label', null, 'Your offer price', price), note, askWarn, warn,
       termEls,
       to ? h('p', { class: 'muted' }, to) : h('p', { class: 'warn1' }, 'No agent email on file. The draft will have no recipient. Add the address in Gmail before you approve the send.'),
       h('p', { class: 'fine' }, 'This makes a Gmail draft for you to read. Nothing is sent until you press Approve & send.')
@@ -1025,11 +1107,11 @@ function offerSheet(d) {
       await requestAction('offer', d.id, { price: Math.round(p), terms: tp }, { toast: 'Queued. The Gmail draft appears here in a moment.' });
     } }, 'Queue the offer draft'), h('button', { class: 'btn quiet block', type: 'button', onclick: function () { sheet.close(); } }, 'Cancel')]
   });
-  price.dispatchEvent(new Event('input'));
+  refresh();
 }
 
 function approveSheet(d) {
-  var offer = obj(obj(d.facts).offer), bullets = arr(d.reply_bullets).filter(function (b) { return String(b).trim(); });
+  var offer = obj(obj(d.facts).offer), rb = replyBullets(d), bullets = rb.list;
   var draft = String(d.reply_draft_id || '').trim();
   var body = [h('p', null, 'This sends the Gmail draft for ', h('b', null, titleOf(d)), ' now. You cannot take it back.')];
   body.push(d.agent_email ? h('p', null, 'To: ', h('b', null, (d.agent_name ? d.agent_name + ' ' : '') + d.agent_email)) : h('p', { class: 'warn1' }, 'No agent email on file. If the Gmail draft has no recipient the desk will refuse and tell you.'));
@@ -1037,9 +1119,13 @@ function approveSheet(d) {
     body.push(h('p', { class: 'lbl' }, 'Offer draft'));
     if (offer.subject) body.push(h('p', null, h('b', null, offer.subject)));
     body.push(offer.body ? h('div', { class: 'email' }, offer.body) : h('p', null, 'Offer at ' + usd(offer.price) + '.'));
+    var how = offerPriceWords(offer, d), owner = String(offer.price_note || '').trim(), over = offerWarning(d);    // for you only: none of this is in the email
+    if (num(offer.price) != null) body.push(note1('Price', usd(offer.price) + (how ? ' · ' + how : '')));
+    if (owner) body.push(h('p', { class: 'fine' }, owner));
+    if (over) body.push(h('p', { class: 'warn1' }, over));
     if (arr(offer.unset).length) body.push(h('p', { class: 'warn1' }, 'These terms are not set yet and read "[set in packs/offer.yaml]" in the draft: ' + arr(offer.unset).join(', ') + '. Edit the draft in Gmail first if you want them filled in.'));
   } else if (bullets.length) {
-    body.push(h('p', { class: 'lbl' }, 'The reply'), h('div', { class: 'outcome' }, h('blockquote', null, h('ul', null, bullets.map(function (b) { return h('li', null, String(b)); })))));
+    body.push(h('p', { class: 'lbl' }, 'The reply'), h('div', { class: 'outcome' }, h('blockquote', null, h('ul', null, bullets.map(function (b) { return h('li', null, String(b)); })), rb.reworded ? h('p', { class: 'fine' }, REWORDED_NOTE) : null)));
   }
   body.push(draftLink(draft), h('p', { class: 'fine' }, 'The desk sends it on its next look at the queue, then shows Sent here.'));
   confirmSheet({ title: 'Approve & send', intro: body, confirmLabel: 'Hold to send', hold: true, onConfirm: async function () {
@@ -1424,7 +1510,7 @@ function actionPanel(d, compact) {
   var offerSub = fin ? 'Already replied' : (offerA && (offerA.status === 'queued' || offerA.status === 'running')) ? (offerA.status === 'running' ? 'Making the draft...' : 'Queued · the draft is coming') :
     (offerA && offerA.status === 'failed' && Date.now() - parseDate(offerA.requested_at) < 6 * 3600e3) ? obj(offerA.result).message || 'It did not work.' :
     (offer.draft_id && offer.draft_id === d.reply_draft_id) ? 'Draft ready · ' + usd(offer.price) + ' · tap to revise' :
-    (maxPrice(obj(d.screen)) > 0 ? 'Drafts at up to ' + usdK(maxPrice(obj(d.screen))) : 'Pick a price, get a draft');
+    (function (p) { return p.price == null ? 'Pick a price, get a draft' : p.bound === 'ask' ? 'Drafts at the ask · ' + usd(p.price) : 'Drafts at up to ' + usd(p.price); })(proposePrice(d.screen, d.ask_price));
   var offerBtn = h('button', { class: 'act primary', type: 'button', 'data-kind': 'offer', 'data-s': offerA && !fin ? offerA.status : null,
     onclick: function () {
       if (fin) return toast('This deal is already replied. Make the offer from Gmail.');
