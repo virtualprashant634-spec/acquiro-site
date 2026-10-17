@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; frame-src https://www.youtube-nocookie.com; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' https://github.com https://release-assets.githubusercontent.com https://objects.githubusercontent.com; frame-src https://www.youtube-nocookie.com; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <title>About | Acquiro</title>
 <meta name="description" content="Two minutes from the founder on why I built Acquiro. Every deal gets read and answered with a number, a Review or a Decline.">
 <meta name="theme-color" content="#F6F3EC">
@@ -91,10 +91,10 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,t
 .p-head{grid-area:head}
 .p-vid{grid-area:vid}
 .p-body{grid-area:body;min-width:0}
-.frame{width:100%;max-width:405px;margin:0 auto;aspect-ratio:9/16;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:#15130F}
+.frame{width:100%;max-width:960px;margin:0 auto;aspect-ratio:16/9;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#15130F}
 .frame:has(:focus-visible){outline:3px solid var(--focus);outline-offset:3px}
-.frame iframe{display:block;width:100%;height:100%;border:0;background:#15130F}
-.alt{max-width:405px;margin:4px auto 0;text-align:center}
+.frame iframe,.frame video{display:block;width:100%;height:100%;border:0;background:#15130F}
+.alt{max-width:960px;margin:8px auto 0;text-align:center}
 .story p{max-width:36em;font-size:clamp(18px,1.7vw,20px)}
 .story p+p{margin-top:20px}
 .story .sign{margin-top:28px;font:700 24px/1.2 var(--d);letter-spacing:-.02em}
@@ -102,7 +102,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,t
 .textlink{display:inline-flex;align-items:center;min-height:44px;font-weight:500;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
 .textlink:hover{text-decoration-thickness:2px}
 @media (min-width:900px){
-  .pitch{grid-template-columns:405px minmax(0,1fr);grid-template-areas:"vid head" "vid body";grid-template-rows:auto 1fr;align-items:start;column-gap:clamp(48px,6vw,88px);row-gap:24px}
+  .pitch{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "vid" "body";row-gap:28px}
   .frame{margin:0}
   .alt{margin-left:0;text-align:left}
 }
@@ -130,14 +130,14 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,t
 <div class="wrap">
 <div class="pitch">
 <div class="p-head">
-<p class="eyebrow">Two minutes, from the founder</p>
+<p class="eyebrow">Two and a half minutes: the product tour</p>
 <h1 class="h1">Why I built <span class="acc">Acquiro.</span></h1>
 </div>
 <div class="p-vid">
 <div class="frame">
-<iframe src="https://www.youtube-nocookie.com/embed/hdKLeTcnUmw?rel=0&amp;modestbranding=1&amp;playsinline=1" title="Prashant's two-minute pitch for Acquiro" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" style="width:100%;height:100%;border:0;background:#15130F"></iframe>
+<video controls playsinline preload="metadata" poster="demo-poster.jpg" title="Acquiro product tour, two and a half minutes" style="width:100%;height:100%;border:0;background:#15130F"><source src="https://github.com/virtualprashant634-spec/acquiro-site/releases/download/media-2026-10-16/acquiro-demo.mp4" type="video/mp4">Your browser cannot play this video. <a href="https://github.com/virtualprashant634-spec/acquiro-site/releases/download/media-2026-10-16/acquiro-demo.mp4">Download the tour (MP4)</a>.</video>
 </div>
-<p class="alt"><a class="textlink" href="https://youtu.be/hdKLeTcnUmw">Watch on YouTube</a></p>
+<p class="alt"><a class="textlink" href="https://youtu.be/hdKLeTcnUmw">Watch the founder's two-minute pitch on YouTube</a></p>
 </div>
 <div class="p-body">
 <div class="story">
